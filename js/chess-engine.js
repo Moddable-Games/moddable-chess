@@ -24,7 +24,7 @@ function createGame(variant) {
     checkCount: { w: 0, b: 0 },
     status: 'active',
   };
-  loadFEN(g, variant === 'chess960' ? randomFEN960() : INITIAL_FEN);
+  loadFEN(g, INITIAL_FEN);
   return g;
 }
 

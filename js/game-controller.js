@@ -5,7 +5,6 @@ const container = document.getElementById('board-container');
 const statusEl = document.getElementById('status');
 const movesEl = document.getElementById('moves');
 
-// Inject piece SVG defs
 fetch('assets/pieces.svg')
   .then(r => r.text())
   .then(svg => {
@@ -15,12 +14,12 @@ fetch('assets/pieces.svg')
     init();
   });
 
-let game, selected, legal;
+let game, selected, moveNum;
 
 function init() {
   game = MCE.createGame('standard');
   selected = null;
-  legal = [];
+  moveNum = 1;
   render();
 }
 
@@ -39,10 +38,16 @@ function render() {
 
   const status = MCE.getStatus(game);
   const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
-  if (status === 'checkmate') statusEl.textContent = turn + ' is checkmated!';
-  else if (status === 'stalemate') statusEl.textContent = 'Stalemate — draw';
-  else if (status === 'check') statusEl.textContent = turn + ' to move (check!)';
-  else statusEl.textContent = turn + ' to move';
+  if (status === 'checkmate') {
+    const winner = game.turn === MCE.WHITE ? 'Black' : 'White';
+    statusEl.textContent = 'Checkmate — ' + winner + ' wins!';
+  } else if (status === 'stalemate') {
+    statusEl.textContent = 'Stalemate — draw';
+  } else if (status === 'check') {
+    statusEl.textContent = turn + ' to move (check!)';
+  } else {
+    statusEl.textContent = turn + ' to move';
+  }
 }
 
 function handleClick(sq) {
@@ -50,10 +55,15 @@ function handleClick(sq) {
   const allMoves = MCE.legalMoves(game);
 
   if (selected !== null) {
-    const move = allMoves.find(m => m.from === selected && m.to === sq);
-    if (move) {
+    let candidates = allMoves.filter(m => m.from === selected && m.to === sq);
+    if (candidates.length > 1) {
+      candidates = candidates.filter(m => m.promo === 'q');
+    }
+    if (candidates.length > 0) {
+      const move = candidates[0];
+      const side = game.turn;
       MCE.makeMove(game, move);
-      addMoveToList(move);
+      addMoveToList(move, side);
       selected = null;
       render();
       return;
@@ -68,16 +78,15 @@ function handleClick(sq) {
   render();
 }
 
-function addMoveToList(move) {
+function addMoveToList(move, side) {
   const from = MCE.sqToAlgebraic(move.from);
   const to = MCE.sqToAlgebraic(move.to);
-  const piece = game.board[move.to] || '';
-  const num = Math.ceil(game.fullmove);
-  const dot = game.turn === MCE.WHITE ? '...' : '.';
+  const prefix = side === MCE.WHITE ? moveNum + '. ' : moveNum + '... ';
   const entry = document.createElement('div');
-  entry.textContent = num + dot + ' ' + from + to + (move.promo || '');
+  entry.textContent = prefix + from + to + (move.promo || '');
   movesEl.appendChild(entry);
   movesEl.scrollTop = movesEl.scrollHeight;
+  if (side === MCE.BLACK) moveNum++;
 }
 
 })();

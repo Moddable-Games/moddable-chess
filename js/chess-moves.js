@@ -149,10 +149,10 @@ function attacks(g, from, target, piece) {
 
 function legalMoves(g) {
   return pseudoLegalMoves(g).filter(m => {
-    const undo = makeMove(g, m);
+    const undo = MCE.makeMove(g, m);
     const opp = g.turn === WHITE ? BLACK : WHITE;
     const legal = !inCheck(g, opp);
-    unmakeMove(g, undo);
+    MCE.unmakeMove(g, undo);
     return legal;
   });
 }
