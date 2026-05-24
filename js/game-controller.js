@@ -27,6 +27,11 @@ function renderPicker() {
     ['antichess', 'Antichess'],
     ['racingKings', 'Racing Kings'],
     ['chess960', 'Fischer Random'],
+    ['rifle', 'Rifle Chess'],
+    ['atomic', 'Atomic'],
+    ['marseillais', 'Marseillais'],
+    ['duckChess', 'Duck Chess'],
+    ['fogOfWar', 'Fog of War'],
   ];
   variants.forEach(([key, label]) => {
     const btn = document.createElement('button');
@@ -40,12 +45,8 @@ function renderPicker() {
 function startGame(variant) {
   currentVariant = variant;
   game = MCE.createGame(variant);
-  if (variant === 'chess960') {
-    MCE.loadFEN(game, MCE.randomFEN960());
-  }
-  if (variant === 'racingKings') {
-    MCE.loadFEN(game, '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1');
-  }
+  if (variant === 'chess960') MCE.loadFEN(game, MCE.randomFEN960());
+  if (variant === 'racingKings') MCE.loadFEN(game, '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1');
   selected = null;
   moveNum = 1;
   movesEl.innerHTML = '';
@@ -54,44 +55,68 @@ function startGame(variant) {
 }
 
 function render() {
-  const allMoves = getMovesForVariant();
-  const movesForSelected = selected !== null
-    ? allMoves.filter(m => m.from === selected)
-    : [];
-
-  MCE.renderBoard(container, game, {
+  const opts = {
     size: 480,
     selected: selected,
-    legalMoves: movesForSelected,
+    legalMoves: [],
     onSquareClick: handleClick,
-  });
+    fogMask: null,
+    duckSq: game.duckSq >= 0 ? game.duckSq : null,
+  };
 
+  if (game.duckPhase) {
+    opts.legalMoves = [];
+  } else {
+    const allMoves = getMovesForVariant();
+    opts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
+  }
+
+  if (currentVariant === 'fogOfWar') {
+    opts.fogMask = computeVisibility(game, game.turn);
+  }
+
+  MCE.renderBoard(container, game, opts);
   updateStatus();
 }
 
+function computeVisibility(g, side) {
+  const visible = new Set();
+  for (let i = 0; i < 64; i++) {
+    const p = g.board[i];
+    if (!p || MCE.pieceColor(p) !== side) continue;
+    visible.add(i);
+    const moves = MCE.pseudoLegalMoves({ ...g, turn: side });
+    moves.filter(m => m.from === i).forEach(m => visible.add(m.to));
+  }
+  return visible;
+}
+
 function getMovesForVariant() {
-  if (MCE.variantLegalMoves && (currentVariant === 'antichess' || currentVariant === 'racingKings')) {
+  if (currentVariant === 'antichess' || currentVariant === 'racingKings') {
     return MCE.variantLegalMoves(game);
   }
   return MCE.legalMoves(game);
 }
 
 function updateStatus() {
+  if (game.duckPhase) {
+    const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
+    statusEl.textContent = turn + ' — place the duck';
+    return;
+  }
+
   const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
   if (variantStatus) {
     if (variantStatus.startsWith('koth-')) {
-      const w = variantStatus === 'koth-w' ? 'White' : 'Black';
-      statusEl.textContent = w + ' wins — King of the Hill!';
+      statusEl.textContent = (variantStatus === 'koth-w' ? 'White' : 'Black') + ' wins — King of the Hill!';
       return;
     }
     if (variantStatus.startsWith('race-')) {
-      const w = variantStatus === 'race-w' ? 'White' : 'Black';
-      statusEl.textContent = w + ' wins — reached rank 8!';
+      statusEl.textContent = (variantStatus === 'race-w' ? 'White' : 'Black') + ' wins — reached rank 8!';
       return;
     }
     if (variantStatus.startsWith('antichess-')) {
-      const w = variantStatus === 'antichess-w' ? 'White' : 'Black';
-      statusEl.textContent = w + ' wins — lost all pieces!';
+      statusEl.textContent = (variantStatus === 'antichess-w' ? 'White' : 'Black') + ' wins — lost all pieces!';
       return;
     }
   }
@@ -99,8 +124,7 @@ function updateStatus() {
   const status = MCE.getStatus(game);
   const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
   if (status === 'checkmate') {
-    const winner = game.turn === MCE.WHITE ? 'Black' : 'White';
-    statusEl.textContent = 'Checkmate — ' + winner + ' wins!';
+    statusEl.textContent = 'Checkmate — ' + (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins!';
   } else if (status === 'stalemate') {
     statusEl.textContent = 'Stalemate — draw';
   } else if (status === 'check') {
@@ -108,24 +132,37 @@ function updateStatus() {
     if (currentVariant === 'threeCheck') {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= 3) {
-        const winner = game.turn === MCE.WHITE ? 'Black' : 'White';
-        statusEl.textContent = winner + ' wins — Three checks!';
+        statusEl.textContent = (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins — Three checks!';
       }
     }
+  } else if (currentVariant === 'marseillais' && game.movesThisTurn === 1) {
+    statusEl.textContent = turn + ' — second move';
   } else {
     statusEl.textContent = turn + ' to move';
   }
 }
 
 function handleClick(sq) {
+  if (game.duckPhase) {
+    if (!game.board[sq] && sq !== game.duckSq) {
+      const oldDuck = game.duckSq;
+      game.duckSq = sq;
+      game.duckPhase = false;
+      if (game.turn === MCE.BLACK) game.fullmove++;
+      game.turn = game.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
+      selected = null;
+      render();
+      return;
+    }
+    return;
+  }
+
   const piece = game.board[sq];
   const allMoves = getMovesForVariant();
 
   if (selected !== null) {
     let candidates = allMoves.filter(m => m.from === selected && m.to === sq);
-    if (candidates.length > 1) {
-      candidates = candidates.filter(m => m.promo === 'q');
-    }
+    if (candidates.length > 1) candidates = candidates.filter(m => m.promo === 'q');
     if (candidates.length > 0) {
       const move = candidates[0];
       const side = game.turn;

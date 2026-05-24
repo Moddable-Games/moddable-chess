@@ -75,10 +75,29 @@ function renderBoard(container, game, opts) {
     }
   }
 
+  // Draw fog overlay (darken hidden squares)
+  const fogMask = opts.fogMask || null;
+  if (fogMask) {
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const dr = flipped ? 7 - r : r;
+        const dc = flipped ? 7 - c : c;
+        const sqIdx = sq(dr, dc);
+        if (!fogMask.has(sqIdx)) {
+          svg.appendChild(svgEl('rect', {
+            x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize,
+            fill: 'rgba(0,0,0,0.6)',
+          }));
+        }
+      }
+    }
+  }
+
   // Draw pieces
   for (let i = 0; i < 64; i++) {
     const p = game.board[i];
     if (!p) continue;
+    if (fogMask && !fogMask.has(i)) continue;
     const [pr, pc] = rc(i);
     const dr = flipped ? 7 - pr : pr;
     const dc = flipped ? 7 - pc : pc;
@@ -91,6 +110,25 @@ function renderBoard(container, game, opts) {
       x, y, width: pieceSize, height: pieceSize,
     });
     svg.appendChild(use);
+  }
+
+  // Draw duck
+  const duckSq = opts.duckSq;
+  if (duckSq !== null && duckSq !== undefined && duckSq >= 0) {
+    const [dr2, dc2] = rc(duckSq);
+    const ddr = flipped ? 7 - dr2 : dr2;
+    const ddc = flipped ? 7 - dc2 : dc2;
+    const cx = ddc * tileSize + tileSize / 2;
+    const cy = ddr * tileSize + tileSize / 2;
+    svg.appendChild(svgEl('circle', {
+      cx, cy, r: tileSize * 0.35,
+      fill: '#f5c542', stroke: '#b8860b', 'stroke-width': 2,
+    }));
+    const txt = svgEl('text', {
+      x: cx, y: cy + 5, 'text-anchor': 'middle', 'font-size': tileSize * 0.3, fill: '#6b4c00',
+    });
+    txt.textContent = '🦆';
+    svg.appendChild(txt);
   }
 
   // Click handler

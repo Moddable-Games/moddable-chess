@@ -22,6 +22,9 @@ function createGame(variant) {
     history: [],
     variant: variant || 'standard',
     checkCount: { w: 0, b: 0 },
+    movesThisTurn: 0,
+    duckSq: -1,
+    duckPhase: false,
     status: 'active',
   };
   loadFEN(g, INITIAL_FEN);
