@@ -95,6 +95,8 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-24
+- Unify site branding: Moddable Games cube logo, Rajdhani/Barlow fonts, consistent nav + footer across all pages
+- Add docs UX: sticky sidebar TOC, active page highlighting, improved layout
 - Add move animation system: `animate`, `animStyle` ('slide' or 'arc'), `animDuration`, `animCaptureBurst` as renderer params
 - Add capture burst particle effect (expanding ring + sparks)
 - Deploy to GitHub Pages with custom domain (chess.moddable.games)
