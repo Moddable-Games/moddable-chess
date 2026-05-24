@@ -14,7 +14,7 @@ const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const VARIANT_BOARDS = {
   capablanca: { rows: 8, cols: 10, fen: 'rnabqkbcnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNABQKBCNR w KQkq - 0 1' },
   grand: { rows: 10, cols: 10, fen: 'r8r/1nbqkcbn1/pppppppppp/10/10/10/10/PPPPPPPPPP/1NBQKCBN1/R8R w - - 0 1' },
-  courier: { rows: 8, cols: 12, fen: 'rnbcqkscbnr1/pppppppppppp/12/12/12/12/PPPPPPPPPPPP/RNBCQKSCBNR1 w - - 0 1' },
+  courier: { rows: 8, cols: 12, fen: 'rnbbqsksbbnr/pppppppppppp/12/12/12/12/PPPPPPPPPPPP/RNBBQSKSBBNR w - - 0 1' },
 };
 
 function createGame(variant) {
