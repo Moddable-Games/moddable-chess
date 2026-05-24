@@ -44,7 +44,7 @@ function startGame(variant) {
     MCE.loadFEN(game, MCE.randomFEN960());
   }
   if (variant === 'racingKings') {
-    MCE.loadFEN(game, 'qnnbbrkr/8/8/8/8/8/8/QNNBBRKR w - - 0 1');
+    MCE.loadFEN(game, '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1');
   }
   selected = null;
   moveNum = 1;
