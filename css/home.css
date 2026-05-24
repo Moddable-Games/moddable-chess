@@ -241,3 +241,22 @@ a { color: inherit; text-decoration: none; }
 .mc-footer a {
   color: var(--mc-glow);
 }
+
+/* Responsive: very small screens */
+@media (max-width: 400px) {
+  .mc-variants__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mc-hero {
+    padding: 80px 16px 60px;
+  }
+
+  .mc-variants {
+    padding: 60px 16px;
+  }
+
+  .mc-dev {
+    padding: 60px 16px;
+  }
+}

@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Documentation — Moddable Chess</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>♟</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="Documentation — Moddable Chess">
+<meta property="og:description" content="Integration guide and architecture overview for the Moddable Chess engine.">
+<meta property="og:url" content="https://moddable-games.github.io/moddable-chess/docs/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Documentation — Moddable Chess">
+<meta name="twitter:description" content="Integration guide and architecture overview for the Moddable Chess engine.">
 <link rel="stylesheet" href="../css/docs.css">
 </head>
 <body>
@@ -47,7 +56,7 @@ MCE.renderBoard(document.getElementById('board'), game, {<br>
     <tr><th>File</th><th>Exports</th><th>Purpose</th></tr>
     <tr><td><code>chess-engine.js</code></td><td>MCE core</td><td>Board state, FEN, coordinate helpers, game creation</td></tr>
     <tr><td><code>chess-moves.js</code></td><td>pseudoLegalMoves, legalMoves, inCheck</td><td>Move generation for all piece types</td></tr>
-    <tr><td><code>chess-play.js</code></td><td>makeMove, unmakeMove, getStatus</td><td>Move execution, undo, game state detection</td></tr>
+    <tr><td><code>chess-play.js</code></td><td>makeMove, unmakeMove, getStatus</td><td>Move execution, undo, game state and draw detection (threefold repetition, insufficient material, 50-move rule)</td></tr>
     <tr><td><code>chess-variants.js</code></td><td>VARIANTS, getVariantStatus, variantLegalMoves</td><td>Variant-specific rule overrides</td></tr>
     <tr><td><code>board-renderer.js</code></td><td>renderBoard</td><td>SVG board rendering with click handling</td></tr>
   </table>

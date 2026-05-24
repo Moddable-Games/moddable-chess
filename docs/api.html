@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>API Reference — Moddable Chess</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>♟</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="API Reference — Moddable Chess">
+<meta property="og:description" content="Complete API reference for all MCE namespace methods.">
+<meta property="og:url" content="https://moddable-games.github.io/moddable-chess/docs/api.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="API Reference — Moddable Chess">
+<meta name="twitter:description" content="Complete API reference for all MCE namespace methods.">
 <link rel="stylesheet" href="../css/docs.css">
 </head>
 <body>
@@ -38,6 +47,13 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board
   <h3>MCE.toFEN(game)</h3>
   <p>Exports the current game state as a FEN string.</p>
 
+  <h3>MCE.positionKey(game)</h3>
+  <p>Returns a string key representing the current position (board + turn + castling + en passant) for repetition detection. Excludes halfmove and fullmove counters.</p>
+  <div class="docs-code">
+const key = MCE.positionKey(game);<br>
+// e.g. "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3"
+  </div>
+
   <h2>Move Generation</h2>
 
   <h3>MCE.legalMoves(game)</h3>
@@ -68,7 +84,19 @@ const undo = MCE.makeMove(game, move);<br>
   <h2>Status Detection</h2>
 
   <h3>MCE.getStatus(game)</h3>
-  <p>Returns: <code>'active'</code>, <code>'check'</code>, <code>'checkmate'</code>, <code>'stalemate'</code>, or <code>'draw-50'</code>.</p>
+  <p>Returns: <code>'active'</code>, <code>'check'</code>, <code>'checkmate'</code>, <code>'stalemate'</code>, <code>'draw-repetition'</code>, <code>'draw-material'</code>, or <code>'draw-50'</code>.</p>
+  <p>Draw conditions:</p>
+  <ul>
+    <li><code>'draw-repetition'</code> — threefold repetition detected (same position reached three times)</li>
+    <li><code>'draw-material'</code> — insufficient material (K vs K, K+B vs K, K+N vs K, K+B vs K+B same colour)</li>
+    <li><code>'draw-50'</code> — 50-move rule (100 half-moves without a pawn move or capture)</li>
+  </ul>
+
+  <h3>Game object properties</h3>
+  <p>In addition to the properties returned by <code>createGame</code>, the game object tracks:</p>
+  <ul>
+    <li><code>positionHistory</code> — array of position keys (one per half-move), used for threefold repetition detection. Updated automatically by <code>makeMove</code>.</li>
+  </ul>
 
   <h3>MCE.getVariantStatus(game)</h3>
   <p>Checks variant-specific win conditions. Returns <code>null</code> if no variant win, or a string like <code>'koth-w'</code>, <code>'race-b'</code>, <code>'antichess-w'</code>.</p>
@@ -106,6 +134,7 @@ MCE.renderBoard(el, game, {<br>
 &nbsp;&nbsp;onSquareClick: fn, // callback(squareIndex)<br>
 &nbsp;&nbsp;fogMask: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Set of visible square indices (Fog of War)<br>
 &nbsp;&nbsp;duckSq: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// duck position index (Duck Chess)<br>
+&nbsp;&nbsp;lastMove: null,&nbsp;&nbsp;&nbsp;&nbsp;// { from, to } — highlights last move squares<br>
 });
   </div>
 
