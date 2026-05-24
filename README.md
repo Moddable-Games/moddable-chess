@@ -95,6 +95,13 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-24
+- Add promotion UI dialog with piece selection (Q/R/B/N, plus A/C for Capablanca/Grand)
+- Add draw detection: threefold repetition, insufficient material, improved 50-move rule messaging
+- Add board controls: flip board, undo move, new game
+- Add last-move highlight (blue overlay on from/to squares)
+- Add captured pieces display (sorted by value, grouped by color)
+- Fix board shift bug — container dimensions now locked between re-renders
+- Refactor play page CSS to use custom properties
 - Engine extensions for Dungeon Chess support: terrain system, config-based game creation, custom piece registry, multi-player turns, pluggable legality/win conditions, per-square metadata, feature flags (noCastling/noEnPassant/noPromotion), capturedAt in undo descriptor
 - Add AI opponent with Solo / Pass & Play mode selection
 - Extract inline script to external `js/home.js` backed by `data/variants.json`

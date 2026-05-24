@@ -144,6 +144,7 @@ function makeMove(g, move) {
   }
 
   g.history.push(move);
+  g.positionHistory.push(MCE.positionKey(g));
   return undo;
 }
 
@@ -198,6 +199,7 @@ function unmakeMove(g, undo) {
   if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
   if (undo.duckPhase !== undefined) g.duckPhase = undo.duckPhase;
   g.history.pop();
+  g.positionHistory.pop();
 }
 
 function updateCastlingRights(g, from, to, piece) {
@@ -214,12 +216,63 @@ function updateCastlingRights(g, from, to, piece) {
   if (from === bRookQ || to === bRookQ) g.castling.q = false;
 }
 
+const REPETITION_SKIP_VARIANTS = new Set([
+  'duckChess', 'fogOfWar', 'atomic'
+]);
+
+function threefoldRepetition(g) {
+  if (REPETITION_SKIP_VARIANTS.has(g.variant)) return false;
+  const current = g.positionHistory[g.positionHistory.length - 1];
+  let count = 0;
+  for (let i = 0; i < g.positionHistory.length; i++) {
+    if (g.positionHistory[i] === current) {
+      count++;
+      if (count >= 3) return true;
+    }
+  }
+  return false;
+}
+
+function insufficientMaterial(g) {
+  if (REPETITION_SKIP_VARIANTS.has(g.variant)) return false;
+  if (g.rows !== 8 || g.cols !== 8) return false;
+
+  const pieces = { w: [], b: [] };
+  const total = g.rows * g.cols;
+  for (let i = 0; i < total; i++) {
+    const p = g.board[i];
+    if (!p) continue;
+    const color = MCE.pieceColor(p);
+    const type = MCE.pieceType(p);
+    if (type !== 'k') {
+      pieces[color].push({ type: type, sq: i });
+    }
+  }
+
+  const wp = pieces[WHITE];
+  const bp = pieces[BLACK];
+
+  if (wp.length === 0 && bp.length === 0) return true;
+  if (wp.length === 0 && bp.length === 1 && (bp[0].type === 'b' || bp[0].type === 'n')) return true;
+  if (bp.length === 0 && wp.length === 1 && (wp[0].type === 'b' || wp[0].type === 'n')) return true;
+
+  if (wp.length === 1 && bp.length === 1 && wp[0].type === 'b' && bp[0].type === 'b') {
+    const [wr, wc] = MCE.rc(wp[0].sq, g);
+    const [br, bc] = MCE.rc(bp[0].sq, g);
+    if ((wr + wc) % 2 === (br + bc) % 2) return true;
+  }
+
+  return false;
+}
+
 function getStatus(g) {
   if (g.winCondition) return g.winCondition(g);
   const moves = legalMoves(g);
   if (moves.length === 0) {
     return inCheck(g, g.turn) ? 'checkmate' : 'stalemate';
   }
+  if (threefoldRepetition(g)) return 'draw-repetition';
+  if (insufficientMaterial(g)) return 'draw-material';
   if (g.halfmove >= 100) return 'draw-50';
   if (inCheck(g, g.turn)) return 'check';
   return 'active';

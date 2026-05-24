@@ -42,6 +42,7 @@ function createGame(config) {
     halfmove: 0,
     fullmove: 1,
     history: [],
+    positionHistory: [],
     variant: config.variant || null,
     checkCount: { w: 0, b: 0 },
     movesThisTurn: 0,
@@ -56,6 +57,7 @@ function createGame(config) {
     winCondition: null,
   };
   if (config.fen) loadFEN(g, config.fen);
+  g.positionHistory.push(positionKey(g));
   return g;
 }
 
@@ -79,6 +81,7 @@ function createVariantGame(variant) {
     halfmove: 0,
     fullmove: 1,
     history: [],
+    positionHistory: [],
     variant: variant || 'standard',
     checkCount: { w: 0, b: 0 },
     movesThisTurn: 0,
@@ -93,6 +96,7 @@ function createVariantGame(variant) {
   };
   const fen = vb ? vb.fen : INITIAL_FEN;
   loadFEN(g, fen);
+  g.positionHistory.push(positionKey(g));
   return g;
 }
 
@@ -236,5 +240,11 @@ function sqToAlgebraic(i, g) {
   return String.fromCharCode(97 + c) + (rows - r);
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
+function positionKey(g) {
+  const fen = toFEN(g);
+  const parts = fen.split(' ');
+  return parts.slice(0, 4).join(' ');
+}
+
+return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
 })();

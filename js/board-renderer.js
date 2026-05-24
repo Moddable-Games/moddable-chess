@@ -10,6 +10,7 @@ const SVGns = 'http://www.w3.org/2000/svg';
 const LIGHT_SQ = '#f0d9b5';
 const DARK_SQ = '#b58863';
 const HIGHLIGHT = 'rgba(255, 255, 0, 0.4)';
+const LAST_MOVE = 'rgba(100, 180, 255, 0.3)';
 const MOVE_DOT = 'rgba(0, 0, 0, 0.2)';
 const CAPTURE_RING = 'rgba(0, 0, 0, 0.2)';
 
@@ -28,6 +29,7 @@ function renderBoard(container, game, opts) {
   const height = tileSize * rows;
   const flipped = opts.flipped || false;
   const selected = opts.selected;
+  const lastMove = opts.lastMove || null;
   const legalMoves = opts.legalMoves || [];
   const onSquareClick = opts.onSquareClick;
 
@@ -48,6 +50,12 @@ function renderBoard(container, game, opts) {
         fill: isLight ? LIGHT_SQ : DARK_SQ,
       });
       svg.appendChild(rect);
+
+      if (lastMove && (sqIdx === lastMove.from || sqIdx === lastMove.to)) {
+        svg.appendChild(svgEl('rect', {
+          x, y, width: tileSize, height: tileSize, fill: LAST_MOVE,
+        }));
+      }
 
       if (sqIdx === selected) {
         svg.appendChild(svgEl('rect', {
