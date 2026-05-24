@@ -19,49 +19,7 @@ p, li { text-wrap: pretty; line-height: 1.7; }
 a { color: var(--mc-blue); }
 code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; }
 
-/* Nav bar */
-.docs-nav {
-  background: var(--mc-deep);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.docs-nav__logo {
-  font-family: 'Inter Tight', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: #fff;
-  text-decoration: none;
-  padding: 16px 0;
-  margin-right: 32px;
-}
-
-.docs-nav__links {
-  display: flex;
-  gap: 0;
-}
-
-.docs-nav__links a {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.6);
-  text-decoration: none;
-  padding: 16px 16px;
-  border-bottom: 2px solid transparent;
-  transition: color 120ms, border-color 120ms;
-}
-
-.docs-nav__links a:hover { color: #fff; }
-
-.docs-nav__links a.active {
-  color: #fff;
-  border-bottom-color: var(--mc-glow);
-}
+/* Nav handled by shared.css */
 
 /* Layout: sidebar TOC + main content */
 .docs-layout {

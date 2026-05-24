@@ -229,18 +229,7 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 32px;
 }
 
-.mc-footer {
-  background: #000;
-  padding: 40px 24px;
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.mc-footer a {
-  color: var(--mc-glow);
-}
+/* Footer handled by shared.css (.site-footer) */
 
 /* Responsive: very small screens */
 @media (max-width: 400px) {

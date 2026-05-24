@@ -19,11 +19,6 @@
 body { font-family: system-ui, sans-serif; background: var(--play-bg); color: var(--play-text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 h1, h2, h3 { text-wrap: pretty; }
 p, li { text-wrap: pretty; }
-#play-nav { width: 100%; display: flex; align-items: center; padding: 10px 24px; gap: 24px; background: rgba(0,0,0,0.25); }
-.play-nav__logo { font-weight: 700; font-size: 13px; color: var(--play-text); text-decoration: none; }
-.play-nav__links { display: flex; gap: 16px; }
-.play-nav__links a { font-size: 12px; color: var(--play-text-muted); text-decoration: none; transition: color 120ms; }
-.play-nav__links a:hover { color: var(--play-text); }
 #app { display: flex; gap: 24px; align-items: flex-start; padding: 24px; flex: 1; align-self: center; }
 #sidebar { max-width: 220px; display: flex; flex-direction: column; gap: 12px; }
 #board-container { border-radius: 4px; overflow: hidden; }

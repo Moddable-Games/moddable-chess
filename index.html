@@ -14,9 +14,23 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Moddable Chess — One engine, infinite rulesets">
 <meta name="twitter:description" content="Modular chess engine with 14 variants. Zero dependencies, pure JavaScript, open source.">
+<link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="./" class="site-nav__brand">
+    <img src="assets/cube.svg" class="site-nav__cube" alt="">
+    <span class="site-nav__wordmark">Moddable Chess</span>
+  </a>
+  <div class="site-nav__links">
+    <a href="play/">Play</a>
+    <a href="docs/">Docs</a>
+    <a href="docs/api.html">API</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
 
 <section class="mc-hero">
   <div class="mc-hero__glow"></div>
@@ -59,7 +73,7 @@ MCE.renderBoard(el, game, { size: 480 });
   </div>
 </section>
 
-<footer class="mc-footer">
+<footer class="site-footer">
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · A <a href="https://moddable.games" target="_blank" rel="noopener">Moddable.Games</a> project</p>
 </footer>
 
