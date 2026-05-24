@@ -54,39 +54,7 @@ MCE.renderBoard(el, game, { size: 480 });
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · A <a href="https://moddable.games" target="_blank" rel="noopener">Moddable.Games</a> project</p>
 </footer>
 
-<script>
-const VARIANTS = [
-  { name: 'Standard Chess', board: '8×8', desc: 'Classic FIDE rules. The foundation everything else is built on.' },
-  { name: 'King of the Hill', board: '8×8', desc: 'Move your king to the centre four squares for an instant win.' },
-  { name: 'Three-Check', board: '8×8', desc: 'Deliver three checks to win. No checkmate needed.' },
-  { name: 'Antichess', board: '8×8', desc: 'Captures are mandatory. Lose all your pieces to win.' },
-  { name: 'Racing Kings', board: '8×8', desc: 'No checks allowed. Race your king to rank 8.' },
-  { name: 'Fischer Random', board: '8×8', desc: '960 possible starting positions. King between rooks.' },
-  { name: 'Rifle Chess', board: '8×8', desc: 'Capturing pieces stay on their original square.' },
-  { name: 'Atomic', board: '8×8', desc: 'Captures explode, destroying adjacent pieces.' },
-  { name: 'Marseillais', board: '8×8', desc: 'Two moves per turn. Check ends your turn early.' },
-  { name: 'Duck Chess', board: '8×8', desc: 'Place a blocker duck after each move. Capture the king to win.' },
-  { name: 'Fog of War', board: '8×8', desc: 'You only see squares your pieces can reach.' },
-  { name: 'Capablanca', board: '10×8', desc: 'Archbishop and Chancellor on a wider board.' },
-  { name: 'Grand Chess', board: '10×10', desc: 'Same new pieces, bigger board, pawns start on rank 3.' },
-  { name: 'Courier Chess', board: '12×8', desc: 'Medieval German variant from the 1200s.' },
-];
-const grid = document.getElementById('variant-grid');
-VARIANTS.forEach(v => {
-  const card = document.createElement('div');
-  card.className = 'mc-variant-card';
-  card.innerHTML = '<div class="mc-variant-card__name">' + v.name + '</div><div class="mc-variant-card__board">' + v.board + '</div><div class="mc-variant-card__desc">' + v.desc + '</div>';
-  grid.appendChild(card);
-});
-
-const dc = document.createElement('a');
-dc.href = 'https://github.com/Moddable-Games/dungeon-chess';
-dc.target = '_blank';
-dc.rel = 'noopener';
-dc.className = 'mc-variant-card mc-variant-card--featured';
-dc.innerHTML = '<div class="mc-variant-card__eyebrow">POWERED BY THIS ENGINE</div><div class="mc-variant-card__name">Dungeon Chess</div><div class="mc-variant-card__board">Modular boards · 4 species · 24 units</div><div class="mc-variant-card__desc">Asymmetric fantasy skirmishes on dungeon boards. Four species, XP drafting, solo vs AI. A standalone game built on the Moddable Chess engine.</div>';
-grid.appendChild(dc);
-</script>
+<script src="js/home.js"></script>
 
 </body>
 </html>
