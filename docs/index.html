@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation — Moddable Chess</title>
+<link rel="stylesheet" href="../css/docs.css">
+</head>
+<body>
+
+<nav class="docs-nav">
+  <a href="../" class="docs-nav__logo">Moddable Chess</a>
+  <div class="docs-nav__links">
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Add a Variant</a>
+    <a href="../play/">Play</a>
+  </div>
+</nav>
+
+<div class="docs-body">
+  <h1>Documentation</h1>
+  <p class="docs-lede">Everything you need to integrate Moddable Chess into your project or extend it with new variants.</p>
+
+  <h2>Quick Start</h2>
+  <p>Include the engine scripts in your HTML (order matters):</p>
+  <div class="docs-code">
+&lt;script src="js/chess-engine.js"&gt;&lt;/script&gt;<br>
+&lt;script src="js/chess-moves.js"&gt;&lt;/script&gt;<br>
+&lt;script src="js/chess-play.js"&gt;&lt;/script&gt;<br>
+&lt;script src="js/chess-variants.js"&gt;&lt;/script&gt;<br>
+&lt;script src="js/board-renderer.js"&gt;&lt;/script&gt;
+  </div>
+
+  <p>Create a game and render it:</p>
+  <div class="docs-code">
+const game = MCE.createGame('standard');<br>
+MCE.renderBoard(document.getElementById('board'), game, {<br>
+&nbsp;&nbsp;size: 480,<br>
+&nbsp;&nbsp;onSquareClick: (sq) =&gt; { /* handle click */ }<br>
+});
+  </div>
+
+  <h2>Architecture</h2>
+  <p>The engine is split into focused modules that extend the global <code>MCE</code> namespace:</p>
+  <table class="docs-table">
+    <tr><th>File</th><th>Exports</th><th>Purpose</th></tr>
+    <tr><td><code>chess-engine.js</code></td><td>MCE core</td><td>Board state, FEN, coordinate helpers, game creation</td></tr>
+    <tr><td><code>chess-moves.js</code></td><td>pseudoLegalMoves, legalMoves, inCheck</td><td>Move generation for all piece types</td></tr>
+    <tr><td><code>chess-play.js</code></td><td>makeMove, unmakeMove, getStatus</td><td>Move execution, undo, game state detection</td></tr>
+    <tr><td><code>chess-variants.js</code></td><td>VARIANTS, getVariantStatus, variantLegalMoves</td><td>Variant-specific rule overrides</td></tr>
+    <tr><td><code>board-renderer.js</code></td><td>renderBoard</td><td>SVG board rendering with click handling</td></tr>
+  </table>
+
+  <h2>Board Representation</h2>
+  <p>The board is a flat array of size <code>rows × cols</code>. Index 0 is the top-left square (a8 in standard chess). Pieces are single characters — uppercase for White, lowercase for Black:</p>
+  <table class="docs-table">
+    <tr><th>Char</th><th>Piece</th><th>Variants</th></tr>
+    <tr><td><code>P/p</code></td><td>Pawn</td><td>All</td></tr>
+    <tr><td><code>N/n</code></td><td>Knight</td><td>All</td></tr>
+    <tr><td><code>B/b</code></td><td>Bishop</td><td>All</td></tr>
+    <tr><td><code>R/r</code></td><td>Rook</td><td>All</td></tr>
+    <tr><td><code>Q/q</code></td><td>Queen</td><td>All</td></tr>
+    <tr><td><code>K/k</code></td><td>King</td><td>All</td></tr>
+    <tr><td><code>A/a</code></td><td>Archbishop (B+N)</td><td>Capablanca, Grand</td></tr>
+    <tr><td><code>C/c</code></td><td>Chancellor (R+N)</td><td>Capablanca, Grand</td></tr>
+    <tr><td><code>S/s</code></td><td>Sage (1-step any direction)</td><td>Courier</td></tr>
+  </table>
+
+  <h2>Variable Board Sizes</h2>
+  <p>The engine supports arbitrary rectangular boards. Each game object has <code>rows</code> and <code>cols</code> properties. All coordinate functions accept an optional game context:</p>
+  <div class="docs-code">
+MCE.sq(row, col, game)&nbsp;&nbsp;// → index<br>
+MCE.rc(index, game)&nbsp;&nbsp;&nbsp;&nbsp;// → [row, col]<br>
+MCE.onBoard(row, col, game) // → boolean
+  </div>
+
+  <h2>Supported Variants</h2>
+  <table class="docs-table">
+    <tr><th>Key</th><th>Board</th><th>Win Condition</th></tr>
+    <tr><td><code>standard</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>kingOfTheHill</code></td><td>8×8</td><td>Checkmate or king to centre</td></tr>
+    <tr><td><code>threeCheck</code></td><td>8×8</td><td>Checkmate or 3 checks</td></tr>
+    <tr><td><code>antichess</code></td><td>8×8</td><td>Lose all pieces</td></tr>
+    <tr><td><code>racingKings</code></td><td>8×8</td><td>King to rank 8</td></tr>
+    <tr><td><code>chess960</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>rifle</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>atomic</code></td><td>8×8</td><td>Explode opponent's king</td></tr>
+    <tr><td><code>marseillais</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>duckChess</code></td><td>8×8</td><td>Capture king</td></tr>
+    <tr><td><code>fogOfWar</code></td><td>8×8</td><td>Capture king</td></tr>
+    <tr><td><code>capablanca</code></td><td>10×8</td><td>Checkmate</td></tr>
+    <tr><td><code>grand</code></td><td>10×10</td><td>Checkmate</td></tr>
+    <tr><td><code>courier</code></td><td>12×8</td><td>Checkmate</td></tr>
+  </table>
+
+  <h2>Next Steps</h2>
+  <ul>
+    <li><a href="api.html">Full API reference</a> — every method on the MCE namespace</li>
+    <li><a href="variants.html">Add a variant</a> — step-by-step guide to creating a new variant</li>
+  </ul>
+</div>
+
+</body>
+</html>

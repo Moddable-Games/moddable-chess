@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add a Variant — Moddable Chess</title>
+<link rel="stylesheet" href="../css/docs.css">
+</head>
+<body>
+
+<nav class="docs-nav">
+  <a href="../" class="docs-nav__logo">Moddable Chess</a>
+  <div class="docs-nav__links">
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Add a Variant</a>
+    <a href="../play/">Play</a>
+  </div>
+</nav>
+
+<div class="docs-body">
+  <h1>Add a Variant</h1>
+  <p class="docs-lede">Step-by-step guide to extending Moddable Chess with a new variant.</p>
+
+  <h2>1. Register the variant</h2>
+  <p>If your variant uses a non-standard board, add it to <code>VARIANT_BOARDS</code> in <code>chess-engine.js</code>:</p>
+  <div class="docs-code">
+const VARIANT_BOARDS = {<br>
+&nbsp;&nbsp;capablanca: { rows: 8, cols: 10, fen: '...' },<br>
+&nbsp;&nbsp;yourVariant: { rows: 8, cols: 8, fen: '...' },<br>
+};
+  </div>
+  <p>For 8×8 variants with standard starting position, you don't need an entry here — just use the variant key in <code>createGame</code>.</p>
+
+  <h2>2. Add rule modifications</h2>
+  <p>Open <code>chess-variants.js</code>. There are three places to hook in:</p>
+
+  <h3>a) Win condition (getVariantStatus)</h3>
+  <p>If your variant has an alternate win condition:</p>
+  <div class="docs-code">
+if (v === 'yourVariant') {<br>
+&nbsp;&nbsp;// Check for your custom win condition<br>
+&nbsp;&nbsp;if (someCondition) return 'yourVariant-w'; // white wins<br>
+}
+  </div>
+
+  <h3>b) Move filtering (variantLegalMoves)</h3>
+  <p>If your variant restricts available moves:</p>
+  <div class="docs-code">
+if (v === 'yourVariant') {<br>
+&nbsp;&nbsp;// Filter moves — e.g., forced captures<br>
+&nbsp;&nbsp;const captures = moves.filter(m =&gt; g.board[m.to]);<br>
+&nbsp;&nbsp;if (captures.length &gt; 0) moves = captures;<br>
+}
+  </div>
+
+  <h3>c) Move execution (chess-play.js)</h3>
+  <p>If your variant changes how moves are executed (e.g., pieces don't move on capture in Rifle Chess), modify <code>makeMove</code>. Always save state in the <code>undo</code> object for proper reversal.</p>
+
+  <h2>3. Add new piece types (optional)</h2>
+  <p>If your variant introduces new pieces:</p>
+  <ul>
+    <li>Add the piece character to <code>MCE.PIECE</code> in <code>chess-engine.js</code></li>
+    <li>Add movement generation in <code>chess-moves.js</code> (in the main piece-type switch)</li>
+    <li>Add attack detection in the <code>attacks()</code> function</li>
+    <li>Add SVG sprites to <code>assets/pieces.svg</code></li>
+  </ul>
+
+  <h2>4. Add to the game controller</h2>
+  <p>In <code>game-controller.js</code>, add your variant to the picker array and the DESCRIPTIONS object:</p>
+  <div class="docs-code">
+['yourVariant', 'Your Variant Name'],
+  </div>
+
+  <h2>5. Handle special starting positions</h2>
+  <p>If your variant has a non-standard starting FEN (like Racing Kings), add it in the <code>startGame</code> function:</p>
+  <div class="docs-code">
+if (variant === 'yourVariant') {<br>
+&nbsp;&nbsp;MCE.loadFEN(game, 'your/custom/fen w - - 0 1');<br>
+}
+  </div>
+
+  <h2>Example: Adding "Horde" variant</h2>
+  <p>Horde has White with 36 pawns (no king) vs Black with a standard army. White wins by capturing all black pieces. Black wins by checkmate (impossible) or capturing all white pawns.</p>
+
+  <div class="docs-code">
+// 1. No VARIANT_BOARDS entry needed (8×8)<br><br>
+// 2. In getVariantStatus:<br>
+if (v === 'horde') {<br>
+&nbsp;&nbsp;const whitePawns = g.board.filter(p =&gt; p === 'P').length;<br>
+&nbsp;&nbsp;if (whitePawns === 0) return 'horde-b';<br>
+}<br><br>
+// 3. In game-controller startGame:<br>
+if (variant === 'horde') {<br>
+&nbsp;&nbsp;MCE.loadFEN(game, 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w - - 0 1');<br>
+}
+  </div>
+
+  <h2>Testing</h2>
+  <p>After adding your variant:</p>
+  <ul>
+    <li>Select it in the variant picker at <code>/play/</code></li>
+    <li>Verify the starting position renders correctly</li>
+    <li>Test that legal moves are generated properly</li>
+    <li>Test the win condition by playing to completion</li>
+    <li>Test that undo works (the engine uses make/unmake for legality checking)</li>
+  </ul>
+</div>
+
+</body>
+</html>

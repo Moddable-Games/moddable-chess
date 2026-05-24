@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Press+Start+2P&display=swap');
+
+:root {
+  --mc-deep: #0a0d2a;
+  --mc-glow: #6fb5ff;
+  --mc-canvas: #f5f4ef;
+  --mc-ink: #14161c;
+  --mc-hairline: #e6e3d8;
+  --mc-blue: #0c4f8d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; color: var(--mc-ink); background: var(--mc-canvas); }
+h1, h2, h3 { font-family: 'Inter Tight', sans-serif; }
+p, li { text-wrap: pretty; line-height: 1.7; }
+a { color: var(--mc-blue); }
+code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; }
+
+.docs-nav {
+  background: var(--mc-deep);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.docs-nav__logo {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+
+.docs-nav__links {
+  display: flex;
+  gap: 16px;
+}
+
+.docs-nav__links a {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+}
+
+.docs-nav__links a:hover { color: #fff; }
+
+.docs-body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.docs-body h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.docs-body .docs-lede {
+  font-size: 1.05rem;
+  color: #555;
+  margin-bottom: 32px;
+}
+
+.docs-body h2 {
+  font-size: 1.3rem;
+  margin: 32px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mc-hairline);
+}
+
+.docs-body h3 {
+  font-size: 1rem;
+  margin: 24px 0 8px;
+}
+
+.docs-body p { margin-bottom: 12px; }
+.docs-body ul { margin: 0 0 16px 20px; }
+.docs-body li { margin-bottom: 6px; }
+
+.docs-code {
+  background: var(--mc-deep);
+  color: rgba(255,255,255,0.85);
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 12px 0 20px;
+}
+
+.docs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 12px 0 20px;
+}
+
+.docs-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.03);
+  border-bottom: 1px solid var(--mc-hairline);
+}
+
+.docs-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--mc-hairline);
+}
+
+.docs-table code {
+  background: rgba(0,0,0,0.04);
+  padding: 1px 5px;
+  border-radius: 3px;
+}

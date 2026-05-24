@@ -3,24 +3,82 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Moddable Chess</title>
-<link rel="stylesheet" href="css/style.css">
+<title>Moddable Chess — One engine, infinite rulesets</title>
+<meta name="description" content="Modular chess engine with 14 variants. Standard chess, Capablanca, Atomic, Fog of War, and more. Zero dependencies, pure JavaScript.">
+<link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-<div id="app">
-  <div id="sidebar">
-    <div id="variant-picker"></div>
-    <div id="status"></div>
-    <div id="moves"></div>
+
+<section class="mc-hero">
+  <div class="mc-hero__glow"></div>
+  <div class="mc-hero__eyebrow">MODDABLE CHESS</div>
+  <h1 class="mc-hero__title">One engine.<br><em>Infinite rulesets.</em></h1>
+  <p class="mc-hero__lede">A modular chess engine that plays 14 variants on boards from 8×8 to 12×8. Zero dependencies. Pure JavaScript. Open source.</p>
+  <div class="mc-hero__btns">
+    <a href="play/" class="mc-btn mc-btn--primary">Play now</a>
+    <a href="docs/" class="mc-btn mc-btn--outline">Documentation</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener" class="mc-btn mc-btn--outline">GitHub</a>
   </div>
-  <div id="board-container"></div>
-  <div id="description"></div>
-</div>
-<script src="js/chess-engine.js"></script>
-<script src="js/chess-moves.js"></script>
-<script src="js/chess-play.js"></script>
-<script src="js/chess-variants.js"></script>
-<script src="js/board-renderer.js"></script>
-<script src="js/game-controller.js"></script>
+</section>
+
+<section class="mc-variants">
+  <div class="mc-variants__inner">
+    <div class="mc-variants__header">
+      <div class="mc-variants__eyebrow">14 VARIANTS</div>
+      <h2 class="mc-variants__title">Every variant. One engine.</h2>
+    </div>
+    <div class="mc-variants__grid" id="variant-grid"></div>
+  </div>
+</section>
+
+<section class="mc-dev">
+  <div class="mc-dev__inner">
+    <div class="mc-dev__eyebrow">FOR DEVELOPERS</div>
+    <h2 class="mc-dev__title">Five lines to a playable board.</h2>
+    <p class="mc-dev__text">Load the scripts, create a game, render the board. The engine handles move generation, check detection, variant rules, and board rendering.</p>
+    <div class="mc-dev__code">
+const game = MCE.createGame('standard');<br>
+const moves = MCE.legalMoves(game);<br>
+MCE.makeMove(game, moves[0]);<br>
+const status = MCE.getStatus(game);<br>
+MCE.renderBoard(el, game, { size: 480 });
+    </div>
+    <div class="mc-hero__btns">
+      <a href="docs/" class="mc-btn mc-btn--primary">Read the docs</a>
+      <a href="docs/variants.html" class="mc-btn mc-btn--outline">Add a variant</a>
+    </div>
+  </div>
+</section>
+
+<footer class="mc-footer">
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · A <a href="https://moddable.games" target="_blank" rel="noopener">Moddable.Games</a> project</p>
+</footer>
+
+<script>
+const VARIANTS = [
+  { name: 'Standard Chess', board: '8×8', desc: 'Classic FIDE rules. The foundation everything else is built on.' },
+  { name: 'King of the Hill', board: '8×8', desc: 'Move your king to the centre four squares for an instant win.' },
+  { name: 'Three-Check', board: '8×8', desc: 'Deliver three checks to win. No checkmate needed.' },
+  { name: 'Antichess', board: '8×8', desc: 'Captures are mandatory. Lose all your pieces to win.' },
+  { name: 'Racing Kings', board: '8×8', desc: 'No checks allowed. Race your king to rank 8.' },
+  { name: 'Fischer Random', board: '8×8', desc: '960 possible starting positions. King between rooks.' },
+  { name: 'Rifle Chess', board: '8×8', desc: 'Capturing pieces stay on their original square.' },
+  { name: 'Atomic', board: '8×8', desc: 'Captures explode, destroying adjacent pieces.' },
+  { name: 'Marseillais', board: '8×8', desc: 'Two moves per turn. Check ends your turn early.' },
+  { name: 'Duck Chess', board: '8×8', desc: 'Place a blocker duck after each move. Capture the king to win.' },
+  { name: 'Fog of War', board: '8×8', desc: 'You only see squares your pieces can reach.' },
+  { name: 'Capablanca', board: '10×8', desc: 'Archbishop and Chancellor on a wider board.' },
+  { name: 'Grand Chess', board: '10×10', desc: 'Same new pieces, bigger board, pawns start on rank 3.' },
+  { name: 'Courier Chess', board: '12×8', desc: 'Medieval German variant from the 1200s.' },
+];
+const grid = document.getElementById('variant-grid');
+VARIANTS.forEach(v => {
+  const card = document.createElement('div');
+  card.className = 'mc-variant-card';
+  card.innerHTML = '<div class="mc-variant-card__name">' + v.name + '</div><div class="mc-variant-card__board">' + v.board + '</div><div class="mc-variant-card__desc">' + v.desc + '</div>';
+  grid.appendChild(card);
+});
+</script>
+
 </body>
 </html>

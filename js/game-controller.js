@@ -24,7 +24,8 @@ const DESCRIPTIONS = {
   courier: { title: 'Courier Chess', text: 'Medieval German variant from the 1200s. Uses a 12-column board with extra bishops and Sage pieces (move one step in any direction, non-royal).', rule: 'Board: 12×8 · Win: Checkmate' },
 };
 
-fetch('assets/pieces.svg')
+const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
+fetch(basePath + 'assets/pieces.svg')
   .then(r => r.text())
   .then(svg => {
     const div = document.createElement('div');

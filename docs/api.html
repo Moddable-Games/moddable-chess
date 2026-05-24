@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Reference — Moddable Chess</title>
+<link rel="stylesheet" href="../css/docs.css">
+</head>
+<body>
+
+<nav class="docs-nav">
+  <a href="../" class="docs-nav__logo">Moddable Chess</a>
+  <div class="docs-nav__links">
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Add a Variant</a>
+    <a href="../play/">Play</a>
+  </div>
+</nav>
+
+<div class="docs-body">
+  <h1>API Reference</h1>
+  <p class="docs-lede">All public methods on the <code>MCE</code> global namespace.</p>
+
+  <h2>Game Lifecycle</h2>
+
+  <h3>MCE.createGame(variant)</h3>
+  <p>Creates a new game object with the board set to the starting position for the given variant.</p>
+  <div class="docs-code">
+const game = MCE.createGame('standard');<br>
+const capablanca = MCE.createGame('capablanca'); // 10×8 board
+  </div>
+  <p>Returns a game object with properties: <code>board</code>, <code>rows</code>, <code>cols</code>, <code>turn</code>, <code>castling</code>, <code>enPassant</code>, <code>halfmove</code>, <code>fullmove</code>, <code>history</code>, <code>variant</code>.</p>
+
+  <h3>MCE.loadFEN(game, fen)</h3>
+  <p>Loads a FEN string into an existing game object. Supports multi-digit empty square counts for boards wider than 9.</p>
+
+  <h3>MCE.toFEN(game)</h3>
+  <p>Exports the current game state as a FEN string.</p>
+
+  <h2>Move Generation</h2>
+
+  <h3>MCE.legalMoves(game)</h3>
+  <p>Returns an array of all legal moves for the current side. Each move is an object:</p>
+  <div class="docs-code">
+{ from: 52, to: 36, flag: 'double', promo: null }
+  </div>
+  <p>Flags: <code>null</code> (quiet), <code>'capture'</code>, <code>'double'</code> (pawn double push), <code>'ep'</code> (en passant), <code>'promo'</code>, <code>'castle-k'</code>, <code>'castle-q'</code>.</p>
+
+  <h3>MCE.pseudoLegalMoves(game)</h3>
+  <p>Returns moves without checking for pins or self-check. Faster but may include illegal moves.</p>
+
+  <h3>MCE.variantLegalMoves(game)</h3>
+  <p>Returns legal moves with variant-specific filtering (e.g., forced captures in Antichess, no-check filter in Racing Kings).</p>
+
+  <h2>Move Execution</h2>
+
+  <h3>MCE.makeMove(game, move)</h3>
+  <p>Executes a move on the game. Mutates the game state. Returns an undo object for <code>unmakeMove</code>.</p>
+  <div class="docs-code">
+const undo = MCE.makeMove(game, move);<br>
+// game.turn has now flipped
+  </div>
+
+  <h3>MCE.unmakeMove(game, undo)</h3>
+  <p>Reverses a move. Restores the game to its previous state.</p>
+
+  <h2>Status Detection</h2>
+
+  <h3>MCE.getStatus(game)</h3>
+  <p>Returns: <code>'active'</code>, <code>'check'</code>, <code>'checkmate'</code>, <code>'stalemate'</code>, or <code>'draw-50'</code>.</p>
+
+  <h3>MCE.getVariantStatus(game)</h3>
+  <p>Checks variant-specific win conditions. Returns <code>null</code> if no variant win, or a string like <code>'koth-w'</code>, <code>'race-b'</code>, <code>'antichess-w'</code>.</p>
+
+  <h3>MCE.inCheck(game, side)</h3>
+  <p>Returns <code>true</code> if the given side's king is in check. <code>side</code> is <code>'w'</code> or <code>'b'</code>.</p>
+
+  <h2>Coordinates</h2>
+
+  <h3>MCE.sq(row, col, game)</h3>
+  <p>Converts row/col to a board index. Pass <code>game</code> for non-8×8 boards.</p>
+
+  <h3>MCE.rc(index, game)</h3>
+  <p>Converts a board index to <code>[row, col]</code>.</p>
+
+  <h3>MCE.onBoard(row, col, game)</h3>
+  <p>Returns <code>true</code> if the coordinates are within the board boundaries.</p>
+
+  <h3>MCE.sqToAlgebraic(index, game)</h3>
+  <p>Converts an index to algebraic notation (e.g., <code>'e4'</code>).</p>
+
+  <h3>MCE.algebraicToSq(str, game)</h3>
+  <p>Converts algebraic notation to an index.</p>
+
+  <h2>Rendering</h2>
+
+  <h3>MCE.renderBoard(container, game, opts)</h3>
+  <p>Renders an SVG chess board into a DOM element.</p>
+  <div class="docs-code">
+MCE.renderBoard(el, game, {<br>
+&nbsp;&nbsp;size: 480,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// width in px (height auto from rows/cols)<br>
+&nbsp;&nbsp;flipped: false,&nbsp;&nbsp;&nbsp;&nbsp;// flip board for black's perspective<br>
+&nbsp;&nbsp;selected: null,&nbsp;&nbsp;&nbsp;&nbsp;// highlighted square index<br>
+&nbsp;&nbsp;legalMoves: [],&nbsp;&nbsp;&nbsp;&nbsp;// array of moves to show indicators for<br>
+&nbsp;&nbsp;onSquareClick: fn, // callback(squareIndex)<br>
+&nbsp;&nbsp;fogMask: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Set of visible square indices (Fog of War)<br>
+&nbsp;&nbsp;duckSq: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// duck position index (Duck Chess)<br>
+});
+  </div>
+
+  <h2>Utilities</h2>
+
+  <h3>MCE.randomFEN960()</h3>
+  <p>Generates a random Chess960 starting position FEN.</p>
+
+  <h3>MCE.pieceColor(char)</h3>
+  <p>Returns <code>'w'</code> or <code>'b'</code> based on case.</p>
+
+  <h3>MCE.pieceType(char)</h3>
+  <p>Returns the lowercase piece letter.</p>
+
+  <h2>Constants</h2>
+  <table class="docs-table">
+    <tr><th>Constant</th><th>Value</th></tr>
+    <tr><td><code>MCE.WHITE</code></td><td><code>'w'</code></td></tr>
+    <tr><td><code>MCE.BLACK</code></td><td><code>'b'</code></td></tr>
+    <tr><td><code>MCE.PIECE</code></td><td><code>{ P:'p', N:'n', B:'b', R:'r', Q:'q', K:'k', A:'a', C:'c', S:'s' }</code></td></tr>
+    <tr><td><code>MCE.INITIAL_FEN</code></td><td>Standard starting position</td></tr>
+    <tr><td><code>MCE.VARIANT_BOARDS</code></td><td>Config for non-8×8 variants (rows, cols, fen)</td></tr>
+  </table>
+</div>
+
+</body>
+</html>
