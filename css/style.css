@@ -1,0 +1,8 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+#app { display: flex; gap: 24px; align-items: flex-start; padding: 24px; }
+#board-container { border-radius: 4px; overflow: hidden; }
+#info { max-width: 240px; }
+#status { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.08); }
+#moves { font-family: monospace; font-size: 13px; color: rgba(255,255,255,0.7); max-height: 400px; overflow-y: auto; }
+#moves div { padding: 2px 0; }
