@@ -21,24 +21,27 @@ function svgEl(tag, attrs) {
 
 function renderBoard(container, game, opts) {
   opts = opts || {};
+  const rows = game.rows || 8;
+  const cols = game.cols || 8;
   const size = opts.size || 480;
-  const tileSize = size / 8;
+  const tileSize = size / cols;
+  const height = tileSize * rows;
   const flipped = opts.flipped || false;
-  const selected = opts.selected; // sq index or null
+  const selected = opts.selected;
   const legalMoves = opts.legalMoves || [];
   const onSquareClick = opts.onSquareClick;
 
   container.innerHTML = '';
-  const svg = svgEl('svg', { width: size, height: size, viewBox: `0 0 ${size} ${size}` });
+  const svg = svgEl('svg', { width: size, height: height, viewBox: `0 0 ${size} ${height}` });
 
   // Draw squares
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      const dr = flipped ? 7 - r : r;
-      const dc = flipped ? 7 - c : c;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const dr = flipped ? rows - 1 - r : r;
+      const dc = flipped ? cols - 1 - c : c;
       const x = c * tileSize, y = r * tileSize;
       const isLight = (dr + dc) % 2 === 0;
-      const sqIdx = sq(dr, dc);
+      const sqIdx = MCE.sq(dr, dc, game);
 
       const rect = svgEl('rect', {
         x, y, width: tileSize, height: tileSize,
@@ -56,9 +59,9 @@ function renderBoard(container, game, opts) {
 
   // Draw legal move indicators
   for (const move of legalMoves) {
-    const [tr, tc] = rc(move.to);
-    const dr = flipped ? 7 - tr : tr;
-    const dc = flipped ? 7 - tc : tc;
+    const [tr, tc] = MCE.rc(move.to, game);
+    const dr = flipped ? rows - 1 - tr : tr;
+    const dc = flipped ? cols - 1 - tc : tc;
     const cx = dc * tileSize + tileSize / 2;
     const cy = dr * tileSize + tileSize / 2;
     const isCapture = game.board[move.to] || move.flag === 'ep';
@@ -75,14 +78,14 @@ function renderBoard(container, game, opts) {
     }
   }
 
-  // Draw fog overlay (darken hidden squares)
+  // Draw fog overlay
   const fogMask = opts.fogMask || null;
   if (fogMask) {
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const dr = flipped ? 7 - r : r;
-        const dc = flipped ? 7 - c : c;
-        const sqIdx = sq(dr, dc);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const dr = flipped ? rows - 1 - r : r;
+        const dc = flipped ? cols - 1 - c : c;
+        const sqIdx = MCE.sq(dr, dc, game);
         if (!fogMask.has(sqIdx)) {
           svg.appendChild(svgEl('rect', {
             x: c * tileSize, y: r * tileSize, width: tileSize, height: tileSize,
@@ -94,13 +97,14 @@ function renderBoard(container, game, opts) {
   }
 
   // Draw pieces
-  for (let i = 0; i < 64; i++) {
+  const total = rows * cols;
+  for (let i = 0; i < total; i++) {
     const p = game.board[i];
     if (!p) continue;
     if (fogMask && !fogMask.has(i)) continue;
-    const [pr, pc] = rc(i);
-    const dr = flipped ? 7 - pr : pr;
-    const dc = flipped ? 7 - pc : pc;
+    const [pr, pc] = MCE.rc(i, game);
+    const dr = flipped ? rows - 1 - pr : pr;
+    const dc = flipped ? cols - 1 - pc : pc;
     const x = dc * tileSize + tileSize * 0.05;
     const y = dr * tileSize + tileSize * 0.05;
     const pieceSize = tileSize * 0.9;
@@ -115,9 +119,9 @@ function renderBoard(container, game, opts) {
   // Draw duck
   const duckSq = opts.duckSq;
   if (duckSq !== null && duckSq !== undefined && duckSq >= 0) {
-    const [dr2, dc2] = rc(duckSq);
-    const ddr = flipped ? 7 - dr2 : dr2;
-    const ddc = flipped ? 7 - dc2 : dc2;
+    const [dr2, dc2] = MCE.rc(duckSq, game);
+    const ddr = flipped ? rows - 1 - dr2 : dr2;
+    const ddc = flipped ? cols - 1 - dc2 : dc2;
     const cx = ddc * tileSize + tileSize / 2;
     const cy = ddr * tileSize + tileSize / 2;
     svg.appendChild(svgEl('circle', {
@@ -134,7 +138,7 @@ function renderBoard(container, game, opts) {
   // Click handler
   if (onSquareClick) {
     const overlay = svgEl('rect', {
-      x: 0, y: 0, width: size, height: size,
+      x: 0, y: 0, width: size, height: height,
       fill: 'transparent', style: 'cursor:pointer',
     });
     overlay.addEventListener('click', (e) => {
@@ -143,10 +147,10 @@ function renderBoard(container, game, opts) {
       const py = e.clientY - rect.top;
       const c = Math.floor(px / tileSize);
       const r = Math.floor(py / tileSize);
-      const dr = flipped ? 7 - r : r;
-      const dc = flipped ? 7 - c : c;
-      if (dr >= 0 && dr < 8 && dc >= 0 && dc < 8) {
-        onSquareClick(sq(dr, dc));
+      const dr = flipped ? rows - 1 - r : r;
+      const dc = flipped ? cols - 1 - c : c;
+      if (dr >= 0 && dr < rows && dc >= 0 && dc < cols) {
+        onSquareClick(MCE.sq(dr, dc, game));
       }
     });
     svg.appendChild(overlay);

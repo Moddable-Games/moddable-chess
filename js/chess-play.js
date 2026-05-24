@@ -4,7 +4,7 @@
  */
 (function() {
 
-const { WHITE, BLACK, rc, sq, pieceColor, pieceType, inCheck, legalMoves } = MCE;
+const { WHITE, BLACK, pieceColor, pieceType, inCheck, legalMoves } = MCE;
 
 function makeMove(g, move) {
   const { from, to, flag, promo } = move;
@@ -31,15 +31,15 @@ function makeMove(g, move) {
 
   if (g.variant === 'atomic' && isCapture && flag !== 'ep') {
     undo.exploded = [];
-    const [tr, tc] = rc(to);
+    const [tr, tc] = MCE.rc(to, g);
     g.board[to] = null;
     g.board[from] = null;
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         if (dr === 0 && dc === 0) continue;
         const nr = tr + dr, nc = tc + dc;
-        if (nr < 0 || nr > 7 || nc < 0 || nc > 7) continue;
-        const adjSq = sq(nr, nc);
+        if (!MCE.onBoard(nr, nc, g)) continue;
+        const adjSq = MCE.sq(nr, nc, g);
         const adjP = g.board[adjSq];
         if (adjP && pieceType(adjP) !== 'p') {
           undo.exploded.push({ sq: adjSq, piece: adjP });
@@ -50,14 +50,18 @@ function makeMove(g, move) {
   }
 
   if (flag === 'ep') {
-    const epCapSq = sq(rc(from)[0], rc(to)[1]);
+    const [fr] = MCE.rc(from, g);
+    const [, tc] = MCE.rc(to, g);
+    const epCapSq = MCE.sq(fr, tc, g);
     undo.epCaptured = g.board[epCapSq];
     undo.epCapSq = epCapSq;
     g.board[epCapSq] = null;
   }
 
   if (flag === 'double') {
-    g.enPassant = sq((rc(from)[0] + rc(to)[0]) / 2, rc(from)[1]);
+    const [fr, fc] = MCE.rc(from, g);
+    const [tr] = MCE.rc(to, g);
+    g.enPassant = MCE.sq((fr + tr) / 2, fc, g);
   } else {
     g.enPassant = -1;
   }
@@ -67,14 +71,18 @@ function makeMove(g, move) {
   }
 
   if (flag === 'castle-k') {
-    const row = rc(from)[0];
-    g.board[sq(row, 5)] = g.board[sq(row, 7)];
-    g.board[sq(row, 7)] = null;
+    const [row, kc] = MCE.rc(from, g);
+    const rookFrom = MCE.sq(row, g.cols - 1, g);
+    const rookTo = MCE.sq(row, kc + 1, g);
+    g.board[rookTo] = g.board[rookFrom];
+    g.board[rookFrom] = null;
   }
   if (flag === 'castle-q') {
-    const row = rc(from)[0];
-    g.board[sq(row, 3)] = g.board[sq(row, 0)];
-    g.board[sq(row, 0)] = null;
+    const [row, kc] = MCE.rc(from, g);
+    const rookFrom = MCE.sq(row, 0, g);
+    const rookTo = MCE.sq(row, kc - 1, g);
+    g.board[rookTo] = g.board[rookFrom];
+    g.board[rookFrom] = null;
   }
 
   updateCastlingRights(g, from, to, piece);
@@ -123,14 +131,18 @@ function unmakeMove(g, undo) {
     g.board[undo.epCapSq] = undo.epCaptured;
   }
   if (flag === 'castle-k') {
-    const row = rc(from)[0];
-    g.board[sq(row, 7)] = g.board[sq(row, 5)];
-    g.board[sq(row, 5)] = null;
+    const [row, kc] = MCE.rc(from, g);
+    const rookTo = MCE.sq(row, kc + 1, g);
+    const rookFrom = MCE.sq(row, g.cols - 1, g);
+    g.board[rookFrom] = g.board[rookTo];
+    g.board[rookTo] = null;
   }
   if (flag === 'castle-q') {
-    const row = rc(from)[0];
-    g.board[sq(row, 0)] = g.board[sq(row, 3)];
-    g.board[sq(row, 3)] = null;
+    const [row, kc] = MCE.rc(from, g);
+    const rookTo = MCE.sq(row, kc - 1, g);
+    const rookFrom = MCE.sq(row, 0, g);
+    g.board[rookFrom] = g.board[rookTo];
+    g.board[rookTo] = null;
   }
 
   g.castling = undo.castling;
@@ -145,10 +157,15 @@ function unmakeMove(g, undo) {
 function updateCastlingRights(g, from, to, piece) {
   if (piece === 'K') { g.castling.K = false; g.castling.Q = false; }
   if (piece === 'k') { g.castling.k = false; g.castling.q = false; }
-  if (from === 63 || to === 63) g.castling.K = false;
-  if (from === 56 || to === 56) g.castling.Q = false;
-  if (from === 7 || to === 7) g.castling.k = false;
-  if (from === 0 || to === 0) g.castling.q = false;
+  const lastSq = g.rows * g.cols - 1;
+  const wRookK = MCE.sq(g.rows - 1, g.cols - 1, g);
+  const wRookQ = MCE.sq(g.rows - 1, 0, g);
+  const bRookK = MCE.sq(0, g.cols - 1, g);
+  const bRookQ = MCE.sq(0, 0, g);
+  if (from === wRookK || to === wRookK) g.castling.K = false;
+  if (from === wRookQ || to === wRookQ) g.castling.Q = false;
+  if (from === bRookK || to === bRookK) g.castling.k = false;
+  if (from === bRookQ || to === bRookQ) g.castling.q = false;
 }
 
 function getStatus(g) {

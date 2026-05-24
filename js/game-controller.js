@@ -32,6 +32,9 @@ function renderPicker() {
     ['marseillais', 'Marseillais'],
     ['duckChess', 'Duck Chess'],
     ['fogOfWar', 'Fog of War'],
+    ['capablanca', 'Capablanca (10×8)'],
+    ['grand', 'Grand Chess (10×10)'],
+    ['courier', 'Courier (12×8)'],
   ];
   variants.forEach(([key, label]) => {
     const btn = document.createElement('button');
