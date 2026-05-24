@@ -24,6 +24,23 @@ const DESCRIPTIONS = {
   courier: { title: 'Courier Chess', text: 'Medieval German variant from the 1200s. Uses a 12-column board with extra bishops and Sage pieces (move one step in any direction, non-royal).', rule: 'Board: 12×8 · Win: Checkmate' },
 };
 
+const VARIANT_LIST = [
+  ['standard', 'Standard'],
+  ['kingOfTheHill', 'King of the Hill'],
+  ['threeCheck', 'Three-Check'],
+  ['antichess', 'Antichess'],
+  ['racingKings', 'Racing Kings'],
+  ['chess960', 'Fischer Random'],
+  ['rifle', 'Rifle Chess'],
+  ['atomic', 'Atomic'],
+  ['marseillais', 'Marseillais'],
+  ['duckChess', 'Duck Chess'],
+  ['fogOfWar', 'Fog of War'],
+  ['capablanca', 'Capablanca (10×8)'],
+  ['grand', 'Grand Chess (10×10)'],
+  ['courier', 'Courier (12×8)'],
+];
+
 const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
 fetch(basePath + 'assets/pieces.svg')
   .then(r => r.text())
@@ -36,32 +53,41 @@ fetch(basePath + 'assets/pieces.svg')
   });
 
 let game, selected, moveNum, currentVariant;
+let gameMode = 'solo';
+let aiColor = MCE.BLACK;
+let aiThinking = false;
+let gameOver = false;
 
 function renderPicker() {
   pickerEl.innerHTML = '';
-  const variants = [
-    ['standard', 'Standard'],
-    ['kingOfTheHill', 'King of the Hill'],
-    ['threeCheck', 'Three-Check'],
-    ['antichess', 'Antichess'],
-    ['racingKings', 'Racing Kings'],
-    ['chess960', 'Fischer Random'],
-    ['rifle', 'Rifle Chess'],
-    ['atomic', 'Atomic'],
-    ['marseillais', 'Marseillais'],
-    ['duckChess', 'Duck Chess'],
-    ['fogOfWar', 'Fog of War'],
-    ['capablanca', 'Capablanca (10×8)'],
-    ['grand', 'Grand Chess (10×10)'],
-    ['courier', 'Courier (12×8)'],
-  ];
-  variants.forEach(([key, label]) => {
+
+  const modeBar = document.createElement('div');
+  modeBar.className = 'mode-bar';
+
+  const soloBtn = document.createElement('button');
+  soloBtn.className = 'mode-btn' + (gameMode === 'solo' ? ' mode-btn--active' : '');
+  soloBtn.textContent = 'Solo';
+  soloBtn.addEventListener('click', () => { gameMode = 'solo'; aiColor = MCE.BLACK; renderPicker(); startGame(currentVariant || 'standard'); });
+
+  const passBtn = document.createElement('button');
+  passBtn.className = 'mode-btn' + (gameMode === 'pass' ? ' mode-btn--active' : '');
+  passBtn.textContent = 'Pass & Play';
+  passBtn.addEventListener('click', () => { gameMode = 'pass'; renderPicker(); startGame(currentVariant || 'standard'); });
+
+  modeBar.appendChild(soloBtn);
+  modeBar.appendChild(passBtn);
+  pickerEl.appendChild(modeBar);
+
+  const variantListEl = document.createElement('div');
+  variantListEl.className = 'variant-list';
+  VARIANT_LIST.forEach(([key, label]) => {
     const btn = document.createElement('button');
     btn.className = 'variant-btn' + (key === currentVariant ? ' variant-btn--active' : '');
     btn.textContent = label;
     btn.addEventListener('click', () => startGame(key));
-    pickerEl.appendChild(btn);
+    variantListEl.appendChild(btn);
   });
+  pickerEl.appendChild(variantListEl);
 }
 
 function renderDescription() {
@@ -77,10 +103,20 @@ function startGame(variant) {
   if (variant === 'racingKings') MCE.loadFEN(game, '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1');
   selected = null;
   moveNum = 1;
+  gameOver = false;
+  aiThinking = false;
   movesEl.innerHTML = '';
   renderPicker();
   renderDescription();
   render();
+}
+
+function isGameOver() {
+  if (gameOver) return true;
+  const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
+  if (variantStatus) return true;
+  const status = MCE.getStatus(game);
+  return status === 'checkmate' || status === 'stalemate' || status === 'draw-50';
 }
 
 function render() {
@@ -95,13 +131,14 @@ function render() {
 
   if (game.duckPhase) {
     opts.legalMoves = [];
-  } else {
+  } else if (!aiThinking || game.turn !== aiColor) {
     const allMoves = getMovesForVariant();
     opts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
   }
 
   if (currentVariant === 'fogOfWar') {
-    opts.fogMask = computeVisibility(game, game.turn);
+    const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
+    opts.fogMask = computeVisibility(game, viewSide);
   }
 
   MCE.renderBoard(container, game, opts);
@@ -110,7 +147,8 @@ function render() {
 
 function computeVisibility(g, side) {
   const visible = new Set();
-  for (let i = 0; i < 64; i++) {
+  const total = g.rows * g.cols;
+  for (let i = 0; i < total; i++) {
     const p = g.board[i];
     if (!p || MCE.pieceColor(p) !== side) continue;
     visible.add(i);
@@ -136,6 +174,7 @@ function updateStatus() {
 
   const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
   if (variantStatus) {
+    gameOver = true;
     if (variantStatus.startsWith('koth-')) {
       statusEl.textContent = (variantStatus === 'koth-w' ? 'White' : 'Black') + ' wins — King of the Hill!';
       return;
@@ -153,14 +192,17 @@ function updateStatus() {
   const status = MCE.getStatus(game);
   const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
   if (status === 'checkmate') {
+    gameOver = true;
     statusEl.textContent = 'Checkmate — ' + (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins!';
   } else if (status === 'stalemate') {
+    gameOver = true;
     statusEl.textContent = 'Stalemate — draw';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
     if (currentVariant === 'threeCheck') {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= 3) {
+        gameOver = true;
         statusEl.textContent = (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins — Three checks!';
       }
     }
@@ -172,16 +214,21 @@ function updateStatus() {
 }
 
 function handleClick(sq) {
+  if (gameOver) return;
+  if (gameMode === 'solo' && game.turn === aiColor && !game.duckPhase) return;
+
   if (game.duckPhase) {
-    if (!game.board[sq] && sq !== game.duckSq) {
-      const oldDuck = game.duckSq;
-      game.duckSq = sq;
-      game.duckPhase = false;
-      if (game.turn === MCE.BLACK) game.fullmove++;
-      game.turn = game.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
-      selected = null;
-      render();
-      return;
+    if (gameMode === 'solo' && game.turn !== aiColor) {
+      if (!game.board[sq] && sq !== game.duckSq) {
+        placeDuck(sq);
+        if (!isGameOver() && game.turn === aiColor) {
+          scheduleAIMove();
+        }
+      }
+    } else if (gameMode === 'pass') {
+      if (!game.board[sq] && sq !== game.duckSq) {
+        placeDuck(sq);
+      }
     }
     return;
   }
@@ -199,6 +246,16 @@ function handleClick(sq) {
       addMoveToList(move, side);
       selected = null;
       render();
+
+      if (gameMode === 'solo' && !isGameOver()) {
+        if (currentVariant === 'duckChess' && game.duckPhase) {
+          // Human places duck, then AI goes
+        } else if (currentVariant === 'marseillais' && game.turn !== aiColor) {
+          // Human still has second move
+        } else {
+          scheduleAIMove();
+        }
+      }
       return;
     }
   }
@@ -211,9 +268,75 @@ function handleClick(sq) {
   render();
 }
 
+function placeDuck(sq) {
+  game.duckSq = sq;
+  game.duckPhase = false;
+  if (game.turn === MCE.BLACK) game.fullmove++;
+  game.turn = game.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
+  selected = null;
+  render();
+}
+
+function scheduleAIMove() {
+  aiThinking = true;
+  render();
+  setTimeout(doAIMove, 300);
+}
+
+function doAIMove() {
+  if (isGameOver()) { aiThinking = false; render(); return; }
+
+  if (currentVariant === 'marseillais') {
+    doAIMoveMarseillais();
+    return;
+  }
+
+  const move = MCE.aiPickMove(game, getAIDepth());
+  if (!move) { aiThinking = false; render(); return; }
+
+  const side = game.turn;
+  MCE.makeMove(game, move);
+  addMoveToList(move, side);
+
+  if (currentVariant === 'duckChess' && game.duckPhase) {
+    const duckSq = MCE.aiPickDuckSquare(game);
+    if (duckSq >= 0) placeDuck(duckSq);
+  }
+
+  aiThinking = false;
+  render();
+}
+
+function doAIMoveMarseillais() {
+  const move1 = MCE.aiPickMove(game, getAIDepth());
+  if (!move1) { aiThinking = false; render(); return; }
+
+  const side = game.turn;
+  MCE.makeMove(game, move1);
+  addMoveToList(move1, side);
+
+  if (game.turn === side && game.movesThisTurn === 1) {
+    const move2 = MCE.aiPickMove(game, getAIDepth());
+    if (move2) {
+      MCE.makeMove(game, move2);
+      addMoveToList(move2, side);
+    }
+  }
+
+  aiThinking = false;
+  render();
+}
+
+function getAIDepth() {
+  const total = game.rows * game.cols;
+  if (total > 80) return 1;
+  if (total > 64) return 2;
+  return 3;
+}
+
 function addMoveToList(move, side) {
-  const from = MCE.sqToAlgebraic(move.from);
-  const to = MCE.sqToAlgebraic(move.to);
+  const from = MCE.sqToAlgebraic(move.from, game);
+  const to = MCE.sqToAlgebraic(move.to, game);
   const prefix = side === MCE.WHITE ? moveNum + '. ' : moveNum + '... ';
   const entry = document.createElement('div');
   entry.textContent = prefix + from + to + (move.promo || '');
