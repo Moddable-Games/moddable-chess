@@ -149,7 +149,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 .mc-variant-card--featured {
-  grid-column: 1 / -1;
   background: var(--mc-deep);
   border-color: rgba(111, 181, 255, 0.3);
   display: block;
