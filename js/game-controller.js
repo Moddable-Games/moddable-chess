@@ -5,6 +5,24 @@ const container = document.getElementById('board-container');
 const statusEl = document.getElementById('status');
 const movesEl = document.getElementById('moves');
 const pickerEl = document.getElementById('variant-picker');
+const descEl = document.getElementById('description');
+
+const DESCRIPTIONS = {
+  standard: { title: 'Standard Chess', text: 'Classic FIDE chess. Checkmate the opponent\'s king to win.', rule: 'Board: 8×8 · Win: Checkmate' },
+  kingOfTheHill: { title: 'King of the Hill', text: 'Standard rules, plus an instant win if your king reaches any of the four centre squares (d4, d5, e4, e5).', rule: 'Board: 8×8 · Win: Checkmate or king reaches centre' },
+  threeCheck: { title: 'Three-Check', text: 'Standard rules, but delivering three checks to your opponent wins immediately — no need for checkmate.', rule: 'Board: 8×8 · Win: Checkmate or 3 checks' },
+  antichess: { title: 'Antichess', text: 'Captures are mandatory. The goal is to lose all your pieces. No check, no castling — the king is just another piece.', rule: 'Board: 8×8 · Win: Lose all pieces or get stalemated' },
+  racingKings: { title: 'Racing Kings', text: 'No checks allowed at any point. Both sides race their king to rank 8. First to arrive wins.', rule: 'Board: 8×8 · Win: King reaches rank 8' },
+  chess960: { title: 'Fischer Random (Chess960)', text: 'Standard rules but the back rank is randomised from 960 possible positions. Bishops on opposite colours, king between rooks.', rule: 'Board: 8×8 · Win: Checkmate' },
+  rifle: { title: 'Rifle Chess', text: 'When you capture a piece, your piece stays on its original square — it "shoots" the target from a distance.', rule: 'Board: 8×8 · Win: Checkmate' },
+  atomic: { title: 'Atomic Chess', text: 'Captures cause explosions that destroy all non-pawn pieces on adjacent squares, including the capturer. If a king is caught in the blast, that side loses.', rule: 'Board: 8×8 · Win: Explode opponent\'s king' },
+  marseillais: { title: 'Marseillais Chess', text: 'Each player makes two moves per turn (except White\'s first turn). If your first move gives check, your turn ends immediately.', rule: 'Board: 8×8 · Win: Checkmate' },
+  duckChess: { title: 'Duck Chess', text: 'After each move, place the duck (yellow blocker) on any empty square. The duck blocks all movement. Win by capturing the opponent\'s king — no check warnings.', rule: 'Board: 8×8 · Win: Capture king' },
+  fogOfWar: { title: 'Fog of War', text: 'You can only see squares your pieces can legally move to. Hidden squares are darkened. No check warnings — you must capture the king to win.', rule: 'Board: 8×8 · Win: Capture king' },
+  capablanca: { title: 'Capablanca Chess', text: 'Invented by world champion José Capablanca. Adds two new pieces: the Archbishop (bishop + knight) and Chancellor (rook + knight) on a wider board.', rule: 'Board: 10×8 · Win: Checkmate' },
+  grand: { title: 'Grand Chess', text: 'Same new pieces as Capablanca on a larger board. Pawns start on rank 3. No castling. Promotion only to previously captured pieces.', rule: 'Board: 10×10 · Win: Checkmate' },
+  courier: { title: 'Courier Chess', text: 'Medieval German variant from the 1200s. Uses a 12-column board with extra bishops and Sage pieces (move one step in any direction, non-royal).', rule: 'Board: 12×8 · Win: Checkmate' },
+};
 
 fetch('assets/pieces.svg')
   .then(r => r.text())
@@ -45,6 +63,12 @@ function renderPicker() {
   });
 }
 
+function renderDescription() {
+  const d = DESCRIPTIONS[currentVariant];
+  if (!d) { descEl.innerHTML = ''; return; }
+  descEl.innerHTML = `<h3>${d.title}</h3><p>${d.text}</p><div class="desc-rule">${d.rule}</div>`;
+}
+
 function startGame(variant) {
   currentVariant = variant;
   game = MCE.createGame(variant);
@@ -54,6 +78,7 @@ function startGame(variant) {
   moveNum = 1;
   movesEl.innerHTML = '';
   renderPicker();
+  renderDescription();
   render();
 }
 
