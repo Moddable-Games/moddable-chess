@@ -4,6 +4,7 @@
 const container = document.getElementById('board-container');
 const statusEl = document.getElementById('status');
 const movesEl = document.getElementById('moves');
+const pickerEl = document.getElementById('variant-picker');
 
 fetch('assets/pieces.svg')
   .then(r => r.text())
@@ -11,20 +12,49 @@ fetch('assets/pieces.svg')
     const div = document.createElement('div');
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
-    init();
+    renderPicker();
+    startGame('standard');
   });
 
-let game, selected, moveNum;
+let game, selected, moveNum, currentVariant;
 
-function init() {
-  game = MCE.createGame('standard');
+function renderPicker() {
+  pickerEl.innerHTML = '';
+  const variants = [
+    ['standard', 'Standard'],
+    ['kingOfTheHill', 'King of the Hill'],
+    ['threeCheck', 'Three-Check'],
+    ['antichess', 'Antichess'],
+    ['racingKings', 'Racing Kings'],
+    ['chess960', 'Fischer Random'],
+  ];
+  variants.forEach(([key, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'variant-btn' + (key === currentVariant ? ' variant-btn--active' : '');
+    btn.textContent = label;
+    btn.addEventListener('click', () => startGame(key));
+    pickerEl.appendChild(btn);
+  });
+}
+
+function startGame(variant) {
+  currentVariant = variant;
+  game = MCE.createGame(variant);
+  if (variant === 'chess960') {
+    MCE.loadFEN(game, MCE.randomFEN960());
+  }
+  if (variant === 'racingKings') {
+    MCE.loadFEN(game, 'qnnbbrkr/8/8/8/8/8/8/QNNBBRKR w - - 0 1');
+  }
   selected = null;
   moveNum = 1;
+  movesEl.innerHTML = '';
+  renderPicker();
   render();
 }
 
 function render() {
-  const allMoves = MCE.legalMoves(game);
+  const allMoves = getMovesForVariant();
   const movesForSelected = selected !== null
     ? allMoves.filter(m => m.from === selected)
     : [];
@@ -36,6 +66,36 @@ function render() {
     onSquareClick: handleClick,
   });
 
+  updateStatus();
+}
+
+function getMovesForVariant() {
+  if (MCE.variantLegalMoves && (currentVariant === 'antichess' || currentVariant === 'racingKings')) {
+    return MCE.variantLegalMoves(game);
+  }
+  return MCE.legalMoves(game);
+}
+
+function updateStatus() {
+  const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
+  if (variantStatus) {
+    if (variantStatus.startsWith('koth-')) {
+      const w = variantStatus === 'koth-w' ? 'White' : 'Black';
+      statusEl.textContent = w + ' wins — King of the Hill!';
+      return;
+    }
+    if (variantStatus.startsWith('race-')) {
+      const w = variantStatus === 'race-w' ? 'White' : 'Black';
+      statusEl.textContent = w + ' wins — reached rank 8!';
+      return;
+    }
+    if (variantStatus.startsWith('antichess-')) {
+      const w = variantStatus === 'antichess-w' ? 'White' : 'Black';
+      statusEl.textContent = w + ' wins — lost all pieces!';
+      return;
+    }
+  }
+
   const status = MCE.getStatus(game);
   const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
   if (status === 'checkmate') {
@@ -45,6 +105,13 @@ function render() {
     statusEl.textContent = 'Stalemate — draw';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
+    if (currentVariant === 'threeCheck') {
+      game.checkCount[game.turn]++;
+      if (game.checkCount[game.turn] >= 3) {
+        const winner = game.turn === MCE.WHITE ? 'Black' : 'White';
+        statusEl.textContent = winner + ' wins — Three checks!';
+      }
+    }
   } else {
     statusEl.textContent = turn + ' to move';
   }
@@ -52,7 +119,7 @@ function render() {
 
 function handleClick(sq) {
   const piece = game.board[sq];
-  const allMoves = MCE.legalMoves(game);
+  const allMoves = getMovesForVariant();
 
   if (selected !== null) {
     let candidates = allMoves.filter(m => m.from === selected && m.to === sq);

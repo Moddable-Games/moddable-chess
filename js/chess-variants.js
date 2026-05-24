@@ -91,10 +91,9 @@ function randomFEN960() {
   e = empty();
   pieces[e[0]] = 'r'; pieces[e[1]] = 'k'; pieces[e[2]] = 'r';
 
-  const backRank = pieces.join('');
-  const whiteRank = backRank.toUpperCase();
-  return whiteRank.split('').join('') + '/' +
-    'pppppppp/8/8/8/8/PPPPPPPP/' + whiteRank + ' w KQkq - 0 1';
+  const blackRank = pieces.join('');
+  const whiteRank = blackRank.toUpperCase();
+  return blackRank + '/pppppppp/8/8/8/8/PPPPPPPP/' + whiteRank + ' w KQkq - 0 1';
 }
 
 Object.assign(MCE, { VARIANTS, getVariantStatus, variantLegalMoves, randomFEN960 });
