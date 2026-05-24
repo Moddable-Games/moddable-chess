@@ -51,6 +51,7 @@ function createGame(config) {
     noCastling: config.noCastling || false,
     noEnPassant: config.noEnPassant || false,
     noPromotion: config.noPromotion || false,
+    ownershipMode: config.ownershipMode || 'case',
     legalityFilter: null,
     winCondition: null,
   };
@@ -149,6 +150,24 @@ function advanceTurn(g) {
 function pieceColor(p) { return p === p.toUpperCase() ? WHITE : BLACK; }
 function pieceType(p) { return p.toLowerCase(); }
 
+function pieceOwner(sqIdx, g) {
+  if (g.ownershipMode === 'pieceData' && g.pieceData && g.pieceData[sqIdx]) {
+    return g.pieceData[sqIdx].owner;
+  }
+  const p = g.board[sqIdx];
+  return p ? pieceColor(p) : null;
+}
+
+function isFriendly(sqIdx, side, g) {
+  if (!g.board[sqIdx]) return false;
+  return pieceOwner(sqIdx, g) === side;
+}
+
+function isEnemy(sqIdx, side, g) {
+  if (!g.board[sqIdx]) return false;
+  return pieceOwner(sqIdx, g) !== side;
+}
+
 function loadFEN(g, fen) {
   const parts = fen.split(' ');
   const fenRows = parts[0].split('/');
@@ -217,5 +236,5 @@ function sqToAlgebraic(i, g) {
   return String.fromCharCode(97 + c) + (rows - r);
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, rc, sq, onBoard, getTerrain, pieceColor, pieceType, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
+return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
 })();
