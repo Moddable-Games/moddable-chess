@@ -95,6 +95,7 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-24
+- Engine extensions for Dungeon Chess support: terrain system, config-based game creation, custom piece registry, multi-player turns, pluggable legality/win conditions, per-square metadata, feature flags (noCastling/noEnPassant/noPromotion), capturedAt in undo descriptor
 - Add AI opponent with Solo / Pass & Play mode selection
 - Extract inline script to external `js/home.js` backed by `data/variants.json`
 - Add homepage, docs hub, API reference, and "add a variant" guide

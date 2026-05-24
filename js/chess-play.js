@@ -12,11 +12,18 @@ function makeMove(g, move) {
   const captured = g.board[to];
   const undo = {
     from, to, piece, captured, flag, promo,
+    capturedAt: to,
     castling: { ...g.castling },
     enPassant: g.enPassant,
     halfmove: g.halfmove,
     turn: g.turn,
+    turnIndex: g.turnIndex,
   };
+
+  if (g.pieceData) {
+    undo.pieceDataFrom = g.pieceData[from];
+    undo.pieceDataTo = g.pieceData[to];
+  }
 
   const isRifle = g.variant === 'rifle';
   const isCapture = captured || flag === 'ep';
@@ -27,6 +34,15 @@ function makeMove(g, move) {
   } else {
     g.board[to] = piece;
     g.board[from] = null;
+  }
+
+  if (g.pieceData) {
+    if (isRifle && isCapture && flag !== 'ep') {
+      g.pieceData[to] = null;
+    } else {
+      g.pieceData[to] = g.pieceData[from];
+      g.pieceData[from] = null;
+    }
   }
 
   if (g.variant === 'atomic' && isCapture && flag !== 'ep') {
@@ -55,6 +71,11 @@ function makeMove(g, move) {
     const epCapSq = MCE.sq(fr, tc, g);
     undo.epCaptured = g.board[epCapSq];
     undo.epCapSq = epCapSq;
+    undo.capturedAt = epCapSq;
+    if (g.pieceData) {
+      undo.pieceDataEp = g.pieceData[epCapSq];
+      g.pieceData[epCapSq] = null;
+    }
     g.board[epCapSq] = null;
   }
 
@@ -76,6 +97,10 @@ function makeMove(g, move) {
     const rookTo = MCE.sq(row, kc + 1, g);
     g.board[rookTo] = g.board[rookFrom];
     g.board[rookFrom] = null;
+    if (g.pieceData) {
+      g.pieceData[rookTo] = g.pieceData[rookFrom];
+      g.pieceData[rookFrom] = null;
+    }
   }
   if (flag === 'castle-q') {
     const [row, kc] = MCE.rc(from, g);
@@ -83,6 +108,10 @@ function makeMove(g, move) {
     const rookTo = MCE.sq(row, kc - 1, g);
     g.board[rookTo] = g.board[rookFrom];
     g.board[rookFrom] = null;
+    if (g.pieceData) {
+      g.pieceData[rookTo] = g.pieceData[rookFrom];
+      g.pieceData[rookFrom] = null;
+    }
   }
 
   updateCastlingRights(g, from, to, piece);
@@ -97,7 +126,7 @@ function makeMove(g, move) {
     const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
     if (g.movesThisTurn >= 2 || isFirstMove || givesCheck) {
       if (g.turn === BLACK) g.fullmove++;
-      g.turn = g.turn === WHITE ? BLACK : WHITE;
+      MCE.advanceTurn(g);
       g.movesThisTurn = 0;
     }
   } else if (g.variant === 'duckChess') {
@@ -106,12 +135,12 @@ function makeMove(g, move) {
     } else {
       g.duckPhase = false;
       if (g.turn === BLACK) g.fullmove++;
-      g.turn = g.turn === WHITE ? BLACK : WHITE;
+      MCE.advanceTurn(g);
     }
     undo.duckPhase = !g.duckPhase;
   } else {
     if (g.turn === BLACK) g.fullmove++;
-    g.turn = g.turn === WHITE ? BLACK : WHITE;
+    MCE.advanceTurn(g);
   }
 
   g.history.push(move);
@@ -122,6 +151,14 @@ function unmakeMove(g, undo) {
   const { from, to, piece, captured, flag } = undo;
   g.board[from] = piece;
   g.board[to] = captured || null;
+
+  if (g.pieceData) {
+    g.pieceData[from] = undo.pieceDataFrom;
+    g.pieceData[to] = undo.pieceDataTo;
+    if (flag === 'ep' && undo.pieceDataEp !== undefined) {
+      g.pieceData[undo.epCapSq] = undo.pieceDataEp;
+    }
+  }
 
   if (undo.exploded) {
     undo.exploded.forEach(e => { g.board[e.sq] = e.piece; });
@@ -136,6 +173,10 @@ function unmakeMove(g, undo) {
     const rookFrom = MCE.sq(row, g.cols - 1, g);
     g.board[rookFrom] = g.board[rookTo];
     g.board[rookTo] = null;
+    if (g.pieceData) {
+      g.pieceData[rookFrom] = g.pieceData[rookTo];
+      g.pieceData[rookTo] = null;
+    }
   }
   if (flag === 'castle-q') {
     const [row, kc] = MCE.rc(from, g);
@@ -143,12 +184,17 @@ function unmakeMove(g, undo) {
     const rookFrom = MCE.sq(row, 0, g);
     g.board[rookFrom] = g.board[rookTo];
     g.board[rookTo] = null;
+    if (g.pieceData) {
+      g.pieceData[rookFrom] = g.pieceData[rookTo];
+      g.pieceData[rookTo] = null;
+    }
   }
 
   g.castling = undo.castling;
   g.enPassant = undo.enPassant;
   g.halfmove = undo.halfmove;
   g.turn = undo.turn;
+  g.turnIndex = undo.turnIndex;
   if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
   if (undo.duckPhase !== undefined) g.duckPhase = undo.duckPhase;
   g.history.pop();
@@ -169,6 +215,7 @@ function updateCastlingRights(g, from, to, piece) {
 }
 
 function getStatus(g) {
+  if (g.winCondition) return g.winCondition(g);
   const moves = legalMoves(g);
   if (moves.length === 0) {
     return inCheck(g, g.turn) ? 'checkmate' : 'stalemate';

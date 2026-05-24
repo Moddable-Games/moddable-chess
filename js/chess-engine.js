@@ -17,15 +17,62 @@ const VARIANT_BOARDS = {
   courier: { rows: 8, cols: 12, fen: 'rnbbqsksbbnr/pppppppppppp/12/12/12/12/PPPPPPPPPPPP/RNBBQSKSBBNR w - - 0 1' },
 };
 
-function createGame(variant) {
-  const vb = VARIANT_BOARDS[variant];
-  const rows = vb ? vb.rows : 8;
-  const cols = vb ? vb.cols : 8;
+const pieceRegistry = {};
+
+function createGame(config) {
+  if (typeof config === 'string' || config === undefined) {
+    return createVariantGame(config);
+  }
+  const rows = config.rows || 8;
+  const cols = config.cols || 8;
+  const total = rows * cols;
+  const players = config.players || [WHITE, BLACK];
   const g = {
     rows: rows,
     cols: cols,
-    board: Array(rows * cols).fill(null),
+    board: Array(total).fill(null),
+    terrain: config.terrain || Array(total).fill(0),
+    pieceData: config.pieceData || Array(total).fill(null),
+    turn: players[0],
+    players: players,
+    turnIndex: 0,
+    eliminated: new Set(),
+    castling: { K: true, Q: true, k: true, q: true },
+    enPassant: -1,
+    halfmove: 0,
+    fullmove: 1,
+    history: [],
+    variant: config.variant || null,
+    checkCount: { w: 0, b: 0 },
+    movesThisTurn: 0,
+    duckSq: -1,
+    duckPhase: false,
+    status: 'active',
+    noCastling: config.noCastling || false,
+    noEnPassant: config.noEnPassant || false,
+    noPromotion: config.noPromotion || false,
+    legalityFilter: null,
+    winCondition: null,
+  };
+  if (config.fen) loadFEN(g, config.fen);
+  return g;
+}
+
+function createVariantGame(variant) {
+  const vb = VARIANT_BOARDS[variant];
+  const rows = vb ? vb.rows : 8;
+  const cols = vb ? vb.cols : 8;
+  const total = rows * cols;
+  const g = {
+    rows: rows,
+    cols: cols,
+    board: Array(total).fill(null),
+    terrain: Array(total).fill(0),
+    pieceData: Array(total).fill(null),
     turn: WHITE,
+    players: [WHITE, BLACK],
+    turnIndex: 0,
+    eliminated: new Set(),
     castling: { K: true, Q: true, k: true, q: true },
     enPassant: -1,
     halfmove: 0,
@@ -37,6 +84,11 @@ function createGame(variant) {
     duckSq: -1,
     duckPhase: false,
     status: 'active',
+    noCastling: false,
+    noEnPassant: false,
+    noPromotion: false,
+    legalityFilter: null,
+    winCondition: null,
   };
   const fen = vb ? vb.fen : INITIAL_FEN;
   loadFEN(g, fen);
@@ -54,7 +106,44 @@ function sq(r, c, g) {
 function onBoard(r, c, g) {
   const rows = (g && g.rows) || 8;
   const cols = (g && g.cols) || 8;
-  return r >= 0 && r < rows && c >= 0 && c < cols;
+  if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
+  if (g && g.terrain) {
+    return g.terrain[r * cols + c] !== null;
+  }
+  return true;
+}
+
+function getTerrain(sqIdx, g) {
+  if (!g || !g.terrain) return 0;
+  return g.terrain[sqIdx];
+}
+
+function registerPiece(typeChar, handlers) {
+  pieceRegistry[typeChar] = handlers;
+}
+
+function getPieceRegistry() {
+  return pieceRegistry;
+}
+
+function setLegalityFilter(g, fn) {
+  g.legalityFilter = fn;
+}
+
+function setWinCondition(g, fn) {
+  g.winCondition = fn;
+}
+
+function advanceTurn(g) {
+  const count = g.players.length;
+  let next = (g.turnIndex + 1) % count;
+  let attempts = 0;
+  while (g.eliminated.has(g.players[next]) && attempts < count) {
+    next = (next + 1) % count;
+    attempts++;
+  }
+  g.turnIndex = next;
+  g.turn = g.players[next];
 }
 
 function pieceColor(p) { return p === p.toUpperCase() ? WHITE : BLACK; }
@@ -83,6 +172,10 @@ function loadFEN(g, fen) {
     }
   }
   g.turn = parts[1] === 'b' ? BLACK : WHITE;
+  if (g.players) {
+    g.turnIndex = g.players.indexOf(g.turn);
+    if (g.turnIndex < 0) g.turnIndex = 0;
+  }
   const cas = parts[2] || '-';
   g.castling = { K: cas.includes('K'), Q: cas.includes('Q'), k: cas.includes('k'), q: cas.includes('q') };
   g.enPassant = parts[3] && parts[3] !== '-' ? algebraicToSq(parts[3], g) : -1;
@@ -124,5 +217,5 @@ function sqToAlgebraic(i, g) {
   return String.fromCharCode(97 + c) + (rows - r);
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, rc, sq, onBoard, pieceColor, pieceType, algebraicToSq, sqToAlgebraic };
+return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, rc, sq, onBoard, getTerrain, pieceColor, pieceType, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
 })();

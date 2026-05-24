@@ -16,19 +16,23 @@ function pseudoLegalMoves(g) {
   const moves = [];
   const side = g.turn;
   const total = g.rows * g.cols;
+  const registry = MCE.getPieceRegistry();
   for (let i = 0; i < total; i++) {
     const p = g.board[i];
     if (!p || pieceColor(p) !== side) continue;
     const type = pieceType(p);
     const [r, c] = MCE.rc(i, g);
-    if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
+    if (registry[type]) {
+      const custom = registry[type].genMoves(g, i, side);
+      if (custom) custom.forEach(m => moves.push(m));
+    } else if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
     else if (type === PIECE.N) genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
     else if (type === PIECE.B) genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
     else if (type === PIECE.R) genSlides(g, i, r, c, side, ROOK_DIRS, moves);
     else if (type === PIECE.Q) genSlides(g, i, r, c, side, QUEEN_DIRS, moves);
     else if (type === PIECE.K) {
       genJumps(g, i, r, c, side, KING_DIRS, moves);
-      genCastling(g, i, r, c, side, moves);
+      if (!g.noCastling) genCastling(g, i, r, c, side, moves);
     }
     else if (type === PIECE.A) { genSlides(g, i, r, c, side, BISHOP_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
     else if (type === PIECE.C) { genSlides(g, i, r, c, side, ROOK_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
@@ -40,7 +44,7 @@ function pseudoLegalMoves(g) {
 function genPawnMoves(g, from, r, c, side, moves) {
   const dir = side === WHITE ? -1 : 1;
   const startRow = side === WHITE ? g.rows - 2 : 1;
-  const promoRow = side === WHITE ? 0 : g.rows - 1;
+  const promoRow = g.noPromotion ? -1 : (side === WHITE ? 0 : g.rows - 1);
   const grandStart = g.variant === 'grand' ? (side === WHITE ? g.rows - 3 : 2) : startRow;
   const actualStart = g.variant === 'grand' ? grandStart : startRow;
 
@@ -49,7 +53,7 @@ function genPawnMoves(g, from, r, c, side, moves) {
     addPawnMove(from, fwd, r + dir, promoRow, moves);
     if (r === actualStart) {
       const fwd2 = MCE.sq(r + dir * 2, c, g);
-      if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: 'double' });
+      if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: g.noEnPassant ? null : 'double' });
     }
   }
   for (const dc of [-1, 1]) {
@@ -58,7 +62,7 @@ function genPawnMoves(g, from, r, c, side, moves) {
     const target = MCE.sq(r + dir, nc, g);
     const tp = g.board[target];
     if (tp && pieceColor(tp) !== side) addPawnMove(from, target, r + dir, promoRow, moves);
-    else if (target === g.enPassant) moves.push({ from, to: target, flag: 'ep' });
+    else if (!g.noEnPassant && target === g.enPassant) moves.push({ from, to: target, flag: 'ep' });
   }
 }
 
@@ -143,6 +147,10 @@ function isAttacked(g, target, bySide) {
 
 function attacks(g, from, target, piece) {
   const type = pieceType(piece);
+  const registry = MCE.getPieceRegistry();
+  if (registry[type]) {
+    return registry[type].attacks(g, from, target);
+  }
   const [fr, fc] = MCE.rc(from, g);
   const [tr, tc] = MCE.rc(target, g);
   const dr = tr - fr, dc = tc - fc;
@@ -180,6 +188,12 @@ function slidesTo(g, from, target, dirs) {
 
 function legalMoves(g) {
   return pseudoLegalMoves(g).filter(m => {
+    if (g.legalityFilter) {
+      const undo = MCE.makeMove(g, m);
+      const legal = g.legalityFilter(g, m, undo);
+      MCE.unmakeMove(g, undo);
+      return legal;
+    }
     const undo = MCE.makeMove(g, m);
     const opp = g.turn === WHITE ? BLACK : WHITE;
     const legal = !inCheck(g, opp);
