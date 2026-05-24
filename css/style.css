@@ -1,5 +1,5 @@
 :root {
-  --play-bg: #1a1a2e;
+  --play-bg: var(--mg-cosmic-deep, #0a0d2a);
   --play-text: #fff;
   --play-text-muted: rgba(255,255,255,0.7);
   --play-text-dim: rgba(255,255,255,0.6);
@@ -16,8 +16,8 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: system-ui, sans-serif; background: var(--play-bg); color: var(--play-text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-h1, h2, h3 { text-wrap: pretty; }
+body { font-family: var(--mg-font-body, 'Barlow', system-ui, sans-serif); background: var(--play-bg); color: var(--play-text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-serif); text-wrap: pretty; }
 p, li { text-wrap: pretty; }
 #app { display: flex; gap: 24px; align-items: flex-start; padding: 24px; flex: 1; align-self: center; }
 #sidebar { max-width: 220px; display: flex; flex-direction: column; gap: 12px; }
