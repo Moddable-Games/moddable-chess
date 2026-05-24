@@ -95,6 +95,7 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-24
+- Add AI opponent with Solo / Pass & Play mode selection
 - Extract inline script to external `js/home.js` backed by `data/variants.json`
 - Add homepage, docs hub, API reference, and "add a variant" guide
 - Add Dungeon Chess featured card to homepage variant grid
