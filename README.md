@@ -95,6 +95,12 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-24
+- Add move animation system: `animate`, `animStyle` ('slide' or 'arc'), `animDuration`, `animCaptureBurst` as renderer params
+- Add capture burst particle effect (expanding ring + sparks)
+- Deploy to GitHub Pages with custom domain (chess.moddable.games)
+- Add OG/Twitter meta tags and favicon to all pages
+- Add responsive mobile layout (stacked on mobile, horizontal variant scroll)
+- Update API docs with animation, draw detection, and positionKey documentation
 - Add promotion UI dialog with piece selection (Q/R/B/N, plus A/C for Capablanca/Grand)
 - Add draw detection: threefold repetition, insufficient material, improved 50-move rule messaging
 - Add board controls: flip board, undo move, new game

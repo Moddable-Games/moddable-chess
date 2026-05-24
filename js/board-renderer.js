@@ -1,7 +1,4 @@
 'use strict';
-/**
- * SVG board renderer for standard 8×8 chess
- */
 (function() {
 
 const { rc, sq, sqToAlgebraic } = MCE;
@@ -20,6 +17,8 @@ function svgEl(tag, attrs) {
   return el;
 }
 
+let prevPiecePositions = null;
+
 function renderBoard(container, game, opts) {
   opts = opts || {};
   const rows = game.rows || 8;
@@ -32,6 +31,13 @@ function renderBoard(container, game, opts) {
   const lastMove = opts.lastMove || null;
   const legalMoves = opts.legalMoves || [];
   const onSquareClick = opts.onSquareClick;
+
+  const animate = opts.animate || false;
+  const animStyle = opts.animStyle || 'slide';
+  const animDuration = opts.animDuration || 200;
+  const animEasing = opts.animEasing || 'ease-out';
+  const animArcHeight = opts.animArcHeight || 0.25;
+  const animCaptureBurst = opts.animCaptureBurst || false;
 
   container.innerHTML = '';
   const svg = svgEl('svg', { width: size, height: height, viewBox: `0 0 ${size} ${height}` });
@@ -104,7 +110,8 @@ function renderBoard(container, game, opts) {
     }
   }
 
-  // Draw pieces
+  // Build current piece positions map
+  const currentPositions = new Map();
   const total = rows * cols;
   for (let i = 0; i < total; i++) {
     const p = game.board[i];
@@ -115,14 +122,72 @@ function renderBoard(container, game, opts) {
     const dc = flipped ? cols - 1 - pc : pc;
     const x = dc * tileSize + tileSize * 0.05;
     const y = dr * tileSize + tileSize * 0.05;
-    const pieceSize = tileSize * 0.9;
-
-    const use = svgEl('use', {
-      href: '#piece-' + p,
-      x, y, width: pieceSize, height: pieceSize,
-    });
-    svg.appendChild(use);
+    currentPositions.set(i, { piece: p, x, y });
   }
+
+  // Determine which piece to animate and whether it's a capture
+  let animateFromX = null, animateFromY = null, animateToSq = null;
+  let isAnimCapture = false;
+  if (animate && lastMove && prevPiecePositions) {
+    const fromSq = lastMove.from;
+    const toSq = lastMove.to;
+    const prev = prevPiecePositions.get(fromSq);
+    if (prev && currentPositions.has(toSq)) {
+      animateFromX = prev.x;
+      animateFromY = prev.y;
+      animateToSq = toSq;
+      isAnimCapture = prevPiecePositions.has(toSq) && prevPiecePositions.get(toSq).piece !== currentPositions.get(toSq).piece;
+    }
+  }
+
+  // Draw pieces
+  for (const [sqIdx, pos] of currentPositions) {
+    const pieceSize = tileSize * 0.9;
+    const use = svgEl('use', {
+      href: '#piece-' + pos.piece,
+      width: pieceSize,
+      height: pieceSize,
+    });
+
+    if (animate && sqIdx === animateToSq && animateFromX !== null) {
+      if (animStyle === 'arc') {
+        use.setAttribute('x', pos.x);
+        use.setAttribute('y', pos.y);
+        use.setAttribute('transform', 'translate(0, 0)');
+        svg.appendChild(use);
+        animateArc(svg, use, animateFromX, animateFromY, pos.x, pos.y, tileSize, animDuration, animArcHeight, pos.piece);
+      } else {
+        const dx = animateFromX - pos.x;
+        const dy = animateFromY - pos.y;
+        use.setAttribute('x', pos.x);
+        use.setAttribute('y', pos.y);
+        use.setAttribute('transform', `translate(${dx}, ${dy})`);
+        use.style.transition = `transform ${animDuration}ms ${animEasing}`;
+        svg.appendChild(use);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            use.setAttribute('transform', 'translate(0, 0)');
+          });
+        });
+      }
+    } else {
+      use.setAttribute('x', pos.x);
+      use.setAttribute('y', pos.y);
+      svg.appendChild(use);
+    }
+  }
+
+  // Capture burst effect
+  if (animate && animCaptureBurst && isAnimCapture && animateToSq !== null) {
+    const pos = currentPositions.get(animateToSq);
+    if (pos) {
+      const burstDelay = animStyle === 'arc' ? animDuration : animDuration * 0.8;
+      setTimeout(() => captureBurst(svg, pos.x + tileSize * 0.45, pos.y + tileSize * 0.45, tileSize), burstDelay);
+    }
+  }
+
+  // Save positions for next render
+  prevPiecePositions = currentPositions;
 
   // Draw duck
   const duckSq = opts.duckSq;
@@ -168,5 +233,94 @@ function renderBoard(container, game, opts) {
   return svg;
 }
 
-Object.assign(MCE, { renderBoard });
+function animateArc(svg, use, fromX, fromY, toX, toY, tileSize, duration, arcFactor, piece) {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const arcHeight = Math.min(dist * arcFactor, tileSize * 0.8);
+  const startTime = performance.now();
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+
+    const ease = t < 0.5
+      ? 2 * t * t
+      : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    const cx = fromX + dx * ease;
+    const cy = fromY + dy * ease;
+    const arc = arcHeight * 4 * t * (1 - t);
+    const scale = 1 + 0.15 * Math.sin(t * Math.PI);
+
+    const offsetX = cx - toX;
+    const offsetY = (cy - arc) - toY;
+    use.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      use.setAttribute('transform', 'translate(0, 0)');
+    }
+  }
+
+  const offsetX = fromX - toX;
+  const offsetY = fromY - toY;
+  use.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
+  requestAnimationFrame(frame);
+}
+
+function captureBurst(svg, cx, cy, tileSize) {
+  const flash = svgEl('g', { style: 'pointer-events:none' });
+
+  const ring = svgEl('circle', { cx, cy, r: tileSize * 0.15,
+    fill: 'none', stroke: 'rgba(255,100,40,0.95)', 'stroke-width': 3 });
+  flash.appendChild(ring);
+
+  const particleCount = 8;
+  for (let i = 0; i < particleCount; i++) {
+    const angle = (i / particleCount) * Math.PI * 2;
+    flash.appendChild(svgEl('circle', {
+      cx: cx + Math.cos(angle) * tileSize * 0.1,
+      cy: cy + Math.sin(angle) * tileSize * 0.1,
+      r: 2.5, fill: 'rgba(255,220,60,0.95)'
+    }));
+  }
+
+  const innerFlash = svgEl('circle', { cx, cy, r: tileSize * 0.3,
+    fill: 'rgba(255,200,80,0.4)' });
+  flash.appendChild(innerFlash);
+
+  svg.appendChild(flash);
+
+  const start = performance.now();
+  const FLASH_DURATION = 400;
+  function frameFlash(now) {
+    const t = Math.min((now - start) / FLASH_DURATION, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+
+    ring.setAttribute('r', tileSize * 0.15 + ease * tileSize * 0.6);
+    ring.setAttribute('stroke-opacity', 1 - ease);
+    ring.setAttribute('stroke-width', 3 * (1 - ease * 0.7));
+
+    innerFlash.setAttribute('r', tileSize * 0.3 * (1 - ease));
+    innerFlash.setAttribute('opacity', 1 - ease);
+
+    const particles = flash.querySelectorAll('circle:not(:first-child):not(:last-child)');
+    particles.forEach((p, i) => {
+      const angle = (i / particleCount) * Math.PI * 2;
+      const dist = tileSize * 0.1 + ease * tileSize * 0.55;
+      p.setAttribute('cx', cx + Math.cos(angle) * dist);
+      p.setAttribute('cy', cy + Math.sin(angle) * dist);
+      p.setAttribute('opacity', 1 - ease * ease);
+      p.setAttribute('r', 2.5 * (1 - ease * 0.5));
+    });
+
+    if (t < 1) requestAnimationFrame(frameFlash);
+    else flash.remove();
+  }
+  requestAnimationFrame(frameFlash);
+}
+
+Object.assign(MCE, { renderBoard, captureBurst });
 })();

@@ -9,7 +9,7 @@
 <meta property="og:site_name" content="Moddable Chess">
 <meta property="og:title" content="API Reference — Moddable Chess">
 <meta property="og:description" content="Complete API reference for all MCE namespace methods.">
-<meta property="og:url" content="https://moddable-games.github.io/moddable-chess/docs/api.html">
+<meta property="og:url" content="https://chess.moddable.games/docs/api.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="API Reference — Moddable Chess">
 <meta name="twitter:description" content="Complete API reference for all MCE namespace methods.">
@@ -127,16 +127,30 @@ const undo = MCE.makeMove(game, move);<br>
   <p>Renders an SVG chess board into a DOM element.</p>
   <div class="docs-code">
 MCE.renderBoard(el, game, {<br>
-&nbsp;&nbsp;size: 480,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// width in px (height auto from rows/cols)<br>
-&nbsp;&nbsp;flipped: false,&nbsp;&nbsp;&nbsp;&nbsp;// flip board for black's perspective<br>
-&nbsp;&nbsp;selected: null,&nbsp;&nbsp;&nbsp;&nbsp;// highlighted square index<br>
-&nbsp;&nbsp;legalMoves: [],&nbsp;&nbsp;&nbsp;&nbsp;// array of moves to show indicators for<br>
-&nbsp;&nbsp;onSquareClick: fn, // callback(squareIndex)<br>
-&nbsp;&nbsp;fogMask: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Set of visible square indices (Fog of War)<br>
-&nbsp;&nbsp;duckSq: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// duck position index (Duck Chess)<br>
-&nbsp;&nbsp;lastMove: null,&nbsp;&nbsp;&nbsp;&nbsp;// { from, to } — highlights last move squares<br>
+&nbsp;&nbsp;size: 480,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// width in px (height auto from rows/cols)<br>
+&nbsp;&nbsp;flipped: false,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// flip board for black's perspective<br>
+&nbsp;&nbsp;selected: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// highlighted square index<br>
+&nbsp;&nbsp;legalMoves: [],&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// array of moves to show indicators for<br>
+&nbsp;&nbsp;onSquareClick: fn,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// callback(squareIndex)<br>
+&nbsp;&nbsp;fogMask: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Set of visible square indices (Fog of War)<br>
+&nbsp;&nbsp;duckSq: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// duck position index (Duck Chess)<br>
+&nbsp;&nbsp;lastMove: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// { from, to } — highlights last move squares<br>
+&nbsp;&nbsp;animate: false,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// enable piece movement animation<br>
+&nbsp;&nbsp;animStyle: 'slide',&nbsp;&nbsp;&nbsp;&nbsp;// 'slide' (CSS transition) or 'arc' (parabolic jump)<br>
+&nbsp;&nbsp;animDuration: 200,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// animation duration in ms<br>
+&nbsp;&nbsp;animEasing: 'ease-out',// CSS easing (slide mode only)<br>
+&nbsp;&nbsp;animArcHeight: 0.25,&nbsp;&nbsp;&nbsp;// arc peak as fraction of distance (arc mode)<br>
+&nbsp;&nbsp;animCaptureBurst: false,// show particle burst on captures<br>
 });
   </div>
+
+  <h3>Animation styles</h3>
+  <p><code>animStyle: 'slide'</code> — Piece slides smoothly from origin to destination using a CSS transform transition. Clean and minimal.</p>
+  <p><code>animStyle: 'arc'</code> — Piece lifts in a parabolic arc, scaling up mid-flight then landing on the target square. Suitable for dungeon/fantasy themes.</p>
+  <p><code>animCaptureBurst: true</code> — On captures, triggers an expanding ring + spark particles effect at the capture square after the move animation completes.</p>
+
+  <h3>MCE.captureBurst(svg, cx, cy, tileSize)</h3>
+  <p>Triggers a capture burst animation at the given SVG coordinates. Can be called independently for custom capture effects.</p>
 
   <h2>Utilities</h2>
 
