@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 18 playable variants on boards from 8×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 20 playable variants on boards from 8×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -65,6 +65,8 @@ moddable-chess/
 | Done | Torpedo Chess | 8×8 | Pawns can always double-move |
 | Done | Horde Chess | 8×8 | 36 pawns vs normal army |
 | Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
+| Done | Breakthrough | 7×7 | Pawns only, first to far rank wins |
+| Done | Maharaja & Sepoys | 8×8 | One Queen+Knight piece vs full army |
 
 ---
 

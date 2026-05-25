@@ -16,5 +16,7 @@
   { "name": "No Castling", "board": "8×8", "desc": "Standard chess, castling disabled. Endorsed by Kramnik." },
   { "name": "Torpedo Chess", "board": "8×8", "desc": "Pawns can always double-move, not just from starting rank." },
   { "name": "Horde Chess", "board": "8×8", "desc": "36 pawns vs a normal army. Asymmetric survival." },
-  { "name": "Extinction Chess", "board": "8×8", "desc": "Lose when any piece type is fully eliminated." }
+  { "name": "Extinction Chess", "board": "8×8", "desc": "Lose when any piece type is fully eliminated." },
+  { "name": "Breakthrough", "board": "7×7", "desc": "Pawns only. First to reach the far rank wins." },
+  { "name": "Maharaja & Sepoys", "board": "8×8", "desc": "One Queen+Knight super-piece vs a full army." }
 ]

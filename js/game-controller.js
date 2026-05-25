@@ -27,6 +27,8 @@ const DESCRIPTIONS = {
   torpedo: { title: 'Torpedo Chess', text: 'Pawns can always move two squares forward, not just from their starting rank. Makes pawns far more dynamic and endgames completely different.', rule: 'Board: 8×8 · Win: Checkmate' },
   horde: { title: 'Horde Chess', text: 'Massively asymmetric — White has 36 pawns filling ranks 1-4, Black has a normal army. Black wins by checkmate or eliminating all White pieces. White wins by checkmating Black.', rule: 'Board: 8×8 · Win: Checkmate (Black) or eliminate horde (Black)' },
   extinction: { title: 'Extinction Chess', text: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.', rule: 'Board: 8×8 · Win: Eliminate a piece type' },
+  breakthrough: { title: 'Breakthrough', text: 'Only pawns on a 7×7 board. First to reach the far rank wins. No promotion — just push through. Simple to learn, deep to master. Used in AI competitions.', rule: 'Board: 7×7 · Win: Reach far rank' },
+  maharaja: { title: 'Maharaja & Sepoys', text: 'Extreme asymmetry — White has only a Maharaja (Queen + Knight compound piece) against Black\'s full army. The Maharaja must checkmate Black\'s king alone.', rule: 'Board: 8×8 · Win: Checkmate' },
 };
 
 const VARIANT_GROUPS = [
@@ -50,6 +52,8 @@ const VARIANT_GROUPS = [
     ['duckChess', 'Duck Chess'],
     ['fogOfWar', 'Fog of War'],
     ['horde', 'Horde'],
+    ['breakthrough', 'Breakthrough (7×7)'],
+    ['maharaja', 'Maharaja & Sepoys'],
   ]},
   { label: 'Large Boards', variants: [
     ['capablanca', 'Capablanca (10×8)'],
@@ -395,6 +399,14 @@ function updateStatus() {
     }
     if (variantStatus.startsWith('extinction-')) {
       statusEl.textContent = (variantStatus === 'extinction-w' ? playerNames.w : playerNames.b) + ' wins — piece type extinct!';
+      return;
+    }
+    if (variantStatus.startsWith('breakthrough-')) {
+      statusEl.textContent = (variantStatus === 'breakthrough-w' ? playerNames.w : playerNames.b) + ' wins — reached the far rank!';
+      return;
+    }
+    if (variantStatus === 'maharaja-b') {
+      statusEl.textContent = playerNames.b + ' wins — Maharaja captured!';
       return;
     }
   }

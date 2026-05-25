@@ -28,18 +28,19 @@ p, li { text-wrap: pretty; }
 .variant-search { padding: 7px 10px; border: 1px solid var(--play-border); border-radius: 6px; background: var(--play-surface); color: var(--play-text); font-size: 12px; font-family: inherit; outline: none; }
 .variant-search::placeholder { color: var(--play-text-faint); }
 .variant-search:focus { border-color: var(--play-accent-border); }
-.variant-list-wrap { display: flex; flex-direction: column; gap: 2px; max-height: 60vh; overflow-y: auto; }
-.variant-group-header { padding: 6px 10px; border: none; border-radius: 6px; background: transparent; color: var(--play-text-faint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; text-align: left; transition: color 120ms; }
-.variant-group-header:hover { color: var(--play-text-muted); }
-.variant-group-header--open { color: var(--play-text-muted); }
+.variant-list-wrap { display: flex; flex-direction: column; gap: 2px; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.variant-group-header { padding: 8px 10px 6px; border: none; border-radius: 0; background: transparent; color: var(--play-text-faint); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; text-align: left; transition: color 120ms; border-top: 1px solid var(--play-border); margin-top: 6px; }
+.variant-group-header:first-child { border-top: none; margin-top: 0; }
+.variant-group-header:hover { color: var(--play-text); }
+.variant-group-header--open { color: var(--play-text); }
 .mode-bar { display: flex; gap: 4px; margin-bottom: 4px; }
 .mode-btn { flex: 1; padding: 8px 12px; border: 1px solid var(--play-border-accent); border-radius: 8px; background: transparent; color: var(--play-text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 120ms; }
 .mode-btn:hover { background: var(--play-surface-hover); color: var(--play-text); }
 .mode-btn--active { background: var(--play-accent); border-color: var(--play-accent-border); color: var(--play-text); }
 .variant-list, .variant-list-wrap { display: flex; flex-direction: column; gap: 2px; }
-.variant-btn { padding: 8px 12px; border: 1px solid var(--play-border); border-radius: 8px; background: transparent; color: var(--play-text-muted); font-size: 13px; text-align: left; cursor: pointer; transition: all 120ms; }
+.variant-btn { padding: 6px 10px 6px 16px; border: none; border-radius: 4px; background: transparent; color: var(--play-text-muted); font-size: 12px; text-align: left; cursor: pointer; transition: all 120ms; }
 .variant-btn:hover { background: var(--play-surface-hover); color: var(--play-text); }
-.variant-btn--active { background: var(--play-surface-active); border-color: var(--play-border-hover); color: var(--play-text); font-weight: 600; }
+.variant-btn--active { background: var(--play-accent); color: var(--play-text); font-weight: 600; }
 #status { font-size: 14px; font-weight: 600; padding: 8px 12px; border-radius: 8px; background: var(--play-surface); }
 #moves { font-family: monospace; font-size: 12px; color: var(--play-text-dim); max-height: 300px; overflow-y: auto; }
 #moves div { padding: 2px 0; }

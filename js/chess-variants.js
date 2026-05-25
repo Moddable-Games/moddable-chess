@@ -22,6 +22,8 @@ const VARIANTS = {
   torpedo: { label: 'Torpedo Chess' },
   horde: { label: 'Horde Chess' },
   extinction: { label: 'Extinction Chess' },
+  breakthrough: { label: 'Breakthrough' },
+  maharaja: { label: 'Maharaja' },
 };
 
 function getVariantStatus(g) {
@@ -75,6 +77,22 @@ function getVariantStatus(g) {
       }
     }
   }
+  if (v === 'breakthrough') {
+    for (let c = 0; c < g.cols; c++) {
+      const topPiece = g.board[sq(0, c, g)];
+      if (topPiece === 'P') return 'breakthrough-w';
+      const botPiece = g.board[sq(g.rows - 1, c, g)];
+      if (botPiece === 'p') return 'breakthrough-b';
+    }
+    const whiteHas = g.board.some(p => p && pieceColor(p) === WHITE);
+    if (!whiteHas) return 'breakthrough-b';
+    const blackHas = g.board.some(p => p && pieceColor(p) === BLACK);
+    if (!blackHas) return 'breakthrough-w';
+  }
+  if (v === 'maharaja') {
+    const hasM = g.board.some(p => p === 'M');
+    if (!hasM) return 'maharaja-b';
+  }
   return null;
 }
 
@@ -120,6 +138,56 @@ function randomFEN960() {
   const whiteRank = blackRank.toUpperCase();
   return blackRank + '/pppppppp/8/8/8/8/PPPPPPPP/' + whiteRank + ' w KQkq - 0 1';
 }
+
+// Maharaja piece (Queen + Knight compound)
+const QUEEN_DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+const KNIGHT_JUMPS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+
+MCE.registerPiece('m', {
+  genMoves: function(g, from, side) {
+    const moves = [];
+    const [r, c] = rc(from, g);
+    for (const [dr, dc] of QUEEN_DIRS) {
+      let nr = r + dr, nc = c + dc;
+      while (onBoard(nr, nc, g)) {
+        const target = sq(nr, nc, g);
+        const tp = g.board[target];
+        if (tp) {
+          if (pieceColor(tp) !== side) moves.push({ from, to: target, flag: null });
+          break;
+        }
+        moves.push({ from, to: target, flag: null });
+        nr += dr; nc += dc;
+      }
+    }
+    for (const [dr, dc] of KNIGHT_JUMPS) {
+      const nr = r + dr, nc = c + dc;
+      if (!onBoard(nr, nc, g)) continue;
+      const target = sq(nr, nc, g);
+      const tp = g.board[target];
+      if (!tp || pieceColor(tp) !== side) moves.push({ from, to: target, flag: null });
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    const [fr, fc] = rc(from, g);
+    const [tr, tc] = rc(target, g);
+    const dr = tr - fr, dc = tc - fc;
+    if ((Math.abs(dr) === 2 && Math.abs(dc) === 1) || (Math.abs(dr) === 1 && Math.abs(dc) === 2)) return true;
+    if (dr === 0 && dc === 0) return false;
+    if (dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc)) {
+      const stepR = dr === 0 ? 0 : dr / Math.abs(dr);
+      const stepC = dc === 0 ? 0 : dc / Math.abs(dc);
+      let cr = fr + stepR, cc = fc + stepC;
+      while (cr !== tr || cc !== tc) {
+        if (g.board[sq(cr, cc, g)]) return false;
+        cr += stepR; cc += stepC;
+      }
+      return true;
+    }
+    return false;
+  }
+});
 
 Object.assign(MCE, { VARIANTS, getVariantStatus, variantLegalMoves, randomFEN960 });
 })();
