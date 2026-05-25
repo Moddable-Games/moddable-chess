@@ -45,6 +45,9 @@ const VARIANT_LIST = [
 const params = new URLSearchParams(location.search);
 const paramVariant = params.get('variant');
 const embedMode = params.get('embed') === '1';
+const paramP1 = params.get('p1') || 'White';
+const paramP2 = params.get('p2') || 'Black';
+const paramMode = params.get('mode');
 
 if (embedMode) {
   document.querySelectorAll('.site-nav, .site-footer, #sidebar').forEach(el => el.style.display = 'none');
@@ -64,8 +67,9 @@ fetch(basePath + 'assets/pieces.svg')
   });
 
 let game, selected, moveNum, currentVariant;
-let gameMode = 'solo';
+let gameMode = paramMode === 'pass' ? 'pass' : 'solo';
 let aiColor = MCE.BLACK;
+const playerNames = { w: paramP1, b: paramP2 };
 let aiThinking = false;
 let gameOver = false;
 let undoStack = [];
@@ -268,10 +272,12 @@ function getMovesForVariant() {
   return MCE.legalMoves(game);
 }
 
+function nameFor(color) { return color === MCE.WHITE ? playerNames.w : playerNames.b; }
+function nameForOpp(color) { return color === MCE.WHITE ? playerNames.b : playerNames.w; }
+
 function updateStatus() {
   if (game.duckPhase) {
-    const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
-    statusEl.textContent = turn + ' — place the duck';
+    statusEl.textContent = nameFor(game.turn) + ' — place the duck';
     return;
   }
 
@@ -279,24 +285,24 @@ function updateStatus() {
   if (variantStatus) {
     gameOver = true;
     if (variantStatus.startsWith('koth-')) {
-      statusEl.textContent = (variantStatus === 'koth-w' ? 'White' : 'Black') + ' wins — King of the Hill!';
+      statusEl.textContent = (variantStatus === 'koth-w' ? playerNames.w : playerNames.b) + ' wins — King of the Hill!';
       return;
     }
     if (variantStatus.startsWith('race-')) {
-      statusEl.textContent = (variantStatus === 'race-w' ? 'White' : 'Black') + ' wins — reached rank 8!';
+      statusEl.textContent = (variantStatus === 'race-w' ? playerNames.w : playerNames.b) + ' wins — reached rank 8!';
       return;
     }
     if (variantStatus.startsWith('antichess-')) {
-      statusEl.textContent = (variantStatus === 'antichess-w' ? 'White' : 'Black') + ' wins — lost all pieces!';
+      statusEl.textContent = (variantStatus === 'antichess-w' ? playerNames.w : playerNames.b) + ' wins — lost all pieces!';
       return;
     }
   }
 
   const status = MCE.getStatus(game);
-  const turn = game.turn === MCE.WHITE ? 'White' : 'Black';
+  const turn = nameFor(game.turn);
   if (status === 'checkmate') {
     gameOver = true;
-    statusEl.textContent = 'Checkmate — ' + (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins!';
+    statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
   } else if (status === 'stalemate') {
     gameOver = true;
     statusEl.textContent = 'Stalemate — draw';
@@ -315,7 +321,7 @@ function updateStatus() {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= 3) {
         gameOver = true;
-        statusEl.textContent = (game.turn === MCE.WHITE ? 'Black' : 'White') + ' wins — Three checks!';
+        statusEl.textContent = nameForOpp(game.turn) + ' wins — Three checks!';
       }
     }
   } else if (currentVariant === 'marseillais' && game.movesThisTurn === 1) {
