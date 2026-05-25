@@ -164,6 +164,20 @@ p, li { text-wrap: pretty; }
     max-width: 100%;
     width: 100%;
     order: 1;
+    display: contents;
+  }
+
+  #variant-picker {
+    order: 1;
+  }
+
+  #status {
+    order: 4;
+  }
+
+  #moves {
+    order: 5;
+    max-height: 150px;
   }
 
   .mode-bar {
@@ -202,16 +216,7 @@ p, li { text-wrap: pretty; }
   }
 
   #captured {
-    order: 4;
-  }
-
-  #status {
-    order: 5;
-  }
-
-  #moves {
     order: 6;
-    max-height: 200px;
   }
 
   #description {
