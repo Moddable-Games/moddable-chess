@@ -179,6 +179,55 @@ MCE.renderBoard(el, game, {<br>
     <tr><td><code>MCE.INITIAL_FEN</code></td><td>Standard starting position</td></tr>
     <tr><td><code>MCE.VARIANT_BOARDS</code></td><td>Config for non-8×8 variants (rows, cols, fen)</td></tr>
   </table>
+
+  <h2>Embedding</h2>
+  <p>The play page supports URL parameters for embedding in iframes. Combine parameters to control appearance and behaviour.</p>
+
+  <h3>Basic parameters</h3>
+  <table class="docs-table">
+    <tr><th>Parameter</th><th>Values</th><th>Effect</th></tr>
+    <tr><td><code>variant</code></td><td>Any variant key</td><td>Start with a specific variant (e.g. <code>atomic</code>, <code>fogOfWar</code>)</td></tr>
+    <tr><td><code>embed</code></td><td><code>1</code></td><td>Hides nav, sidebar, and footer. Adds <code>embed-mode</code> class to body</td></tr>
+    <tr><td><code>boardonly</code></td><td><code>1</code></td><td>Requires <code>embed=1</code>. Hides all UI except the board. Board fills container width</td></tr>
+    <tr><td><code>mode</code></td><td><code>solo</code> | <code>pass</code></td><td>Solo plays vs AI; pass-and-play is two humans alternating</td></tr>
+    <tr><td><code>p1</code></td><td>Any string</td><td>White player name (default: "White")</td></tr>
+    <tr><td><code>p2</code></td><td>Any string</td><td>Black player name (default: "Black")</td></tr>
+  </table>
+
+  <h3>Styling parameters</h3>
+  <p>These only apply when <code>embed=1</code> is set:</p>
+  <table class="docs-table">
+    <tr><th>Parameter</th><th>Values</th><th>Effect</th></tr>
+    <tr><td><code>theme</code></td><td><code>light</code></td><td>Switches to light colour scheme (white background, dark text)</td></tr>
+    <tr><td><code>bg</code></td><td>CSS colour</td><td>Override background colour (e.g. <code>%23f0f0f0</code> for #f0f0f0)</td></tr>
+    <tr><td><code>accent</code></td><td>CSS colour</td><td>Override accent colour for selection highlights and borders</td></tr>
+    <tr><td><code>radius</code></td><td>CSS value</td><td>Border radius on the board container (e.g. <code>12px</code>)</td></tr>
+  </table>
+
+  <h3>Examples</h3>
+  <p>Minimal embed — board only, atomic variant:</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;variant=atomic"<br>
+&nbsp;&nbsp;width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
+
+  <p>Full game UI in light theme with custom names:</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;theme=light&amp;p1=Alice&amp;p2=Bob&amp;variant=standard"<br>
+&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
+
+  <p>Custom styling — green accent, rounded corners:</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;accent=%233a9928&amp;radius=16px&amp;variant=kingOfTheHill"<br>
+&nbsp;&nbsp;width="600" height="500" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
+
+  <p>Pass-and-play with player names (no AI):</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;mode=pass&amp;p1=Magnus&amp;p2=Hikaru"<br>
+&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
 </div>
 </div>
 
