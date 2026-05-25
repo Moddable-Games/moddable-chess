@@ -50,7 +50,10 @@ const paramP2 = params.get('p2') || 'Black';
 const paramMode = params.get('mode');
 
 if (embedMode) {
-  document.querySelectorAll('.site-nav, .site-footer, #sidebar').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.site-nav, #sidebar').forEach(el => el.style.display = 'none');
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.site-footer').forEach(el => el.style.display = 'none');
+  });
   document.body.classList.add('embed-mode');
   if (params.get('boardonly') === '1') {
     document.querySelectorAll('#description, #captured, #board-controls, #status, #moves').forEach(el => el.style.display = 'none');
