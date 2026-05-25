@@ -52,6 +52,34 @@ const paramMode = params.get('mode');
 if (embedMode) {
   document.querySelectorAll('.site-nav, .site-footer, #sidebar').forEach(el => el.style.display = 'none');
   document.body.classList.add('embed-mode');
+
+  const theme = params.get('theme');
+  const bg = params.get('bg');
+  const accent = params.get('accent');
+  const radius = params.get('radius');
+  const root = document.documentElement;
+
+  if (theme === 'light') {
+    root.style.setProperty('--play-bg', '#ffffff');
+    root.style.setProperty('--play-text', '#14161c');
+    root.style.setProperty('--play-text-muted', '#4f5764');
+    root.style.setProperty('--play-text-dim', '#636b78');
+    root.style.setProperty('--play-text-faint', '#7a8290');
+    root.style.setProperty('--play-border', '#e6e3d8');
+    root.style.setProperty('--play-border-hover', '#14161c');
+    root.style.setProperty('--play-border-accent', '#c3c5cc');
+    root.style.setProperty('--play-surface', '#f5f4ef');
+    root.style.setProperty('--play-surface-hover', '#eceae4');
+    root.style.setProperty('--play-surface-active', '#e6e3d8');
+    root.style.setProperty('--play-accent', 'rgba(12,79,141,0.1)');
+    root.style.setProperty('--play-accent-border', '#0c4f8d');
+  }
+  if (bg) root.style.setProperty('--play-bg', bg);
+  if (accent) {
+    root.style.setProperty('--play-accent', accent + '1a');
+    root.style.setProperty('--play-accent-border', accent);
+  }
+  if (radius) document.getElementById('board-container').style.borderRadius = radius;
 }
 
 const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
