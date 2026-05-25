@@ -53,10 +53,12 @@ if (embedMode) {
   document.querySelectorAll('.site-nav, .site-footer, #sidebar').forEach(el => el.style.display = 'none');
   document.body.classList.add('embed-mode');
   if (params.get('boardonly') === '1') {
-    document.querySelectorAll('#description, #captured, #board-controls').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#description, #captured, #board-controls, #status, #moves').forEach(el => el.style.display = 'none');
     document.body.style.overflow = 'hidden';
     document.body.style.padding = '0';
     document.body.style.minHeight = 'auto';
+    const app = document.getElementById('app');
+    if (app) { app.style.padding = '0'; app.style.gap = '0'; }
   }
 
   const theme = params.get('theme');
