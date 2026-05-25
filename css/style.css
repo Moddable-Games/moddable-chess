@@ -194,6 +194,7 @@ p, li { text-wrap: pretty; }
     width: 100%;
     height: auto;
     display: block;
+    touch-action: manipulation;
   }
 
   #board-controls {

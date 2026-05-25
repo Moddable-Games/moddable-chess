@@ -214,14 +214,13 @@ function renderBoard(container, game, opts) {
       x: 0, y: 0, width: size, height: height,
       fill: 'transparent', style: 'cursor:pointer',
     });
-    overlay.addEventListener('click', (e) => {
-      const rect = svg.getBoundingClientRect();
-      const scaleX = size / rect.width;
-      const scaleY = height / rect.height;
-      const px = (e.clientX - rect.left) * scaleX;
-      const py = (e.clientY - rect.top) * scaleY;
-      const c = Math.floor(px / tileSize);
-      const r = Math.floor(py / tileSize);
+    overlay.addEventListener('pointerup', (e) => {
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+      const c = Math.floor(svgPt.x / tileSize);
+      const r = Math.floor(svgPt.y / tileSize);
       const dr = flipped ? rows - 1 - r : r;
       const dc = flipped ? cols - 1 - c : c;
       if (dr >= 0 && dr < rows && dc >= 0 && dc < cols) {

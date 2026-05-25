@@ -88,6 +88,8 @@
   margin: 0 auto 16px;
   height: 24px;
   width: auto;
+  max-width: 80%;
+  object-fit: contain;
   opacity: 0.5;
   transition: opacity 150ms;
 }
