@@ -42,6 +42,15 @@ const VARIANT_LIST = [
   ['courier', 'Courier (12×8)'],
 ];
 
+const params = new URLSearchParams(location.search);
+const paramVariant = params.get('variant');
+const embedMode = params.get('embed') === '1';
+
+if (embedMode) {
+  document.querySelectorAll('.site-nav, .site-footer, #sidebar').forEach(el => el.style.display = 'none');
+  document.body.classList.add('embed-mode');
+}
+
 const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
 fetch(basePath + 'assets/pieces.svg')
   .then(r => r.text())
@@ -49,8 +58,9 @@ fetch(basePath + 'assets/pieces.svg')
     const div = document.createElement('div');
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
-    renderPicker();
-    startGame('standard');
+    if (!embedMode) renderPicker();
+    const initVariant = paramVariant && DESCRIPTIONS[paramVariant] ? paramVariant : 'standard';
+    startGame(initVariant);
   });
 
 let game, selected, moveNum, currentVariant;
