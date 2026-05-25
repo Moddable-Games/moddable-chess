@@ -60,8 +60,10 @@ if (embedMode) {
     document.body.style.overflow = 'hidden';
     document.body.style.padding = '0';
     document.body.style.minHeight = 'auto';
+    document.body.style.alignItems = 'stretch';
     const app = document.getElementById('app');
-    if (app) { app.style.padding = '0'; app.style.gap = '0'; }
+    if (app) { app.style.padding = '0'; app.style.gap = '0'; app.style.width = '100%'; }
+    container.style.width = '100%';
   }
 
   const theme = params.get('theme');
@@ -236,7 +238,8 @@ function startGame(variant) {
   movesEl.innerHTML = '';
 
   // Lock container dimensions to prevent layout shift when innerHTML is cleared between renders
-  const boardWidth = 480;
+  const isBoardOnly = embedMode && params.get('boardonly') === '1';
+  const boardWidth = isBoardOnly ? container.parentElement.offsetWidth : 480;
   const tileSize = boardWidth / (game.cols || 8);
   const boardHeight = tileSize * (game.rows || 8);
   container.style.width = boardWidth + 'px';
@@ -259,8 +262,9 @@ function isGameOver() {
 }
 
 function render() {
+  const isBoardOnly = embedMode && params.get('boardonly') === '1';
   const opts = {
-    size: 480,
+    size: isBoardOnly ? container.offsetWidth : 480,
     selected: selected,
     lastMove: lastMove,
     flipped: flipped,
