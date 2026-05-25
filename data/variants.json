@@ -12,5 +12,9 @@
   { "name": "Fog of War", "board": "8×8", "desc": "You only see squares your pieces can reach." },
   { "name": "Capablanca", "board": "10×8", "desc": "Archbishop and Chancellor on a wider board." },
   { "name": "Grand Chess", "board": "10×10", "desc": "Same new pieces, bigger board, pawns start on rank 3." },
-  { "name": "Courier Chess", "board": "12×8", "desc": "Medieval German variant from the 1200s." }
+  { "name": "Courier Chess", "board": "12×8", "desc": "Medieval German variant from the 1200s." },
+  { "name": "No Castling", "board": "8×8", "desc": "Standard chess, castling disabled. Endorsed by Kramnik." },
+  { "name": "Torpedo Chess", "board": "8×8", "desc": "Pawns can always double-move, not just from starting rank." },
+  { "name": "Horde Chess", "board": "8×8", "desc": "36 pawns vs a normal army. Asymmetric survival." },
+  { "name": "Extinction Chess", "board": "8×8", "desc": "Lose when any piece type is fully eliminated." }
 ]

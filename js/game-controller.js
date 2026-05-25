@@ -23,6 +23,10 @@ const DESCRIPTIONS = {
   capablanca: { title: 'Capablanca Chess', text: 'Invented by world champion José Capablanca. Adds two new pieces: the Archbishop (bishop + knight) and Chancellor (rook + knight) on a wider board.', rule: 'Board: 10×8 · Win: Checkmate' },
   grand: { title: 'Grand Chess', text: 'Same new pieces as Capablanca on a larger board. Pawns start on rank 3. No castling. Promotion only to previously captured pieces.', rule: 'Board: 10×10 · Win: Checkmate' },
   courier: { title: 'Courier Chess', text: 'Medieval German variant from the 1200s. Uses a 12-column board with extra bishops and Sage pieces (move one step in any direction, non-royal).', rule: 'Board: 12×8 · Win: Checkmate' },
+  noCastling: { title: 'No Castling', text: 'Standard chess with castling disabled. Endorsed by Vladimir Kramnik and played in elite tournaments. Forces creative king safety solutions.', rule: 'Board: 8×8 · Win: Checkmate' },
+  torpedo: { title: 'Torpedo Chess', text: 'Pawns can always move two squares forward, not just from their starting rank. Makes pawns far more dynamic and endgames completely different.', rule: 'Board: 8×8 · Win: Checkmate' },
+  horde: { title: 'Horde Chess', text: 'Massively asymmetric — White has 36 pawns filling ranks 1-4, Black has a normal army. Black wins by checkmate or eliminating all White pieces. White wins by checkmating Black.', rule: 'Board: 8×8 · Win: Checkmate (Black) or eliminate horde (Black)' },
+  extinction: { title: 'Extinction Chess', text: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.', rule: 'Board: 8×8 · Win: Eliminate a piece type' },
 };
 
 const VARIANT_LIST = [
@@ -40,6 +44,10 @@ const VARIANT_LIST = [
   ['capablanca', 'Capablanca (10×8)'],
   ['grand', 'Grand Chess (10×10)'],
   ['courier', 'Courier (12×8)'],
+  ['noCastling', 'No Castling'],
+  ['torpedo', 'Torpedo Chess'],
+  ['horde', 'Horde Chess'],
+  ['extinction', 'Extinction Chess'],
 ];
 
 const params = new URLSearchParams(location.search);
@@ -337,6 +345,14 @@ function updateStatus() {
     }
     if (variantStatus.startsWith('antichess-')) {
       statusEl.textContent = (variantStatus === 'antichess-w' ? playerNames.w : playerNames.b) + ' wins — lost all pieces!';
+      return;
+    }
+    if (variantStatus === 'horde-b') {
+      statusEl.textContent = playerNames.b + ' wins — horde eliminated!';
+      return;
+    }
+    if (variantStatus.startsWith('extinction-')) {
+      statusEl.textContent = (variantStatus === 'extinction-w' ? playerNames.w : playerNames.b) + ' wins — piece type extinct!';
       return;
     }
   }

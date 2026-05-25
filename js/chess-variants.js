@@ -18,6 +18,10 @@ const VARIANTS = {
   rifle: { label: 'Rifle Chess' },
   marseillais: { label: 'Marseillais' },
   chess960: { label: 'Fischer Random' },
+  noCastling: { label: 'No Castling' },
+  torpedo: { label: 'Torpedo Chess' },
+  horde: { label: 'Horde Chess' },
+  extinction: { label: 'Extinction Chess' },
 };
 
 function getVariantStatus(g) {
@@ -49,6 +53,27 @@ function getVariantStatus(g) {
     const side = g.turn;
     const hasPieces = g.board.some(p => p && pieceColor(p) === side);
     if (!hasPieces) return 'antichess-' + side;
+  }
+  if (v === 'horde') {
+    const whiteHasPieces = g.board.some(p => p && pieceColor(p) === WHITE);
+    if (!whiteHasPieces) return 'horde-b';
+    if (g.turn === WHITE) {
+      const moves = legalMoves(g);
+      if (moves.length === 0) return 'horde-b';
+    }
+  }
+  if (v === 'extinction') {
+    const initial = { w: new Set(['p','n','b','r','q','k']), b: new Set(['p','n','b','r','q','k']) };
+    const current = { w: new Set(), b: new Set() };
+    for (const p of g.board) {
+      if (!p) continue;
+      current[pieceColor(p)].add(pieceType(p));
+    }
+    for (const side of [WHITE, BLACK]) {
+      for (const t of initial[side]) {
+        if (!current[side].has(t)) return 'extinction-' + (side === WHITE ? 'b' : 'w');
+      }
+    }
   }
   return null;
 }

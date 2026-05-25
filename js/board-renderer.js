@@ -216,8 +216,10 @@ function renderBoard(container, game, opts) {
     });
     overlay.addEventListener('click', (e) => {
       const rect = svg.getBoundingClientRect();
-      const px = e.clientX - rect.left;
-      const py = e.clientY - rect.top;
+      const scaleX = size / rect.width;
+      const scaleY = height / rect.height;
+      const px = (e.clientX - rect.left) * scaleX;
+      const py = (e.clientY - rect.top) * scaleY;
       const c = Math.floor(px / tileSize);
       const r = Math.floor(py / tileSize);
       const dr = flipped ? rows - 1 - r : r;

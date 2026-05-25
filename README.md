@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 14 playable variants on boards from 8×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 18 playable variants on boards from 8×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -61,6 +61,10 @@ moddable-chess/
 | Done | Capablanca | 10×8 | Archbishop + Chancellor |
 | Done | Grand Chess | 10×10 | Same new pieces, bigger board |
 | Done | Courier Chess | 12×8 | Medieval German variant (1200s) |
+| Done | No Castling | 8×8 | Standard chess, castling disabled |
+| Done | Torpedo Chess | 8×8 | Pawns can always double-move |
+| Done | Horde Chess | 8×8 | 36 pawns vs normal army |
+| Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
 
 ---
 
@@ -93,6 +97,13 @@ Open `http://localhost:8000/`
 ---
 
 ### Changelog
+
+#### 2026-05-25
+- Add 4 new variants: No Castling, Torpedo Chess, Horde Chess, Extinction Chess (18 total)
+- Add version system: version.txt + bump.sh for cache-busting propagation
+- Add Moddable Games logo to footer (replaces text link)
+- Document embed/iframe URL parameters in API reference
+- Fix mobile touch targeting on board (SVG scale correction)
 
 #### 2026-05-24
 - Unify site branding: Moddable Games cube logo, Rajdhani/Barlow fonts, consistent nav + footer across all pages

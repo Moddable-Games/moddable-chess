@@ -51,9 +51,12 @@ function genPawnMoves(g, from, r, c, side, moves) {
   const fwd = MCE.sq(r + dir, c, g);
   if (MCE.onBoard(r + dir, c, g) && !g.board[fwd]) {
     addPawnMove(from, fwd, r + dir, promoRow, moves);
-    if (r === actualStart) {
-      const fwd2 = MCE.sq(r + dir * 2, c, g);
-      if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: g.noEnPassant ? null : 'double' });
+    if (r === actualStart || g.torpedo) {
+      const fwd2r = r + dir * 2;
+      if (MCE.onBoard(fwd2r, c, g)) {
+        const fwd2 = MCE.sq(fwd2r, c, g);
+        if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: g.noEnPassant ? null : 'double' });
+      }
     }
   }
   for (const dc of [-1, 1]) {
