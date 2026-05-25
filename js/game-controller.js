@@ -29,25 +29,33 @@ const DESCRIPTIONS = {
   extinction: { title: 'Extinction Chess', text: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.', rule: 'Board: 8×8 · Win: Eliminate a piece type' },
 };
 
-const VARIANT_LIST = [
-  ['standard', 'Standard'],
-  ['kingOfTheHill', 'King of the Hill'],
-  ['threeCheck', 'Three-Check'],
-  ['antichess', 'Antichess'],
-  ['racingKings', 'Racing Kings'],
-  ['chess960', 'Fischer Random'],
-  ['rifle', 'Rifle Chess'],
-  ['atomic', 'Atomic'],
-  ['marseillais', 'Marseillais'],
-  ['duckChess', 'Duck Chess'],
-  ['fogOfWar', 'Fog of War'],
-  ['capablanca', 'Capablanca (10×8)'],
-  ['grand', 'Grand Chess (10×10)'],
-  ['courier', 'Courier (12×8)'],
-  ['noCastling', 'No Castling'],
-  ['torpedo', 'Torpedo Chess'],
-  ['horde', 'Horde Chess'],
-  ['extinction', 'Extinction Chess'],
+const VARIANT_GROUPS = [
+  { label: 'Classic', variants: [
+    ['standard', 'Standard'],
+    ['chess960', 'Fischer Random'],
+    ['noCastling', 'No Castling'],
+    ['torpedo', 'Torpedo'],
+  ]},
+  { label: 'Tactical', variants: [
+    ['kingOfTheHill', 'King of the Hill'],
+    ['threeCheck', 'Three-Check'],
+    ['atomic', 'Atomic'],
+    ['rifle', 'Rifle'],
+    ['extinction', 'Extinction'],
+  ]},
+  { label: 'Alternate Rules', variants: [
+    ['antichess', 'Antichess'],
+    ['racingKings', 'Racing Kings'],
+    ['marseillais', 'Marseillais'],
+    ['duckChess', 'Duck Chess'],
+    ['fogOfWar', 'Fog of War'],
+    ['horde', 'Horde'],
+  ]},
+  { label: 'Large Boards', variants: [
+    ['capablanca', 'Capablanca (10×8)'],
+    ['grand', 'Grand Chess (10×10)'],
+    ['courier', 'Courier (12×8)'],
+  ]},
 ];
 
 const params = new URLSearchParams(location.search);
@@ -127,6 +135,9 @@ let lastMove = null;
 let capturedPieces = { w: [], b: [] };
 let pendingPromotion = null;
 
+let openGroup = 'Classic';
+let filterText = '';
+
 function renderPicker() {
   pickerEl.innerHTML = '';
 
@@ -147,16 +158,45 @@ function renderPicker() {
   modeBar.appendChild(passBtn);
   pickerEl.appendChild(modeBar);
 
-  const variantListEl = document.createElement('div');
-  variantListEl.className = 'variant-list';
-  VARIANT_LIST.forEach(([key, label]) => {
-    const btn = document.createElement('button');
-    btn.className = 'variant-btn' + (key === currentVariant ? ' variant-btn--active' : '');
-    btn.textContent = label;
-    btn.addEventListener('click', () => startGame(key));
-    variantListEl.appendChild(btn);
+  const search = document.createElement('input');
+  search.className = 'variant-search';
+  search.type = 'text';
+  search.placeholder = 'Filter variants...';
+  search.value = filterText;
+  search.addEventListener('input', (e) => { filterText = e.target.value; renderPicker(); });
+  pickerEl.appendChild(search);
+
+  const listWrap = document.createElement('div');
+  listWrap.className = 'variant-list-wrap';
+
+  const query = filterText.toLowerCase();
+
+  VARIANT_GROUPS.forEach(group => {
+    const matches = group.variants.filter(([, label]) => label.toLowerCase().includes(query));
+    if (matches.length === 0) return;
+
+    const isOpen = query || group.label === openGroup;
+    const header = document.createElement('button');
+    header.className = 'variant-group-header' + (isOpen ? ' variant-group-header--open' : '');
+    header.textContent = group.label;
+    header.addEventListener('click', () => {
+      openGroup = openGroup === group.label ? null : group.label;
+      renderPicker();
+    });
+    listWrap.appendChild(header);
+
+    if (isOpen) {
+      matches.forEach(([key, label]) => {
+        const btn = document.createElement('button');
+        btn.className = 'variant-btn' + (key === currentVariant ? ' variant-btn--active' : '');
+        btn.textContent = label;
+        btn.addEventListener('click', () => startGame(key));
+        listWrap.appendChild(btn);
+      });
+    }
   });
-  pickerEl.appendChild(variantListEl);
+
+  pickerEl.appendChild(listWrap);
 }
 
 function renderDescription() {
@@ -227,6 +267,8 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
+  const g = VARIANT_GROUPS.find(gr => gr.variants.some(([k]) => k === variant));
+  if (g) openGroup = g.label;
   game = MCE.createGame(variant);
   if (variant === 'chess960') {
     MCE.loadFEN(game, MCE.randomFEN960());
