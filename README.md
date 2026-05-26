@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 36 playable variants on boards from 5×5 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 39 playable variants on boards from 5×5 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
