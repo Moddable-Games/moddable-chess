@@ -14,7 +14,7 @@ fetch('data/variants.json')
     });
 
     const dc = document.createElement('a');
-    dc.href = 'https://github.com/Moddable-Games/dungeon-chess';
+    dc.href = 'https://dungeon.moddable.games';
     dc.target = '_blank';
     dc.rel = 'noopener';
     dc.className = 'mc-variant-card mc-variant-card--featured';
