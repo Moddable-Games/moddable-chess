@@ -118,28 +118,29 @@ a { color: inherit; text-decoration: none; }
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
+  justify-content: center;
 }
 
 .mc-filter-btn {
   padding: 6px 14px;
-  border: 1px solid var(--mc-border, #333);
+  border: 1px solid var(--mc-hairline);
   border-radius: 20px;
   background: transparent;
-  color: var(--mc-muted, #999);
+  color: #636b78;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .mc-filter-btn:hover {
-  border-color: var(--mc-ink, #fff);
-  color: var(--mc-ink, #fff);
+  border-color: var(--mc-ink);
+  color: var(--mc-ink);
 }
 
 .mc-filter-btn--active {
-  background: var(--mc-ink, #fff);
-  color: var(--mc-bg, #0a0a14);
-  border-color: var(--mc-ink, #fff);
+  background: var(--mc-blue);
+  color: #fff;
+  border-color: var(--mc-blue);
 }
 
 .mc-variants__grid {
