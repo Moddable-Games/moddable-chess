@@ -249,3 +249,16 @@ p, li { text-wrap: pretty; }
     height: 48px;
   }
 }
+
+/* Embed mode: prevent display:contents from collapsing layout dimensions */
+.embed-mode #center {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.embed-mode #app {
+  display: block;
+  width: 100%;
+  padding: 0;
+}
