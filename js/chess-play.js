@@ -129,6 +129,31 @@ function makeMove(g, move) {
       MCE.advanceTurn(g);
       g.movesThisTurn = 0;
     }
+  } else if (g.variant === 'monsterChess') {
+    g.movesThisTurn++;
+    undo.movesThisTurn = g.movesThisTurn - 1;
+    undo.lastMovedSq = g.lastMovedSq;
+    const max = g.maxMovesPerTurn[g.turn] || 1;
+    const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
+    if (g.movesThisTurn >= max || givesCheck) {
+      if (g.turn === BLACK) g.fullmove++;
+      MCE.advanceTurn(g);
+      g.movesThisTurn = 0;
+      g.lastMovedSq = -1;
+    } else {
+      g.lastMovedSq = to;
+    }
+  } else if (g.variant === 'progressive') {
+    g.movesThisTurn++;
+    undo.movesThisTurn = g.movesThisTurn - 1;
+    undo.progressiveMove = g.progressiveMove;
+    const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
+    if (g.movesThisTurn >= g.progressiveMove || givesCheck) {
+      if (g.turn === BLACK) g.fullmove++;
+      g.progressiveMove++;
+      MCE.advanceTurn(g);
+      g.movesThisTurn = 0;
+    }
   } else if (g.variant === 'duckChess') {
     if (!g.duckPhase) {
       g.duckPhase = true;
@@ -197,14 +222,21 @@ function unmakeMove(g, undo) {
   g.turn = undo.turn;
   g.turnIndex = undo.turnIndex;
   if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+  if (undo.progressiveMove !== undefined) g.progressiveMove = undo.progressiveMove;
+  if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
   if (undo.duckPhase !== undefined) g.duckPhase = undo.duckPhase;
   g.history.pop();
   g.positionHistory.pop();
 }
 
 function updateCastlingRights(g, from, to, piece) {
-  if (piece === 'K') { g.castling.K = false; g.castling.Q = false; }
-  if (piece === 'k') { g.castling.k = false; g.castling.q = false; }
+  if (g.variant === 'knightmate') {
+    if (piece === 'N') { g.castling.K = false; g.castling.Q = false; }
+    if (piece === 'n') { g.castling.k = false; g.castling.q = false; }
+  } else {
+    if (piece === 'K') { g.castling.K = false; g.castling.Q = false; }
+    if (piece === 'k') { g.castling.k = false; g.castling.q = false; }
+  }
   const lastSq = g.rows * g.cols - 1;
   const wRookK = MCE.sq(g.rows - 1, g.cols - 1, g);
   const wRookQ = MCE.sq(g.rows - 1, 0, g);

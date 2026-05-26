@@ -96,19 +96,31 @@ if (variant === 'yourVariant') {<br>
 }
   </div>
 
-  <h2>Example: Adding "Horde" variant</h2>
-  <p>Horde has White with 36 pawns (no king) vs Black with a standard army. White wins by capturing all black pieces. Black wins by checkmate (impossible) or capturing all white pawns.</p>
+  <h2>Example: Adding "Los Alamos" variant</h2>
+  <p>Los Alamos Chess uses a 6×6 board with no bishops, no castling, and no double pawn step. The first chess game ever played by a computer (1956).</p>
 
   <div class="docs-code">
-// 1. No VARIANT_BOARDS entry needed (8×8)<br><br>
-// 2. In getVariantStatus:<br>
-if (v === 'horde') {<br>
-&nbsp;&nbsp;const whitePawns = g.board.filter(p =&gt; p === 'P').length;<br>
-&nbsp;&nbsp;if (whitePawns === 0) return 'horde-b';<br>
-}<br><br>
-// 3. In game-controller startGame:<br>
-if (variant === 'horde') {<br>
-&nbsp;&nbsp;MCE.loadFEN(game, 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w - - 0 1');<br>
+// 1. In VARIANT_BOARDS (chess-engine.js):<br>
+losAlamos: { rows: 6, cols: 6, fen: 'rnqknr/pppppp/6/6/PPPPPP/RNQKNR w - - 0 1' },<br><br>
+// 2. In createVariantGame (chess-engine.js):<br>
+if (variant === 'losAlamos') { g.noCastling = true; g.noEnPassant = true; }<br><br>
+// 3. In VARIANTS (chess-variants.js):<br>
+losAlamos: { label: 'Los Alamos' },<br><br>
+// 4. In DESCRIPTIONS + VARIANT_GROUPS (game-controller.js):<br>
+losAlamos: { title: 'Los Alamos Chess', text: '...', rule: 'Board: 6×6 · Win: Checkmate' },
+  </div>
+
+  <h2>Example: Adding a rule-only variant</h2>
+  <p>Single-Check wins on the first check delivered. It reuses Three-Check's check counter but with a threshold of 1.</p>
+
+  <div class="docs-code">
+// 1. No VARIANT_BOARDS entry needed (standard 8×8 position)<br><br>
+// 2. In VARIANTS (chess-variants.js):<br>
+singleCheck: { label: 'Single-Check' },<br><br>
+// 3. In getVariantStatus (chess-variants.js):<br>
+if (v === 'singleCheck') {<br>
+&nbsp;&nbsp;if (g.checkCount.w &gt;= 1) return 'checkmate';<br>
+&nbsp;&nbsp;if (g.checkCount.b &gt;= 1) return 'checkmate';<br>
 }
   </div>
 

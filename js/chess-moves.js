@@ -26,13 +26,24 @@ function pseudoLegalMoves(g) {
       const custom = registry[type].genMoves(g, i, side);
       if (custom) custom.forEach(m => moves.push(m));
     } else if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
-    else if (type === PIECE.N) genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
+    else if (type === PIECE.N) {
+      if (g.variant === 'knightmate') {
+        genJumps(g, i, r, c, side, KING_DIRS, moves);
+        if (!g.noCastling) genCastlingKnightmate(g, i, r, c, side, moves);
+      } else {
+        genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
+      }
+    }
     else if (type === PIECE.B) genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
     else if (type === PIECE.R) genSlides(g, i, r, c, side, ROOK_DIRS, moves);
     else if (type === PIECE.Q) genSlides(g, i, r, c, side, QUEEN_DIRS, moves);
     else if (type === PIECE.K) {
-      genJumps(g, i, r, c, side, KING_DIRS, moves);
-      if (!g.noCastling) genCastling(g, i, r, c, side, moves);
+      if (g.variant === 'knightmate') {
+        genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
+      } else {
+        genJumps(g, i, r, c, side, KING_DIRS, moves);
+        if (!g.noCastling) genCastling(g, i, r, c, side, moves);
+      }
     }
     else if (type === PIECE.A) { genSlides(g, i, r, c, side, BISHOP_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
     else if (type === PIECE.C) { genSlides(g, i, r, c, side, ROOK_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
@@ -156,6 +167,38 @@ function genCastling(g, from, r, c, side, moves) {
   }
 }
 
+function genCastlingKnightmate(g, from, r, c, side, moves) {
+  if (isAttacked(g, from, side)) return;
+  const row = side === WHITE ? g.rows - 1 : 0;
+  if (r !== row) return;
+  const ks = side === WHITE ? 'K' : 'k';
+  const qs = side === WHITE ? 'Q' : 'q';
+  if (g.castling[ks]) {
+    let clear = true;
+    for (let cc = c + 1; cc < g.cols - 1; cc++) {
+      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
+    }
+    if (clear) {
+      const f = MCE.sq(row, c + 1, g);
+      if (!isAttacked(g, f, side)) {
+        moves.push({ from, to: MCE.sq(row, c + 2, g), flag: 'castle-k' });
+      }
+    }
+  }
+  if (g.castling[qs]) {
+    let clear = true;
+    for (let cc = 1; cc < c; cc++) {
+      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
+    }
+    if (clear) {
+      const d = MCE.sq(row, c - 1, g);
+      if (!isAttacked(g, d, side)) {
+        moves.push({ from, to: MCE.sq(row, c - 2, g), flag: 'castle-q' });
+      }
+    }
+  }
+}
+
 function isAttacked(g, target, bySide) {
   const total = g.rows * g.cols;
   for (let i = 0; i < total; i++) {
@@ -180,8 +223,15 @@ function attacks(g, from, target, piece) {
     const dir = g.pawnDirection ? g.pawnDirection(owner) : (owner === WHITE ? -1 : 1);
     return dr === dir && Math.abs(dc) === 1;
   }
-  if (type === PIECE.N) return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
-  if (type === PIECE.K || type === PIECE.S) return Math.abs(dr) <= 1 && Math.abs(dc) <= 1;
+  if (type === PIECE.N) {
+    if (g.variant === 'knightmate') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
+    return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
+  }
+  if (type === PIECE.K) {
+    if (g.variant === 'knightmate') return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
+    return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
+  }
+  if (type === PIECE.S) return Math.abs(dr) <= 1 && Math.abs(dc) <= 1;
   if (type === PIECE.A) {
     if (KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc)) return true;
     return slidesTo(g, from, target, BISHOP_DIRS);
@@ -208,8 +258,11 @@ function slidesTo(g, from, target, dirs) {
   return false;
 }
 
+const NO_CHECK_VARIANTS = new Set(['antichess', 'giveaway', 'suicideChess', 'codrus']);
+
 function legalMoves(g) {
   const movingSide = g.turn;
+  const skipCheck = NO_CHECK_VARIANTS.has(g.variant);
   return pseudoLegalMoves(g).filter(m => {
     if (g.legalityFilter) {
       const undo = MCE.makeMove(g, m);
@@ -217,6 +270,7 @@ function legalMoves(g) {
       MCE.unmakeMove(g, undo);
       return legal;
     }
+    if (skipCheck) return true;
     const undo = MCE.makeMove(g, m);
     const legal = !inCheck(g, movingSide);
     MCE.unmakeMove(g, undo);
@@ -232,6 +286,9 @@ function inCheck(g, side) {
       const pd = g.pieceData[i];
       if (pd && pd.owner === side && pd.isKing) { kingSq = i; break; }
     }
+  } else if (g.variant === 'knightmate') {
+    const royalChar = side === WHITE ? 'N' : 'n';
+    kingSq = g.board.indexOf(royalChar);
   } else {
     const kingChar = side === WHITE ? 'K' : 'k';
     kingSq = g.board.indexOf(kingChar);

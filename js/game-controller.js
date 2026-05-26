@@ -29,6 +29,25 @@ const DESCRIPTIONS = {
   extinction: { title: 'Extinction Chess', text: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.', rule: 'Board: 8×8 · Win: Eliminate a piece type' },
   breakthrough: { title: 'Breakthrough', text: 'Only pawns on a 7×7 board. First to reach the far rank wins. No promotion — just push through. Simple to learn, deep to master. Used in AI competitions.', rule: 'Board: 7×7 · Win: Reach far rank' },
   maharaja: { title: 'Maharaja & Sepoys', text: 'Extreme asymmetry — White has only a Maharaja (Queen + Knight compound piece) against Black\'s full army. The Maharaja must checkmate Black\'s king alone.', rule: 'Board: 8×8 · Win: Checkmate' },
+  knightmate: { title: 'Knightmate', text: 'The roles of king and knight are swapped. The knight is the royal piece that must be checkmated, while the king moves like a knight and is expendable.', rule: 'Board: 8×8 · Win: Checkmate knight' },
+  monsterChess: { title: 'Monster Chess', text: 'White has only a king and rooks but gets two moves per turn. Black has a full army with one move per turn. Giving check ends your turn early.', rule: 'Board: 8×8 · Win: Checkmate' },
+  progressive: { title: 'Progressive Chess', text: 'White makes 1 move, then Black makes 2, White makes 3, Black makes 4, and so on — escalating each turn. Giving check ends your turn immediately.', rule: 'Board: 8×8 · Win: Checkmate' },
+  chigorin: { title: 'Chigorin Chess', text: 'White has knights instead of bishops, Black has the standard army. Named after Mikhail Chigorin. White\'s knights provide a tactical edge but lack long-range diagonal control.', rule: 'Board: 8×8 · Win: Checkmate' },
+  almostChess: { title: 'Almost Chess', text: 'Identical to standard chess except one queen is replaced by a Chancellor (Rook + Knight compound). Subtle but significant strategic shift.', rule: 'Board: 8×8 · Win: Checkmate' },
+  amazonChess: { title: 'Amazon Chess', text: 'Both sides have an Amazon (Queen + Knight compound) instead of a regular Queen. The most powerful piece in fairy chess on a standard board.', rule: 'Board: 8×8 · Win: Checkmate' },
+  endgameChess: { title: 'Endgame Chess', text: 'Start with only pawns and kings — no back-rank pieces. Pure endgame technique from move one. Great for endgame practice.', rule: 'Board: 8×8 · Win: Checkmate' },
+  peasantsRevolt: { title: "Peasants' Revolt", text: 'Asymmetric: White has a king and 8 pawns against Black\'s king and 2 knights. Can the peasant army overwhelm the cavalry?', rule: 'Board: 8×8 · Win: Checkmate' },
+  pawnsOnly: { title: 'Pawns Only', text: 'Only pawns and kings on the board. First player to promote a pawn (or checkmate) wins. Simple to learn, surprisingly deep.', rule: 'Board: 8×8 · Win: Checkmate or promotion' },
+  upsideDown: { title: 'Upside-Down Chess', text: 'Pieces start on the opponent\'s back rank — white pieces on rank 8, black on rank 1. Pawns march "backward" toward promotion. Chaotic opening.', rule: 'Board: 8×8 · Win: Checkmate' },
+  singleCheck: { title: 'Single-Check', text: 'Deliver just one check to win instantly. Ultra-aggressive variant where every move is a potential game-ender. King safety is everything.', rule: 'Board: 8×8 · Win: One check' },
+  fiveCheck: { title: 'Five-Check', text: 'Like Three-Check but you need five checks to win. More strategic than Single-Check, more aggressive than standard.', rule: 'Board: 8×8 · Win: 5 checks or checkmate' },
+  giveaway: { title: 'Giveaway Chess', text: 'Captures are mandatory. Lose all your pieces to win. Unlike Antichess, being stalemated means you LOSE (not win). FICS rules.', rule: 'Board: 8×8 · Win: Lose all pieces' },
+  suicideChess: { title: 'Suicide Chess', text: 'Captures are mandatory. Lose all your pieces to win. Stalemate is a draw (not a win for either side). The gentlest losing-chess variant.', rule: 'Board: 8×8 · Win: Lose all pieces' },
+  stalemateWins: { title: 'Stalemate Wins', text: 'Standard chess rules but stalemate is a WIN for the stalemating side (not a draw). Completely changes endgame theory.', rule: 'Board: 8×8 · Win: Checkmate or stalemate' },
+  codrus: { title: 'Codrus', text: 'Named after the Athenian king who sacrificed himself. Lose your king to win. No check concept — you must arrange for your own king to be captured.', rule: 'Board: 8×8 · Win: Lose your king' },
+  makpong: { title: 'Makpong', text: 'Thai chess variant where the king cannot move out of check — must block or capture the attacker. If neither is possible, checkmate. Based on Makruk.', rule: 'Board: 8×8 · Win: Checkmate' },
+  losAlamos: { title: 'Los Alamos Chess', text: 'The first chess variant ever played by a computer (1956). 6×6 board with no bishops, no castling, no double pawn step. Pure tactics.', rule: 'Board: 6×6 · Win: Checkmate' },
+  minichess: { title: 'Minichess (5×5)', text: 'Gardner\'s Minichess — full piece types crammed onto a tiny 5×5 board. Fast, tactical, and surprisingly rich for its size.', rule: 'Board: 5×5 · Win: Checkmate' },
 };
 
 const VARIANT_GROUPS = [
@@ -37,23 +56,46 @@ const VARIANT_GROUPS = [
     ['chess960', 'Fischer Random'],
     ['noCastling', 'No Castling'],
     ['torpedo', 'Torpedo'],
+    ['chigorin', 'Chigorin'],
+    ['almostChess', 'Almost Chess'],
+    ['amazonChess', 'Amazon Chess'],
+    ['upsideDown', 'Upside-Down'],
   ]},
   { label: 'Tactical', variants: [
     ['kingOfTheHill', 'King of the Hill'],
     ['threeCheck', 'Three-Check'],
+    ['singleCheck', 'Single-Check'],
+    ['fiveCheck', 'Five-Check'],
     ['atomic', 'Atomic'],
     ['rifle', 'Rifle'],
     ['extinction', 'Extinction'],
   ]},
   { label: 'Alternate Rules', variants: [
     ['antichess', 'Antichess'],
+    ['giveaway', 'Giveaway'],
+    ['suicideChess', 'Suicide Chess'],
+    ['stalemateWins', 'Stalemate Wins'],
+    ['codrus', 'Codrus'],
     ['racingKings', 'Racing Kings'],
     ['marseillais', 'Marseillais'],
+    ['progressive', 'Progressive'],
+    ['monsterChess', 'Monster Chess'],
     ['duckChess', 'Duck Chess'],
     ['fogOfWar', 'Fog of War'],
     ['horde', 'Horde'],
     ['breakthrough', 'Breakthrough (7×7)'],
     ['maharaja', 'Maharaja & Sepoys'],
+    ['knightmate', 'Knightmate'],
+    ['makpong', 'Makpong'],
+  ]},
+  { label: 'Asymmetric', variants: [
+    ['peasantsRevolt', "Peasants' Revolt"],
+    ['endgameChess', 'Endgame Chess'],
+    ['pawnsOnly', 'Pawns Only'],
+  ]},
+  { label: 'Small Boards', variants: [
+    ['losAlamos', 'Los Alamos (6×6)'],
+    ['minichess', 'Minichess (5×5)'],
   ]},
   { label: 'Large Boards', variants: [
     ['capablanca', 'Capablanca (10×8)'],
@@ -409,6 +451,14 @@ function updateStatus() {
       statusEl.textContent = playerNames.b + ' wins — Maharaja captured!';
       return;
     }
+    if (variantStatus.startsWith('knightmate-')) {
+      statusEl.textContent = (variantStatus === 'knightmate-w' ? playerNames.w : playerNames.b) + ' wins — royal knight captured!';
+      return;
+    }
+    if (variantStatus.startsWith('codrus-')) {
+      statusEl.textContent = (variantStatus === 'codrus-w' ? playerNames.w : playerNames.b) + ' wins — sacrificed their king!';
+      return;
+    }
   }
 
   const status = MCE.getStatus(game);
@@ -418,7 +468,13 @@ function updateStatus() {
     statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
   } else if (status === 'stalemate') {
     gameOver = true;
-    statusEl.textContent = 'Stalemate — draw';
+    if (currentVariant === 'giveaway') {
+      statusEl.textContent = nameForOpp(game.turn) + ' wins — opponent stalemated!';
+    } else if (currentVariant === 'stalemateWins') {
+      statusEl.textContent = nameForOpp(game.turn) + ' wins — stalemate!';
+    } else {
+      statusEl.textContent = 'Stalemate — draw';
+    }
   } else if (status === 'draw-repetition') {
     gameOver = true;
     statusEl.textContent = 'Draw — threefold repetition';
@@ -430,15 +486,21 @@ function updateStatus() {
     statusEl.textContent = 'Draw — 50-move rule';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
-    if (currentVariant === 'threeCheck') {
+    if (currentVariant === 'threeCheck' || currentVariant === 'singleCheck' || currentVariant === 'fiveCheck') {
       game.checkCount[game.turn]++;
-      if (game.checkCount[game.turn] >= 3) {
+      const threshold = currentVariant === 'singleCheck' ? 1 : currentVariant === 'fiveCheck' ? 5 : 3;
+      if (game.checkCount[game.turn] >= threshold) {
         gameOver = true;
-        statusEl.textContent = nameForOpp(game.turn) + ' wins — Three checks!';
+        statusEl.textContent = nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!');
       }
     }
   } else if (currentVariant === 'marseillais' && game.movesThisTurn === 1) {
     statusEl.textContent = turn + ' — second move';
+  } else if (currentVariant === 'monsterChess' && game.movesThisTurn > 0) {
+    const max = game.maxMovesPerTurn[game.turn] || 1;
+    statusEl.textContent = turn + ' — move ' + (game.movesThisTurn + 1) + ' of ' + max;
+  } else if (currentVariant === 'progressive' && game.movesThisTurn > 0) {
+    statusEl.textContent = turn + ' — move ' + (game.movesThisTurn + 1) + ' of ' + game.progressiveMove;
   } else {
     statusEl.textContent = turn + ' to move';
   }
@@ -505,6 +567,10 @@ function executeMove(move) {
       // Human places duck, then AI goes
     } else if (currentVariant === 'marseillais' && game.turn !== aiColor) {
       // Human still has second move
+    } else if (currentVariant === 'monsterChess' && game.turn !== aiColor) {
+      // Human still has moves this turn
+    } else if (currentVariant === 'progressive' && game.turn !== aiColor) {
+      // Human still has moves this turn
     } else {
       scheduleAIMove();
     }
@@ -614,6 +680,10 @@ function doAIMove() {
     doAIMoveMarseillais();
     return;
   }
+  if (currentVariant === 'monsterChess' || currentVariant === 'progressive') {
+    doAIMoveMulti();
+    return;
+  }
 
   const move = MCE.aiPickMove(game, getAIDepth());
   if (!move) { aiThinking = false; render(); return; }
@@ -656,6 +726,29 @@ function doAIMoveMarseillais() {
       lastMove = { from: move2.from, to: move2.to };
       addMoveToList(move2, side);
     }
+  }
+
+  aiThinking = false;
+  renderControls();
+  renderCaptured();
+  render();
+}
+
+function doAIMoveMulti() {
+  const side = game.turn;
+  let maxMoves = currentVariant === 'monsterChess'
+    ? (game.maxMovesPerTurn[side] || 1)
+    : game.progressiveMove;
+
+  for (let i = 0; i < maxMoves; i++) {
+    if (isGameOver() || game.turn !== side) break;
+    const move = MCE.aiPickMove(game, getAIDepth());
+    if (!move) break;
+    trackCaptures(move, side);
+    const undo = MCE.makeMove(game, move);
+    undoStack.push(undo);
+    lastMove = { from: move.from, to: move.to };
+    addMoveToList(move, side);
   }
 
   aiThinking = false;

@@ -81,6 +81,7 @@ MCE.renderBoard(document.getElementById('board'), game, {<br>
     <tr><td><code>A/a</code></td><td>Archbishop (B+N)</td><td>Capablanca, Grand</td></tr>
     <tr><td><code>C/c</code></td><td>Chancellor (R+N)</td><td>Capablanca, Grand</td></tr>
     <tr><td><code>S/s</code></td><td>Sage (1-step any direction)</td><td>Courier</td></tr>
+    <tr><td><code>M/m</code></td><td>Maharaja (Q+N compound)</td><td>Maharaja, Amazon Chess</td></tr>
   </table>
 
   <h2>Variable Board Sizes</h2>
@@ -91,20 +92,45 @@ MCE.rc(index, game)&nbsp;&nbsp;&nbsp;&nbsp;// → [row, col]<br>
 MCE.onBoard(row, col, game) // → boolean
   </div>
 
-  <h2>Supported Variants</h2>
+  <h2>Supported Variants (36)</h2>
   <table class="docs-table">
     <tr><th>Key</th><th>Board</th><th>Win Condition</th></tr>
     <tr><td><code>standard</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>chess960</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>noCastling</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>torpedo</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>chigorin</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>almostChess</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>amazonChess</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>upsideDown</code></td><td>8×8</td><td>Checkmate</td></tr>
     <tr><td><code>kingOfTheHill</code></td><td>8×8</td><td>Checkmate or king to centre</td></tr>
     <tr><td><code>threeCheck</code></td><td>8×8</td><td>Checkmate or 3 checks</td></tr>
-    <tr><td><code>antichess</code></td><td>8×8</td><td>Lose all pieces</td></tr>
-    <tr><td><code>racingKings</code></td><td>8×8</td><td>King to rank 8</td></tr>
-    <tr><td><code>chess960</code></td><td>8×8</td><td>Checkmate</td></tr>
-    <tr><td><code>rifle</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>singleCheck</code></td><td>8×8</td><td>1 check</td></tr>
+    <tr><td><code>fiveCheck</code></td><td>8×8</td><td>Checkmate or 5 checks</td></tr>
     <tr><td><code>atomic</code></td><td>8×8</td><td>Explode opponent's king</td></tr>
-    <tr><td><code>marseillais</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>rifle</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>extinction</code></td><td>8×8</td><td>Eliminate a piece type</td></tr>
+    <tr><td><code>antichess</code></td><td>8×8</td><td>Lose all pieces (stalemate = win)</td></tr>
+    <tr><td><code>giveaway</code></td><td>8×8</td><td>Lose all pieces (stalemate = loss)</td></tr>
+    <tr><td><code>suicideChess</code></td><td>8×8</td><td>Lose all pieces (stalemate = draw)</td></tr>
+    <tr><td><code>stalemateWins</code></td><td>8×8</td><td>Checkmate or stalemate opponent</td></tr>
+    <tr><td><code>codrus</code></td><td>8×8</td><td>Lose your king</td></tr>
+    <tr><td><code>racingKings</code></td><td>8×8</td><td>King to rank 8</td></tr>
+    <tr><td><code>marseillais</code></td><td>8×8</td><td>Checkmate (2 moves/turn)</td></tr>
+    <tr><td><code>progressive</code></td><td>8×8</td><td>Checkmate (escalating moves)</td></tr>
+    <tr><td><code>monsterChess</code></td><td>8×8</td><td>Checkmate (White: 2 moves)</td></tr>
     <tr><td><code>duckChess</code></td><td>8×8</td><td>Capture king</td></tr>
     <tr><td><code>fogOfWar</code></td><td>8×8</td><td>Capture king</td></tr>
+    <tr><td><code>horde</code></td><td>8×8</td><td>Checkmate or eliminate horde</td></tr>
+    <tr><td><code>maharaja</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>knightmate</code></td><td>8×8</td><td>Checkmate knight (royal)</td></tr>
+    <tr><td><code>makpong</code></td><td>8×8</td><td>Checkmate (king can't flee)</td></tr>
+    <tr><td><code>endgameChess</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>peasantsRevolt</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>pawnsOnly</code></td><td>8×8</td><td>Checkmate</td></tr>
+    <tr><td><code>breakthrough</code></td><td>7×7</td><td>Reach far rank</td></tr>
+    <tr><td><code>losAlamos</code></td><td>6×6</td><td>Checkmate</td></tr>
+    <tr><td><code>minichess</code></td><td>5×5</td><td>Checkmate</td></tr>
     <tr><td><code>capablanca</code></td><td>10×8</td><td>Checkmate</td></tr>
     <tr><td><code>grand</code></td><td>10×10</td><td>Checkmate</td></tr>
     <tr><td><code>courier</code></td><td>12×8</td><td>Checkmate</td></tr>

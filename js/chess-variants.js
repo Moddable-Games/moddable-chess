@@ -24,6 +24,25 @@ const VARIANTS = {
   extinction: { label: 'Extinction Chess' },
   breakthrough: { label: 'Breakthrough' },
   maharaja: { label: 'Maharaja' },
+  knightmate: { label: 'Knightmate' },
+  monsterChess: { label: 'Monster Chess' },
+  progressive: { label: 'Progressive' },
+  chigorin: { label: 'Chigorin' },
+  almostChess: { label: 'Almost Chess' },
+  amazonChess: { label: 'Amazon Chess' },
+  endgameChess: { label: 'Endgame Chess' },
+  peasantsRevolt: { label: "Peasants' Revolt" },
+  pawnsOnly: { label: 'Pawns Only' },
+  upsideDown: { label: 'Upside-Down' },
+  singleCheck: { label: 'Single-Check' },
+  fiveCheck: { label: 'Five-Check' },
+  giveaway: { label: 'Giveaway' },
+  suicideChess: { label: 'Suicide Chess' },
+  stalemateWins: { label: 'Stalemate Wins' },
+  codrus: { label: 'Codrus' },
+  makpong: { label: 'Makpong' },
+  losAlamos: { label: 'Los Alamos' },
+  minichess: { label: 'Minichess' },
 };
 
 function getVariantStatus(g) {
@@ -93,6 +112,31 @@ function getVariantStatus(g) {
     const hasM = g.board.some(p => p === 'M');
     if (!hasM) return 'maharaja-b';
   }
+  if (v === 'knightmate') {
+    const royalW = g.board.some(p => p === 'N');
+    if (!royalW) return 'knightmate-b';
+    const royalB = g.board.some(p => p === 'n');
+    if (!royalB) return 'knightmate-w';
+  }
+  if (v === 'singleCheck') {
+    if (g.checkCount.w >= 1) return 'checkmate';
+    if (g.checkCount.b >= 1) return 'checkmate';
+  }
+  if (v === 'fiveCheck') {
+    if (g.checkCount.w >= 5) return 'checkmate';
+    if (g.checkCount.b >= 5) return 'checkmate';
+  }
+  if (v === 'giveaway' || v === 'suicideChess') {
+    const side = g.turn;
+    const hasPieces = g.board.some(p => p && pieceColor(p) === side);
+    if (!hasPieces) return 'antichess-' + side;
+  }
+  if (v === 'codrus') {
+    const hasWhiteK = g.board.some(p => p === 'K');
+    if (!hasWhiteK) return 'codrus-w';
+    const hasBlackK = g.board.some(p => p === 'k');
+    if (!hasBlackK) return 'codrus-b';
+  }
   return null;
 }
 
@@ -100,7 +144,7 @@ function variantLegalMoves(g) {
   const v = g.variant;
   let moves = legalMoves(g);
 
-  if (v === 'antichess') {
+  if (v === 'antichess' || v === 'giveaway' || v === 'suicideChess') {
     const captures = moves.filter(m => g.board[m.to] || m.flag === 'ep');
     if (captures.length > 0) moves = captures;
   }
@@ -112,6 +156,13 @@ function variantLegalMoves(g) {
       const legal = !inCheck(g, opp);
       unmakeMove(g, undo);
       return legal;
+    });
+  }
+
+  if (v === 'makpong' && inCheck(g, g.turn)) {
+    moves = moves.filter(m => {
+      const piece = g.board[m.from];
+      return piece && pieceType(piece) !== 'k';
     });
   }
 

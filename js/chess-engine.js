@@ -18,6 +18,17 @@ const VARIANT_BOARDS = {
   horde: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1' },
   breakthrough: { rows: 7, cols: 7, fen: 'ppppppp/ppppppp/7/7/7/PPPPPPP/PPPPPPP w - - 0 1' },
   maharaja: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/8/4M3 w kq - 0 1' },
+  knightmate: { rows: 8, cols: 8, fen: 'rkbqnbkr/pppppppp/8/8/8/8/PPPPPPPP/RKBQNBKR w KQkq - 0 1' },
+  monsterChess: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1' },
+  chigorin: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNNQKNNR w KQkq - 0 1' },
+  almostChess: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBCKBNR w KQkq - 0 1' },
+  amazonChess: { rows: 8, cols: 8, fen: 'rnbmkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBMKBNR w KQkq - 0 1' },
+  endgameChess: { rows: 8, cols: 8, fen: '4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
+  peasantsRevolt: { rows: 8, cols: 8, fen: '2n1k1n1/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
+  pawnsOnly: { rows: 8, cols: 8, fen: '4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
+  upsideDown: { rows: 8, cols: 8, fen: 'RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1' },
+  losAlamos: { rows: 6, cols: 6, fen: 'rnqknr/pppppp/6/6/PPPPPP/RNQKNR w - - 0 1' },
+  minichess: { rows: 5, cols: 5, fen: 'kqbnr/ppppp/5/PPPPP/RNBQK w - - 0 1' },
 };
 
 const pieceRegistry = {};
@@ -101,6 +112,16 @@ function createVariantGame(variant) {
   if (variant === 'torpedo') g.torpedo = true;
   if (variant === 'breakthrough') { g.noCastling = true; g.noEnPassant = true; g.noPromotion = true; }
   if (variant === 'maharaja') { g.noCastling = true; }
+  if (variant === 'losAlamos') { g.noCastling = true; g.noEnPassant = true; }
+  if (variant === 'minichess') { g.noCastling = true; g.noEnPassant = true; }
+  if (variant === 'endgameChess') { g.noCastling = true; }
+  if (variant === 'peasantsRevolt') { g.noCastling = true; }
+  if (variant === 'pawnsOnly') { g.noCastling = true; }
+  if (variant === 'upsideDown') { g.noCastling = true; g.pawnDirection = (side) => side === WHITE ? 1 : -1; }
+  if (variant === 'chigorin') { g.noCastling = true; }
+  if (variant === 'codrus') { g.noCastling = true; }
+  if (variant === 'monsterChess') { g.maxMovesPerTurn = { w: 2, b: 1 }; g.lastMovedSq = -1; }
+  if (variant === 'progressive') { g.progressiveMove = 1; }
   const fen = vb ? vb.fen : INITIAL_FEN;
   loadFEN(g, fen);
   g.positionHistory.push(positionKey(g));

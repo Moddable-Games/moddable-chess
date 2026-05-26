@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 20 playable variants on boards from 8×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 36 playable variants on boards from 5×5 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -67,6 +67,25 @@ moddable-chess/
 | Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
 | Done | Breakthrough | 7×7 | Pawns only, first to far rank wins |
 | Done | Maharaja & Sepoys | 8×8 | One Queen+Knight piece vs full army |
+| Done | Knightmate | 8×8 | Knight is royal, king moves like knight |
+| Done | Monster Chess | 8×8 | White gets 2 moves per turn |
+| Done | Progressive | 8×8 | Escalating moves: 1, 2, 3, 4... |
+| Done | Chigorin | 8×8 | White has knights instead of bishops |
+| Done | Almost Chess | 8×8 | One queen replaced by chancellor |
+| Done | Amazon Chess | 8×8 | Amazon (Q+N) replaces queen |
+| Done | Upside-Down | 8×8 | Pieces start on opponent's rank |
+| Done | Single-Check | 8×8 | One check wins instantly |
+| Done | Five-Check | 8×8 | Five checks to win |
+| Done | Giveaway | 8×8 | Antichess (stalemate = loss) |
+| Done | Suicide Chess | 8×8 | Antichess (stalemate = draw) |
+| Done | Stalemate Wins | 8×8 | Stalemating opponent wins |
+| Done | Codrus | 8×8 | Lose your king to win |
+| Done | Makpong | 8×8 | King can't move from check |
+| Done | Endgame Chess | 8×8 | Start with only pawns + kings |
+| Done | Peasants' Revolt | 8×8 | King + pawns vs king + knights |
+| Done | Pawns Only | 8×8 | Only pawns, first promotion wins |
+| Done | Los Alamos | 6×6 | No bishops, first computer chess (1956) |
+| Done | Minichess | 5×5 | Full piece types on tiny board |
 
 ---
 
@@ -99,6 +118,12 @@ Open `http://localhost:8000/`
 ---
 
 ### Changelog
+
+#### 2026-05-26
+- Add 19 new variants (36 total): Knightmate, Monster Chess, Progressive, Chigorin, Almost Chess, Amazon Chess, Upside-Down, Single-Check, Five-Check, Giveaway, Suicide Chess, Stalemate Wins, Codrus, Makpong, Endgame Chess, Peasants' Revolt, Pawns Only, Los Alamos (6x6), Minichess (5x5)
+- Add two new board sizes: 6x6 and 5x5
+- Fix unmakeMove: restore progressiveMove and lastMovedSq from undo records
+- Update developer docs: expanded variant table (36 entries), new examples
 
 #### 2026-05-25
 - Add 4 new variants: No Castling, Torpedo Chess, Horde Chess, Extinction Chess (18 total)
