@@ -12,6 +12,11 @@ const ROOK_DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
 const QUEEN_DIRS = [...ROOK_DIRS, ...BISHOP_DIRS];
 const KING_DIRS = QUEEN_DIRS;
 
+function getRole(g, type) {
+  if (g.pieceRoles) return g.pieceRoles[type] || type;
+  return type;
+}
+
 function pseudoLegalMoves(g) {
   const moves = [];
   const side = g.turn;
@@ -21,29 +26,19 @@ function pseudoLegalMoves(g) {
     const p = g.board[i];
     if (!p || !isFriendly(i, side, g)) continue;
     const type = pieceType(p);
+    const role = getRole(g, type);
     const [r, c] = MCE.rc(i, g);
     if (registry[type]) {
       const custom = registry[type].genMoves(g, i, side);
       if (custom) custom.forEach(m => moves.push(m));
     } else if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
-    else if (type === PIECE.N) {
-      if (g.variant === 'knightmate') {
-        genJumps(g, i, r, c, side, KING_DIRS, moves);
-        if (!g.noCastling) genCastlingKnightmate(g, i, r, c, side, moves);
-      } else {
-        genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
-      }
-    }
-    else if (type === PIECE.B) genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
-    else if (type === PIECE.R) genSlides(g, i, r, c, side, ROOK_DIRS, moves);
-    else if (type === PIECE.Q) genSlides(g, i, r, c, side, QUEEN_DIRS, moves);
-    else if (type === PIECE.K) {
-      if (g.variant === 'knightmate') {
-        genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
-      } else {
-        genJumps(g, i, r, c, side, KING_DIRS, moves);
-        if (!g.noCastling) genCastling(g, i, r, c, side, moves);
-      }
+    else if (role === 'n') genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
+    else if (role === 'b') genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
+    else if (role === 'r') genSlides(g, i, r, c, side, ROOK_DIRS, moves);
+    else if (role === 'q') genSlides(g, i, r, c, side, QUEEN_DIRS, moves);
+    else if (role === 'k') {
+      genJumps(g, i, r, c, side, KING_DIRS, moves);
+      if (!g.noCastling) genCastling(g, i, r, c, side, moves);
     }
     else if (type === PIECE.A) { genSlides(g, i, r, c, side, BISHOP_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
     else if (type === PIECE.C) { genSlides(g, i, r, c, side, ROOK_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
@@ -54,10 +49,9 @@ function pseudoLegalMoves(g) {
 
 function genPawnMoves(g, from, r, c, side, moves) {
   const dir = g.pawnDirection ? g.pawnDirection(side) : (side === WHITE ? -1 : 1);
-  const startRow = side === WHITE ? g.rows - 2 : 1;
+  const defaultStart = side === WHITE ? g.rows - 2 : 1;
   const promoRow = g.noPromotion ? -1 : (side === WHITE ? 0 : g.rows - 1);
-  const grandStart = g.variant === 'grand' ? (side === WHITE ? g.rows - 3 : 2) : startRow;
-  const actualStart = g.variant === 'grand' ? grandStart : startRow;
+  const actualStart = g.pawnStartRow ? g.pawnStartRow(side) : defaultStart;
 
   const fwd = MCE.sq(r + dir, c, g);
   if (MCE.onBoard(r + dir, c, g) && !g.board[fwd]) {
@@ -167,38 +161,6 @@ function genCastling(g, from, r, c, side, moves) {
   }
 }
 
-function genCastlingKnightmate(g, from, r, c, side, moves) {
-  if (isAttacked(g, from, side)) return;
-  const row = side === WHITE ? g.rows - 1 : 0;
-  if (r !== row) return;
-  const ks = side === WHITE ? 'K' : 'k';
-  const qs = side === WHITE ? 'Q' : 'q';
-  if (g.castling[ks]) {
-    let clear = true;
-    for (let cc = c + 1; cc < g.cols - 1; cc++) {
-      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
-    }
-    if (clear) {
-      const f = MCE.sq(row, c + 1, g);
-      if (!isAttacked(g, f, side)) {
-        moves.push({ from, to: MCE.sq(row, c + 2, g), flag: 'castle-k' });
-      }
-    }
-  }
-  if (g.castling[qs]) {
-    let clear = true;
-    for (let cc = 1; cc < c; cc++) {
-      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
-    }
-    if (clear) {
-      const d = MCE.sq(row, c - 1, g);
-      if (!isAttacked(g, d, side)) {
-        moves.push({ from, to: MCE.sq(row, c - 2, g), flag: 'castle-q' });
-      }
-    }
-  }
-}
-
 function isAttacked(g, target, bySide) {
   const total = g.rows * g.cols;
   for (let i = 0; i < total; i++) {
@@ -215,6 +177,7 @@ function attacks(g, from, target, piece) {
   if (registry[type]) {
     return registry[type].attacks(g, from, target);
   }
+  const role = getRole(g, type);
   const [fr, fc] = MCE.rc(from, g);
   const [tr, tc] = MCE.rc(target, g);
   const dr = tr - fr, dc = tc - fc;
@@ -223,14 +186,8 @@ function attacks(g, from, target, piece) {
     const dir = g.pawnDirection ? g.pawnDirection(owner) : (owner === WHITE ? -1 : 1);
     return dr === dir && Math.abs(dc) === 1;
   }
-  if (type === PIECE.N) {
-    if (g.variant === 'knightmate') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
-    return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
-  }
-  if (type === PIECE.K) {
-    if (g.variant === 'knightmate') return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
-    return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
-  }
+  if (role === 'n') return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
+  if (role === 'k') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
   if (type === PIECE.S) return Math.abs(dr) <= 1 && Math.abs(dc) <= 1;
   if (type === PIECE.A) {
     if (KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc)) return true;
@@ -240,7 +197,7 @@ function attacks(g, from, target, piece) {
     if (KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc)) return true;
     return slidesTo(g, from, target, ROOK_DIRS);
   }
-  const dirs = type === PIECE.B ? BISHOP_DIRS : type === PIECE.R ? ROOK_DIRS : QUEEN_DIRS;
+  const dirs = role === 'b' ? BISHOP_DIRS : role === 'r' ? ROOK_DIRS : QUEEN_DIRS;
   return slidesTo(g, from, target, dirs);
 }
 
@@ -262,7 +219,7 @@ const NO_CHECK_VARIANTS = new Set(['antichess', 'giveaway', 'suicideChess', 'cod
 
 function legalMoves(g) {
   const movingSide = g.turn;
-  const skipCheck = NO_CHECK_VARIANTS.has(g.variant);
+  const skipCheck = g.noCheck || NO_CHECK_VARIANTS.has(g.variant);
   return pseudoLegalMoves(g).filter(m => {
     if (g.legalityFilter) {
       const undo = MCE.makeMove(g, m);
@@ -286,12 +243,10 @@ function inCheck(g, side) {
       const pd = g.pieceData[i];
       if (pd && pd.owner === side && pd.isKing) { kingSq = i; break; }
     }
-  } else if (g.variant === 'knightmate') {
-    const royalChar = side === WHITE ? 'N' : 'n';
-    kingSq = g.board.indexOf(royalChar);
   } else {
-    const kingChar = side === WHITE ? 'K' : 'k';
-    kingSq = g.board.indexOf(kingChar);
+    const royal = g.royalPiece || 'k';
+    const royalChar = side === WHITE ? royal.toUpperCase() : royal.toLowerCase();
+    kingSq = g.board.indexOf(royalChar);
   }
   if (kingSq < 0) return false;
   return isAttacked(g, kingSq, side);

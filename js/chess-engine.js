@@ -139,8 +139,14 @@ function createVariantGame(variant) {
     if (vc.noCheck) g.noCheck = true;
     if (vc.torpedo) g.torpedo = true;
     if (vc.pawnDirection) g.pawnDirection = vc.pawnDirection;
+    if (vc.pawnStartRow) g.pawnStartRow = vc.pawnStartRow;
+    if (vc.royalPiece) g.royalPiece = vc.royalPiece;
+    if (vc.pieceRoles) g.pieceRoles = vc.pieceRoles;
     if (vc.maxMovesPerTurn) { g.maxMovesPerTurn = vc.maxMovesPerTurn; g.lastMovedSq = -1; }
     if (vc.progressiveMove) g.progressiveMove = vc.progressiveMove;
+    if (vc.checkThreshold) g.checkThreshold = vc.checkThreshold;
+    if (vc.stalemateMeaning) g.stalemateMeaning = vc.stalemateMeaning;
+    if (vc.promotionPieces) g.promotionPieces = vc.promotionPieces;
     if (vc.init) vc.init(g);
     const fen = vc.fen || (vb ? vb.fen : INITIAL_FEN);
     loadFEN(g, fen);
@@ -160,8 +166,11 @@ function createVariantGame(variant) {
   if (variant === 'upsideDown') { g.noCastling = true; g.pawnDirection = (side) => side === WHITE ? 1 : -1; }
   if (variant === 'chigorin') { g.noCastling = true; }
   if (variant === 'codrus') { g.noCastling = true; }
+  if (variant === 'knightmate') { g.royalPiece = 'n'; g.pieceRoles = { n: 'k', k: 'n' }; }
   if (variant === 'monsterChess') { g.maxMovesPerTurn = { w: 2, b: 1 }; g.lastMovedSq = -1; }
   if (variant === 'progressive') { g.progressiveMove = 1; }
+  if (variant === 'grand') { g.pawnStartRow = (side) => side === WHITE ? 7 : 2; g.promotionPieces = ['q','r','b','n','a','c']; }
+  if (variant === 'capablanca') { g.promotionPieces = ['q','r','b','n','a','c']; }
   const fen = vb ? vb.fen : INITIAL_FEN;
   loadFEN(g, fen);
   g.positionHistory.push(positionKey(g));

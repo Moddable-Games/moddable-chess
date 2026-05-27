@@ -445,7 +445,9 @@ function computeVisibility(g, side) {
 }
 
 function getMovesForVariant() {
-  if (currentVariant === 'antichess' || currentVariant === 'racingKings') {
+  const vc = MCE.getVariantConfig(currentVariant);
+  if (vc && vc.moveFilter) return MCE.variantLegalMoves(game);
+  if (currentVariant === 'antichess' || currentVariant === 'racingKings' || currentVariant === 'giveaway' || currentVariant === 'suicideChess' || currentVariant === 'makpong') {
     return MCE.variantLegalMoves(game);
   }
   return MCE.legalMoves(game);
@@ -514,9 +516,10 @@ function updateStatus() {
     statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
   } else if (status === 'stalemate') {
     gameOver = true;
-    if (currentVariant === 'giveaway') {
+    const sm = game.stalemateMeaning || (currentVariant === 'giveaway' ? 'loss' : currentVariant === 'stalemateWins' ? 'win' : 'draw');
+    if (sm === 'loss') {
       statusEl.textContent = nameForOpp(game.turn) + ' wins — opponent stalemated!';
-    } else if (currentVariant === 'stalemateWins') {
+    } else if (sm === 'win') {
       statusEl.textContent = nameForOpp(game.turn) + ' wins — stalemate!';
     } else {
       statusEl.textContent = 'Stalemate — draw';
@@ -532,9 +535,9 @@ function updateStatus() {
     statusEl.textContent = 'Draw — 50-move rule';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
-    if (currentVariant === 'threeCheck' || currentVariant === 'singleCheck' || currentVariant === 'fiveCheck') {
+    const threshold = game.checkThreshold || (currentVariant === 'singleCheck' ? 1 : currentVariant === 'fiveCheck' ? 5 : currentVariant === 'threeCheck' ? 3 : 0);
+    if (threshold > 0) {
       game.checkCount[game.turn]++;
-      const threshold = currentVariant === 'singleCheck' ? 1 : currentVariant === 'fiveCheck' ? 5 : 3;
       if (game.checkCount[game.turn] >= threshold) {
         gameOver = true;
         statusEl.textContent = nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!');
@@ -624,6 +627,9 @@ function executeMove(move) {
 }
 
 function getPromotionPieces() {
+  if (game.promotionPieces) return game.promotionPieces;
+  const vc = MCE.getVariantConfig(currentVariant);
+  if (vc && vc.promotionPieces) return vc.promotionPieces;
   if (currentVariant === 'capablanca' || currentVariant === 'grand') {
     return ['q', 'r', 'b', 'n', 'a', 'c'];
   }

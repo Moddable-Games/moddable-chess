@@ -25,31 +25,22 @@ function makeMove(g, move) {
     undo.pieceDataTo = g.pieceData[to];
   }
 
-  const isRifle = g.variant === 'rifle';
+  const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   const isCapture = captured || flag === 'ep';
 
-  if (isRifle && isCapture && flag !== 'ep') {
+  if (vc && vc.beforeMove) {
+    vc.beforeMove(g, move, undo);
+  } else if (g.variant === 'rifle' && isCapture && flag !== 'ep') {
     g.board[to] = null;
     g.board[from] = piece;
-  } else {
+    if (g.pieceData) { g.pieceData[to] = null; }
+  } else if (g.variant === 'atomic' && isCapture && flag !== 'ep') {
     g.board[to] = piece;
     g.board[from] = null;
-  }
-
-  if (g.pieceData) {
-    if (isRifle && isCapture && flag !== 'ep') {
-      g.pieceData[to] = null;
-    } else {
-      g.pieceData[to] = g.pieceData[from];
-      g.pieceData[from] = null;
-    }
-  }
-
-  if (g.variant === 'atomic' && isCapture && flag !== 'ep') {
+    if (g.pieceData) { g.pieceData[to] = g.pieceData[from]; g.pieceData[from] = null; }
     undo.exploded = [];
     const [tr, tc] = MCE.rc(to, g);
     g.board[to] = null;
-    g.board[from] = null;
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         if (dr === 0 && dc === 0) continue;
@@ -63,6 +54,10 @@ function makeMove(g, move) {
         }
       }
     }
+  } else {
+    g.board[to] = piece;
+    g.board[from] = null;
+    if (g.pieceData) { g.pieceData[to] = g.pieceData[from]; g.pieceData[from] = null; }
   }
 
   if (flag === 'ep') {
@@ -119,7 +114,6 @@ function makeMove(g, move) {
   if (pieceType(piece) === 'p' || captured) g.halfmove = 0;
   else g.halfmove++;
 
-  const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   if (vc && vc.afterMove) {
     vc.afterMove(g, move, undo);
   }
@@ -248,13 +242,9 @@ function unmakeMove(g, undo) {
 }
 
 function updateCastlingRights(g, from, to, piece) {
-  if (g.variant === 'knightmate') {
-    if (piece === 'N') { g.castling.K = false; g.castling.Q = false; }
-    if (piece === 'n') { g.castling.k = false; g.castling.q = false; }
-  } else {
-    if (piece === 'K') { g.castling.K = false; g.castling.Q = false; }
-    if (piece === 'k') { g.castling.k = false; g.castling.q = false; }
-  }
+  const royal = g.royalPiece || 'k';
+  if (piece === royal.toUpperCase()) { g.castling.K = false; g.castling.Q = false; }
+  if (piece === royal.toLowerCase()) { g.castling.k = false; g.castling.q = false; }
   const lastSq = g.rows * g.cols - 1;
   const wRookK = MCE.sq(g.rows - 1, g.cols - 1, g);
   const wRookQ = MCE.sq(g.rows - 1, 0, g);
