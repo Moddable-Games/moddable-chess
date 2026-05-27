@@ -43,6 +43,21 @@
     'extinction.js',
     'horde.js',
     'codrus.js',
+    'half-chess.js',
+    'diana-chess.js',
+    'petty-chess.js',
+    'weak-chess.js',
+    'patrol-chess.js',
+    'madrasi-chess.js',
+    'omnicide.js',
+    'dark-chess.js',
+    'berserk-chess.js',
+    'benedict-chess.js',
+    'andernach-chess.js',
+    'dice-chess.js',
+    'grid-chess.js',
+    'checkless-chess.js',
+    'no-retreat.js',
   ];
   plugins.forEach(file => {
     const script = document.createElement('script');

@@ -193,5 +193,80 @@
     "name": "Pawns Only",
     "board": "8×8",
     "desc": "Kings and pawns only. First to promote wins instantly."
+  },
+  {
+    "name": "Dice Chess",
+    "board": "8×8",
+    "desc": "A die roll determines which piece type must move each turn."
+  },
+  {
+    "name": "Grid Chess",
+    "board": "8×8",
+    "desc": "Moves must cross at least one grid line (2×2 cells)."
+  },
+  {
+    "name": "Checkless Chess",
+    "board": "8×8",
+    "desc": "You cannot give check unless it is checkmate."
+  },
+  {
+    "name": "No Retreat",
+    "board": "8×8",
+    "desc": "Pieces cannot move backward toward their own starting rank."
+  },
+  {
+    "name": "Weak!",
+    "board": "8×8",
+    "desc": "The weakest piece type with a legal move must move first."
+  },
+  {
+    "name": "Patrol Chess",
+    "board": "8×8",
+    "desc": "A piece can only capture if defended by a friendly piece."
+  },
+  {
+    "name": "Madrasi Chess",
+    "board": "8×8",
+    "desc": "Same-type opposing pieces that attack each other are paralysed."
+  },
+  {
+    "name": "Omnicide",
+    "board": "8×8",
+    "desc": "Lose all pieces to win. Like Antichess but captures are not forced."
+  },
+  {
+    "name": "Dark Chess",
+    "board": "8×8",
+    "desc": "Total fog — you can only see your own pieces. Capture the king to win."
+  },
+  {
+    "name": "Berserk Chess",
+    "board": "8×8",
+    "desc": "Delivering check grants an immediate bonus move."
+  },
+  {
+    "name": "Benedict Chess",
+    "board": "8×8",
+    "desc": "Pieces convert enemies they attack instead of capturing. Win by converting the king."
+  },
+  {
+    "name": "Andernach Chess",
+    "board": "8×8",
+    "desc": "Capturing pieces change colour. Kings are exempt."
+  },
+  {
+    "name": "Half Chess",
+    "board": "4×8",
+    "desc": "Compressed 4-rank board. Armies start adjacent — instant contact."
+  },
+  {
+    "name": "Diana Chess",
+    "board": "6×6",
+    "desc": "6×6 board with no queens or knights. Bishops and rooks dominate."
+  },
+  {
+    "name": "Petty Chess",
+    "board": "5×6",
+    "desc": "All piece types on a compact 5×6 board. Fast tactical games."
   }
 ]

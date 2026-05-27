@@ -96,7 +96,7 @@ MCE.rc(index, game)&nbsp;&nbsp;&nbsp;&nbsp;// → [row, col]<br>
 MCE.onBoard(row, col, game) // → boolean
   </div>
 
-  <h2>Supported Variants (39)</h2>
+  <h2>Supported Variants (54)</h2>
   <table class="docs-table">
     <tr><th>Key</th><th>Board</th><th>Win Condition</th></tr>
     <tr><td><code>standard</code></td><td>8×8</td><td>Checkmate</td></tr>
@@ -138,6 +138,21 @@ MCE.onBoard(row, col, game) // → boolean
     <tr><td><code>capablanca</code></td><td>10×8</td><td>Checkmate</td></tr>
     <tr><td><code>grand</code></td><td>10×10</td><td>Checkmate</td></tr>
     <tr><td><code>courier</code></td><td>12×8</td><td>Checkmate</td></tr>
+    <tr><td><code>diceChess</code></td><td>8×8</td><td>Checkmate (die constrains piece type)</td></tr>
+    <tr><td><code>gridChess</code></td><td>8×8</td><td>Checkmate (must cross grid lines)</td></tr>
+    <tr><td><code>checklessChess</code></td><td>8×8</td><td>Checkmate (no check unless mate)</td></tr>
+    <tr><td><code>noRetreat</code></td><td>8×8</td><td>Checkmate (no backward moves)</td></tr>
+    <tr><td><code>weakChess</code></td><td>8×8</td><td>Checkmate (weakest piece must move)</td></tr>
+    <tr><td><code>patrolChess</code></td><td>8×8</td><td>Checkmate (capture only when defended)</td></tr>
+    <tr><td><code>madrasiChess</code></td><td>8×8</td><td>Checkmate (same-type pieces paralyse)</td></tr>
+    <tr><td><code>omnicide</code></td><td>8×8</td><td>Lose all pieces (no forced captures)</td></tr>
+    <tr><td><code>darkChess</code></td><td>8×8</td><td>Capture king (total fog)</td></tr>
+    <tr><td><code>berserkChess</code></td><td>8×8</td><td>Checkmate (check grants bonus move)</td></tr>
+    <tr><td><code>benedictChess</code></td><td>8×8</td><td>Convert opponent's king</td></tr>
+    <tr><td><code>andernachChess</code></td><td>8×8</td><td>Checkmate (captures flip colour)</td></tr>
+    <tr><td><code>halfChess</code></td><td>4×8</td><td>Checkmate</td></tr>
+    <tr><td><code>dianaChess</code></td><td>6×6</td><td>Checkmate</td></tr>
+    <tr><td><code>pettyChess</code></td><td>5×6</td><td>Checkmate</td></tr>
   </table>
 
   <h2>Sister Projects</h2>
@@ -149,7 +164,7 @@ MCE.onBoard(row, col, game) // → boolean
   <h2>Next Steps</h2>
   <ul>
     <li><a href="api.html">Full API reference</a> — every method on the MCE namespace</li>
-    <li><a href="variants.html">Add a variant</a> — step-by-step guide to creating a new variant</li>
+    <li><a href="variants.html">Plugin Guide</a> — create variants using MCE.registerVariant()</li>
   </ul>
 </div>
 </div>

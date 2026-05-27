@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 39 playable variants on boards from 5×5 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 54 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -91,6 +91,21 @@ moddable-chess/
 | Done | Pawns Only | 8×8 | Only pawns, first promotion wins |
 | Done | Los Alamos | 6×6 | No bishops, first computer chess (1956) |
 | Done | Minichess | 5×5 | Full piece types on tiny board |
+| Done | Dice Chess | 8×8 | Die roll constrains which piece type moves |
+| Done | Grid Chess | 8×8 | Moves must cross 2×2 grid lines |
+| Done | Checkless Chess | 8×8 | No check unless it's checkmate |
+| Done | No Retreat | 8×8 | Pieces can't move backward |
+| Done | Weak! | 8×8 | Weakest piece must move first |
+| Done | Patrol Chess | 8×8 | Capture only when defended |
+| Done | Madrasi Chess | 8×8 | Same-type pieces paralyse each other |
+| Done | Omnicide | 8×8 | Lose all pieces, captures not forced |
+| Done | Dark Chess | 8×8 | Total fog, capture king to win |
+| Done | Berserk Chess | 8×8 | Check grants bonus move |
+| Done | Benedict Chess | 8×8 | Convert enemies instead of capturing |
+| Done | Andernach Chess | 8×8 | Captures flip piece colour |
+| Done | Half Chess | 4×8 | Compressed board, instant contact |
+| Done | Diana Chess | 6×6 | No queens or knights |
+| Done | Petty Chess | 5×6 | All pieces on compact board |
 
 ---
 
