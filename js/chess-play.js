@@ -119,6 +119,18 @@ function makeMove(g, move) {
   if (pieceType(piece) === 'p' || captured) g.halfmove = 0;
   else g.halfmove++;
 
+  const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
+  if (vc && vc.afterMove) {
+    vc.afterMove(g, move, undo);
+  }
+
+  if (vc && vc.turnLogic) {
+    vc.turnLogic(g, undo);
+    g.history.push(move);
+    g.positionHistory.push(MCE.positionKey(g));
+    return undo;
+  }
+
   if (g.variant === 'marseillais') {
     g.movesThisTurn++;
     undo.movesThisTurn = g.movesThisTurn - 1;
@@ -225,6 +237,12 @@ function unmakeMove(g, undo) {
   if (undo.progressiveMove !== undefined) g.progressiveMove = undo.progressiveMove;
   if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
   if (undo.duckPhase !== undefined) g.duckPhase = undo.duckPhase;
+
+  const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
+  if (vc && vc.restoreState) {
+    vc.restoreState(g, undo);
+  }
+
   g.history.pop();
   g.positionHistory.pop();
 }

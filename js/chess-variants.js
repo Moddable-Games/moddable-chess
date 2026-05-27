@@ -46,6 +46,12 @@ const VARIANTS = {
 };
 
 function getVariantStatus(g) {
+  const vc = MCE.getVariantConfig(g.variant);
+  if (vc && vc.winCondition) {
+    const result = vc.winCondition(g);
+    if (result) return result;
+  }
+
   const v = g.variant;
   if (v === 'kingOfTheHill') {
     const center = [27, 28, 35, 36]; // d4,e4,d5,e5
@@ -141,8 +147,14 @@ function getVariantStatus(g) {
 }
 
 function variantLegalMoves(g) {
+  const vc = MCE.getVariantConfig(g.variant);
   const v = g.variant;
   let moves = legalMoves(g);
+
+  if (vc && vc.moveFilter) {
+    moves = vc.moveFilter(g, moves);
+    return moves;
+  }
 
   if (v === 'antichess' || v === 'giveaway' || v === 'suicideChess') {
     const captures = moves.filter(m => g.board[m.to] || m.flag === 'ep');

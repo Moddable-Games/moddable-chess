@@ -418,7 +418,11 @@ function render() {
     opts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
   }
 
-  if (currentVariant === 'fogOfWar') {
+  const vc = MCE.getVariantConfig(currentVariant);
+  if (vc && vc.visibility) {
+    const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
+    opts.fogMask = vc.visibility(game, viewSide);
+  } else if (currentVariant === 'fogOfWar') {
     const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
     opts.fogMask = computeVisibility(game, viewSide);
   }
@@ -454,6 +458,12 @@ function updateStatus() {
   if (game.duckPhase) {
     statusEl.textContent = nameFor(game.turn) + ' — place the duck';
     return;
+  }
+
+  const vcStatus = MCE.getVariantConfig(currentVariant);
+  if (vcStatus && vcStatus.statusText) {
+    const custom = vcStatus.statusText(game, { nameFor, nameForOpp, gameOver });
+    if (custom) { statusEl.textContent = custom; return; }
   }
 
   const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
@@ -712,6 +722,12 @@ function scheduleAIMove() {
 function doAIMove() {
   if (isGameOver()) { aiThinking = false; render(); return; }
 
+  const vcAI = MCE.getVariantConfig(currentVariant);
+  if (vcAI && vcAI.aiMoveCount) {
+    const count = vcAI.aiMoveCount(game);
+    if (count > 1) { doAIMoveMultiPlugin(count); return; }
+  }
+
   if (currentVariant === 'marseillais') {
     doAIMoveMarseillais();
     return;
@@ -787,6 +803,24 @@ function doAIMoveMulti() {
     addMoveToList(move, side);
   }
 
+  aiThinking = false;
+  renderControls();
+  renderCaptured();
+  render();
+}
+
+function doAIMoveMultiPlugin(count) {
+  const side = game.turn;
+  for (let i = 0; i < count; i++) {
+    if (isGameOver() || game.turn !== side) break;
+    const move = MCE.aiPickMove(game, getAIDepth());
+    if (!move) break;
+    trackCaptures(move, side);
+    const undo = MCE.makeMove(game, move);
+    undoStack.push(undo);
+    lastMove = { from: move.from, to: move.to };
+    addMoveToList(move, side);
+  }
   aiThinking = false;
   renderControls();
   renderCaptured();
