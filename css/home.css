@@ -20,6 +20,9 @@ a { color: inherit; text-decoration: none; }
   padding: 120px 24px 80px;
   text-align: center;
   overflow: hidden;
+  background-image: url('../assets/hex-grid-blue.svg');
+  background-size: 56px 64px;
+  background-repeat: repeat;
 }
 
 .mc-hero__glow {
@@ -213,6 +216,9 @@ a { color: inherit; text-decoration: none; }
 .mc-dev {
   background: var(--mc-deep);
   padding: 80px 24px;
+  background-image: url('../assets/hex-grid-blue.svg');
+  background-size: 56px 64px;
+  background-repeat: repeat;
 }
 
 .mc-dev__inner {

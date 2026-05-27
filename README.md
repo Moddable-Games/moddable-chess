@@ -119,6 +119,18 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-05-27
+- Add 6 board colour themes: Classic, Cosmic Dark, Classic Wood, Marble, Neon, Minimal
+- Add theme picker control to play page board controls
+- Add theme API: `MCE.setTheme()`, `MCE.getTheme()`, `MCE.THEMES` with custom theme support
+- Add `theme` URL parameter for embeds (cosmic, wood, marble, neon, minimal)
+- Add hex-grid-blue.svg tiling background to hero and developer sections
+- Add cross-promotion for Moddable Hexmaps in docs (hex-board geometry limitations)
+- Add "Sister Projects" section to documentation hub
+- Update API reference with full theme documentation and examples
+- Fix variant count in docs (36 → 39)
+- Bump version to 0.6.0
+
 #### 2026-05-26
 - Add 19 new variants (36 total): Knightmate, Monster Chess, Progressive, Chigorin, Almost Chess, Amazon Chess, Upside-Down, Single-Check, Five-Check, Giveaway, Suicide Chess, Stalemate Wins, Codrus, Makpong, Endgame Chess, Peasants' Revolt, Pawns Only, Los Alamos (6x6), Minichess (5x5)
 - Add two new board sizes: 6x6 and 5x5

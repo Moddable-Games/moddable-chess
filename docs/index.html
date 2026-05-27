@@ -13,12 +13,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Documentation — Moddable Chess">
 <meta name="twitter:description" content="Integration guide and architecture overview for the Moddable Chess engine.">
-<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.5.1">
-<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.5.1">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="stylesheet" href="../css/shared.css?v=0.5.1">
-<link rel="stylesheet" href="../css/docs.css?v=0.5.1">
+<link rel="stylesheet" href="../css/shared.css?v=0.6.0">
+<link rel="stylesheet" href="../css/docs.css?v=0.6.0">
 </head>
 <body>
 
@@ -96,7 +96,7 @@ MCE.rc(index, game)&nbsp;&nbsp;&nbsp;&nbsp;// → [row, col]<br>
 MCE.onBoard(row, col, game) // → boolean
   </div>
 
-  <h2>Supported Variants (36)</h2>
+  <h2>Supported Variants (39)</h2>
   <table class="docs-table">
     <tr><th>Key</th><th>Board</th><th>Win Condition</th></tr>
     <tr><td><code>standard</code></td><td>8×8</td><td>Checkmate</td></tr>
@@ -140,6 +140,12 @@ MCE.onBoard(row, col, game) // → boolean
     <tr><td><code>courier</code></td><td>12×8</td><td>Checkmate</td></tr>
   </table>
 
+  <h2>Sister Projects</h2>
+  <p>Moddable Chess handles rectangular boards only. For other geometries:</p>
+  <ul>
+    <li><a href="https://hex.moddable.games" target="_blank" rel="noopener">Moddable Hexmaps</a> — hex-grid engine for Hexagonal Chess, Glinski, and other hex-board games</li>
+  </ul>
+
   <h2>Next Steps</h2>
   <ul>
     <li><a href="api.html">Full API reference</a> — every method on the MCE namespace</li>
@@ -150,8 +156,8 @@ MCE.onBoard(row, col, game) // → boolean
 
 <footer class="site-footer">
   <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
-  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.5.1</p>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.6.0</p>
 </footer>
-<script src="../js/docs-toc.js?v=0.5.1"></script>
+<script src="../js/docs-toc.js?v=0.6.0"></script>
 </body>
 </html>

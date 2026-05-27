@@ -4,12 +4,24 @@
 const { rc, sq, sqToAlgebraic } = MCE;
 const SVGns = 'http://www.w3.org/2000/svg';
 
-const LIGHT_SQ = '#f0d9b5';
-const DARK_SQ = '#b58863';
-const HIGHLIGHT = 'rgba(255, 255, 0, 0.4)';
-const LAST_MOVE = 'rgba(100, 180, 255, 0.3)';
-const MOVE_DOT = 'rgba(0, 0, 0, 0.2)';
-const CAPTURE_RING = 'rgba(0, 0, 0, 0.2)';
+const THEMES = {
+  classic: { light: '#f0d9b5', dark: '#b58863', highlight: 'rgba(255, 255, 0, 0.4)', lastMove: 'rgba(100, 180, 255, 0.3)', dot: 'rgba(0, 0, 0, 0.2)', ring: 'rgba(0, 0, 0, 0.2)', border: '#8b6914', label: 'Classic' },
+  cosmic: { light: '#2d3760', dark: '#141c37', highlight: 'rgba(111, 181, 255, 0.35)', lastMove: 'rgba(111, 181, 255, 0.2)', dot: 'rgba(255, 255, 255, 0.25)', ring: 'rgba(255, 255, 255, 0.3)', border: '#0c4f8d', label: 'Cosmic Dark' },
+  wood: { light: '#deb887', dark: '#8b5e3c', highlight: 'rgba(255, 215, 0, 0.4)', lastMove: 'rgba(139, 90, 43, 0.3)', dot: 'rgba(0, 0, 0, 0.2)', ring: 'rgba(0, 0, 0, 0.25)', border: '#5c3317', label: 'Classic Wood' },
+  marble: { light: '#f2f0ec', dark: '#b8b5af', highlight: 'rgba(100, 149, 237, 0.35)', lastMove: 'rgba(100, 149, 237, 0.2)', dot: 'rgba(0, 0, 0, 0.15)', ring: 'rgba(0, 0, 0, 0.2)', border: '#9e9b95', label: 'Marble' },
+  neon: { light: '#1a1a2e', dark: '#0f0f1a', highlight: 'rgba(0, 255, 136, 0.3)', lastMove: 'rgba(0, 200, 255, 0.25)', dot: 'rgba(0, 255, 136, 0.4)', ring: 'rgba(255, 0, 128, 0.5)', border: '#00ff88', label: 'Neon' },
+  minimal: { light: '#fafafa', dark: '#e8e8e8', highlight: 'rgba(66, 133, 244, 0.3)', lastMove: 'rgba(66, 133, 244, 0.15)', dot: 'rgba(0, 0, 0, 0.12)', ring: 'rgba(0, 0, 0, 0.15)', border: '#ddd', label: 'Minimal' },
+};
+
+let currentTheme = 'classic';
+
+function setTheme(name) {
+  if (THEMES[name]) currentTheme = name;
+}
+
+function getTheme() {
+  return THEMES[currentTheme] || THEMES.classic;
+}
 
 function svgEl(tag, attrs) {
   const el = document.createElementNS(SVGns, tag);
@@ -51,21 +63,22 @@ function renderBoard(container, game, opts) {
       const isLight = (dr + dc) % 2 === 0;
       const sqIdx = MCE.sq(dr, dc, game);
 
+      const theme = getTheme();
       const rect = svgEl('rect', {
         x, y, width: tileSize, height: tileSize,
-        fill: isLight ? LIGHT_SQ : DARK_SQ,
+        fill: isLight ? theme.light : theme.dark,
       });
       svg.appendChild(rect);
 
       if (lastMove && (sqIdx === lastMove.from || sqIdx === lastMove.to)) {
         svg.appendChild(svgEl('rect', {
-          x, y, width: tileSize, height: tileSize, fill: LAST_MOVE,
+          x, y, width: tileSize, height: tileSize, fill: theme.lastMove,
         }));
       }
 
       if (sqIdx === selected) {
         svg.appendChild(svgEl('rect', {
-          x, y, width: tileSize, height: tileSize, fill: HIGHLIGHT,
+          x, y, width: tileSize, height: tileSize, fill: theme.highlight,
         }));
       }
     }
@@ -80,14 +93,15 @@ function renderBoard(container, game, opts) {
     const cy = dr * tileSize + tileSize / 2;
     const isCapture = game.board[move.to] || move.flag === 'ep';
 
+    const theme = getTheme();
     if (isCapture) {
       svg.appendChild(svgEl('circle', {
         cx, cy, r: tileSize * 0.45,
-        fill: 'none', stroke: CAPTURE_RING, 'stroke-width': tileSize * 0.08,
+        fill: 'none', stroke: theme.ring, 'stroke-width': tileSize * 0.08,
       }));
     } else {
       svg.appendChild(svgEl('circle', {
-        cx, cy, r: tileSize * 0.15, fill: MOVE_DOT,
+        cx, cy, r: tileSize * 0.15, fill: theme.dot,
       }));
     }
   }
@@ -323,5 +337,5 @@ function captureBurst(svg, cx, cy, tileSize) {
   requestAnimationFrame(frameFlash);
 }
 
-Object.assign(MCE, { renderBoard, captureBurst });
+Object.assign(MCE, { renderBoard, captureBurst, setTheme, getTheme, THEMES });
 })();

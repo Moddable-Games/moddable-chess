@@ -128,13 +128,17 @@ if (embedMode) {
     container.style.width = '100%';
   }
 
-  const theme = params.get('theme');
+  const themeParam = params.get('theme');
   const bg = params.get('bg');
   const accent = params.get('accent');
   const radius = params.get('radius');
   const root = document.documentElement;
 
-  if (theme === 'light') {
+  if (themeParam && MCE.THEMES && MCE.THEMES[themeParam]) {
+    MCE.setTheme(themeParam);
+  }
+
+  if (themeParam === 'light') {
     root.style.setProperty('--play-bg', '#ffffff');
     root.style.setProperty('--play-text', '#14161c');
     root.style.setProperty('--play-text-muted', '#4f5764');
@@ -301,6 +305,22 @@ function renderControls() {
   controlsEl.appendChild(flipBtn);
   controlsEl.appendChild(undoBtn);
   controlsEl.appendChild(newBtn);
+
+  const themeSelect = document.createElement('select');
+  themeSelect.className = 'ctrl-select';
+  const currentThemeObj = MCE.getTheme();
+  Object.entries(MCE.THEMES).forEach(([key, t]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = t.label;
+    if (t === currentThemeObj) opt.selected = true;
+    themeSelect.appendChild(opt);
+  });
+  themeSelect.addEventListener('change', () => {
+    MCE.setTheme(themeSelect.value);
+    render();
+  });
+  controlsEl.appendChild(themeSelect);
 }
 
 function removeMoveFromList() {

@@ -48,6 +48,8 @@ p, li { text-wrap: pretty; }
 .ctrl-btn { padding: 6px 14px; border: 1px solid var(--play-border-accent); border-radius: 6px; background: transparent; color: var(--play-text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 120ms; }
 .ctrl-btn:hover { background: var(--play-surface-hover); color: var(--play-text); border-color: var(--play-border-hover); }
 .ctrl-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+.ctrl-select { padding: 6px 10px; border: 1px solid var(--play-border-accent); border-radius: 6px; background: var(--play-surface); color: var(--play-text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 120ms; font-family: inherit; }
+.ctrl-select:hover { background: var(--play-surface-hover); color: var(--play-text); border-color: var(--play-border-hover); }
 #description { font-size: 13px; line-height: 1.5; color: var(--play-text-muted); }
 #description h3 { font-size: 14px; font-weight: 600; color: var(--play-text); margin: 0 0 6px; }
 #description p { margin: 0 0 8px; }

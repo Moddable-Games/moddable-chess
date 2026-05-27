@@ -13,12 +13,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="API Reference — Moddable Chess">
 <meta name="twitter:description" content="Complete API reference for all MCE namespace methods.">
-<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.5.1">
-<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.5.1">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="stylesheet" href="../css/shared.css?v=0.5.1">
-<link rel="stylesheet" href="../css/docs.css?v=0.5.1">
+<link rel="stylesheet" href="../css/shared.css?v=0.6.0">
+<link rel="stylesheet" href="../css/docs.css?v=0.6.0">
 </head>
 <body>
 
@@ -163,6 +163,53 @@ MCE.renderBoard(el, game, {<br>
   <h3>MCE.captureBurst(svg, cx, cy, tileSize)</h3>
   <p>Triggers a capture burst animation at the given SVG coordinates. Can be called independently for custom capture effects.</p>
 
+  <h2>Board Themes</h2>
+
+  <h3>MCE.setTheme(name)</h3>
+  <p>Sets the active board colour theme. Affects all subsequent <code>renderBoard</code> calls.</p>
+  <div class="docs-code">
+MCE.setTheme('cosmic');&nbsp;&nbsp;// deep navy squares<br>
+MCE.setTheme('wood');&nbsp;&nbsp;&nbsp;&nbsp;// warm brown tones<br>
+MCE.setTheme('marble');&nbsp;&nbsp;// grey/white stone<br>
+MCE.setTheme('neon');&nbsp;&nbsp;&nbsp;&nbsp;// dark bg, bright accents<br>
+MCE.setTheme('minimal');&nbsp;// near-white, subtle contrast<br>
+MCE.setTheme('classic');&nbsp;// default tan/brown
+  </div>
+
+  <h3>MCE.getTheme()</h3>
+  <p>Returns the current theme object with colour values:</p>
+  <div class="docs-code">
+const t = MCE.getTheme();<br>
+// { light, dark, highlight, lastMove, dot, ring, border, label }
+  </div>
+
+  <h3>MCE.THEMES</h3>
+  <p>Object containing all available theme definitions. Keys: <code>classic</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>.</p>
+  <table class="docs-table">
+    <tr><th>Theme</th><th>Light sq</th><th>Dark sq</th><th>Style</th></tr>
+    <tr><td><code>classic</code></td><td>#f0d9b5</td><td>#b58863</td><td>Standard tan/brown (default)</td></tr>
+    <tr><td><code>cosmic</code></td><td>#2d3760</td><td>#141c37</td><td>Deep navy, inspired by the OG card</td></tr>
+    <tr><td><code>wood</code></td><td>#deb887</td><td>#8b5e3c</td><td>Warm brown wood tones</td></tr>
+    <tr><td><code>marble</code></td><td>#f2f0ec</td><td>#b8b5af</td><td>Grey/white stone</td></tr>
+    <tr><td><code>neon</code></td><td>#1a1a2e</td><td>#0f0f1a</td><td>Dark with bright move indicators</td></tr>
+    <tr><td><code>minimal</code></td><td>#fafafa</td><td>#e8e8e8</td><td>Near-white, very subtle contrast</td></tr>
+  </table>
+
+  <h3>Custom themes</h3>
+  <p>Add your own theme by extending <code>MCE.THEMES</code> before calling <code>setTheme</code>:</p>
+  <div class="docs-code">
+MCE.THEMES.forest = {<br>
+&nbsp;&nbsp;light: '#4a7c59', dark: '#2d5a3a',<br>
+&nbsp;&nbsp;highlight: 'rgba(255,215,0,0.35)',<br>
+&nbsp;&nbsp;lastMove: 'rgba(144,238,144,0.25)',<br>
+&nbsp;&nbsp;dot: 'rgba(255,255,255,0.2)',<br>
+&nbsp;&nbsp;ring: 'rgba(255,255,255,0.3)',<br>
+&nbsp;&nbsp;border: '#1a3d2a',<br>
+&nbsp;&nbsp;label: 'Forest'<br>
+};<br>
+MCE.setTheme('forest');
+  </div>
+
   <h2>Utilities</h2>
 
   <h3>MCE.randomFEN960()</h3>
@@ -202,7 +249,7 @@ MCE.renderBoard(el, game, {<br>
   <p>These only apply when <code>embed=1</code> is set:</p>
   <table class="docs-table">
     <tr><th>Parameter</th><th>Values</th><th>Effect</th></tr>
-    <tr><td><code>theme</code></td><td><code>light</code></td><td>Switches to light colour scheme (white background, dark text)</td></tr>
+    <tr><td><code>theme</code></td><td><code>light</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code></td><td><code>light</code> switches UI colour scheme. Others set the board colour theme</td></tr>
     <tr><td><code>bg</code></td><td>CSS colour</td><td>Override background colour (e.g. <code>%23f0f0f0</code> for #f0f0f0)</td></tr>
     <tr><td><code>accent</code></td><td>CSS colour</td><td>Override accent colour for selection highlights and borders</td></tr>
     <tr><td><code>radius</code></td><td>CSS value</td><td>Border radius on the board container (e.g. <code>12px</code>)</td></tr>
@@ -232,13 +279,25 @@ MCE.renderBoard(el, game, {<br>
 &lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;mode=pass&amp;p1=Magnus&amp;p2=Hikaru"<br>
 &nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
   </div>
+
+  <p>Cosmic dark board theme with Capablanca variant:</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;theme=cosmic&amp;variant=capablanca"<br>
+&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
+
+  <p>Neon theme, board only:</p>
+  <div class="docs-code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;theme=neon&amp;variant=standard"<br>
+&nbsp;&nbsp;width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
 </div>
 </div>
 
 <footer class="site-footer">
   <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
-  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.5.1</p>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.6.0</p>
 </footer>
-<script src="../js/docs-toc.js?v=0.5.1"></script>
+<script src="../js/docs-toc.js?v=0.6.0"></script>
 </body>
 </html>
