@@ -104,6 +104,22 @@ const VARIANT_GROUPS = [
   ]},
 ];
 
+function getVariantGroups() {
+  const groups = VARIANT_GROUPS.map(g => ({ label: g.label, variants: [...g.variants] }));
+  const knownKeys = new Set(groups.flatMap(g => g.variants.map(([k]) => k)));
+  for (const [key, vc] of Object.entries(MCE.variantRegistry)) {
+    if (knownKeys.has(key)) continue;
+    const groupLabel = vc.group || 'Plugins';
+    let target = groups.find(g => g.label === groupLabel);
+    if (!target) { target = { label: groupLabel, variants: [] }; groups.push(target); }
+    target.variants.push([key, vc.label || key]);
+    if (vc.title && vc.description) {
+      DESCRIPTIONS[key] = { title: vc.title, text: vc.description, rule: vc.rule || '' };
+    }
+  }
+  return groups;
+}
+
 const params = new URLSearchParams(location.search);
 const paramVariant = params.get('variant');
 const embedMode = params.get('embed') === '1';
@@ -221,7 +237,7 @@ function renderPicker() {
 
   const query = filterText.toLowerCase();
 
-  VARIANT_GROUPS.forEach(group => {
+  getVariantGroups().forEach(group => {
     const matches = group.variants.filter(([, label]) => label.toLowerCase().includes(query));
     if (matches.length === 0) return;
 
@@ -333,7 +349,7 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
-  const g = VARIANT_GROUPS.find(gr => gr.variants.some(([k]) => k === variant));
+  const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   if (g) openGroup = g.label;
   game = MCE.createGame(variant);
   if (variant === 'chess960') {

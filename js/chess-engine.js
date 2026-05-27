@@ -32,6 +32,28 @@ const VARIANT_BOARDS = {
 };
 
 const pieceRegistry = {};
+const variantRegistry = {};
+
+function registerVariant(key, config) {
+  variantRegistry[key] = config;
+}
+
+function getVariantConfig(key) {
+  return resolveVariantConfig(key);
+}
+
+function resolveVariantConfig(key) {
+  const raw = variantRegistry[key];
+  if (!raw) return null;
+  if (!raw.extends) return raw;
+  const parents = Array.isArray(raw.extends) ? raw.extends : [raw.extends];
+  let merged = {};
+  for (const parentKey of parents) {
+    const parent = resolveVariantConfig(parentKey);
+    if (parent) merged = Object.assign(merged, parent);
+  }
+  return Object.assign(merged, raw);
+}
 
 function createGame(config) {
   if (typeof config === 'string' || config === undefined) {
@@ -76,9 +98,10 @@ function createGame(config) {
 }
 
 function createVariantGame(variant) {
+  const vc = getVariantConfig(variant);
   const vb = VARIANT_BOARDS[variant];
-  const rows = vb ? vb.rows : 8;
-  const cols = vb ? vb.cols : 8;
+  const rows = (vc && vc.rows) || (vb ? vb.rows : 8);
+  const cols = (vc && vc.cols) || (vb ? vb.cols : 8);
   const total = rows * cols;
   const g = {
     rows: rows,
@@ -108,6 +131,23 @@ function createVariantGame(variant) {
     legalityFilter: null,
     winCondition: null,
   };
+
+  if (vc) {
+    if (vc.noCastling) g.noCastling = true;
+    if (vc.noEnPassant) g.noEnPassant = true;
+    if (vc.noPromotion) g.noPromotion = true;
+    if (vc.noCheck) g.noCheck = true;
+    if (vc.torpedo) g.torpedo = true;
+    if (vc.pawnDirection) g.pawnDirection = vc.pawnDirection;
+    if (vc.maxMovesPerTurn) { g.maxMovesPerTurn = vc.maxMovesPerTurn; g.lastMovedSq = -1; }
+    if (vc.progressiveMove) g.progressiveMove = vc.progressiveMove;
+    if (vc.init) vc.init(g);
+    const fen = vc.fen || (vb ? vb.fen : INITIAL_FEN);
+    loadFEN(g, fen);
+    g.positionHistory.push(positionKey(g));
+    return g;
+  }
+
   if (variant === 'noCastling') g.noCastling = true;
   if (variant === 'torpedo') g.torpedo = true;
   if (variant === 'breakthrough') { g.noCastling = true; g.noEnPassant = true; g.noPromotion = true; }
@@ -274,5 +314,5 @@ function positionKey(g) {
   return parts.slice(0, 4).join(' ');
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn };
+return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
 })();
