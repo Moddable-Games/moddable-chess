@@ -30,30 +30,6 @@ function makeMove(g, move) {
 
   if (vc && vc.beforeMove) {
     vc.beforeMove(g, move, undo);
-  } else if (g.variant === 'rifle' && isCapture && flag !== 'ep') {
-    g.board[to] = null;
-    g.board[from] = piece;
-    if (g.pieceData) { g.pieceData[to] = null; }
-  } else if (g.variant === 'atomic' && isCapture && flag !== 'ep') {
-    g.board[to] = piece;
-    g.board[from] = null;
-    if (g.pieceData) { g.pieceData[to] = g.pieceData[from]; g.pieceData[from] = null; }
-    undo.exploded = [];
-    const [tr, tc] = MCE.rc(to, g);
-    g.board[to] = null;
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const nr = tr + dr, nc = tc + dc;
-        if (!MCE.onBoard(nr, nc, g)) continue;
-        const adjSq = MCE.sq(nr, nc, g);
-        const adjP = g.board[adjSq];
-        if (adjP && pieceType(adjP) !== 'p') {
-          undo.exploded.push({ sq: adjSq, piece: adjP });
-          g.board[adjSq] = null;
-        }
-      }
-    }
   } else {
     g.board[to] = piece;
     g.board[from] = null;
@@ -120,55 +96,6 @@ function makeMove(g, move) {
 
   if (vc && vc.turnLogic) {
     vc.turnLogic(g, undo);
-    g.history.push(move);
-    g.positionHistory.push(MCE.positionKey(g));
-    return undo;
-  }
-
-  if (g.variant === 'marseillais') {
-    g.movesThisTurn++;
-    undo.movesThisTurn = g.movesThisTurn - 1;
-    const isFirstMove = g.fullmove === 1 && g.turn === WHITE;
-    const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
-    if (g.movesThisTurn >= 2 || isFirstMove || givesCheck) {
-      if (g.turn === BLACK) g.fullmove++;
-      MCE.advanceTurn(g);
-      g.movesThisTurn = 0;
-    }
-  } else if (g.variant === 'monsterChess') {
-    g.movesThisTurn++;
-    undo.movesThisTurn = g.movesThisTurn - 1;
-    undo.lastMovedSq = g.lastMovedSq;
-    const max = g.maxMovesPerTurn[g.turn] || 1;
-    const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
-    if (g.movesThisTurn >= max || givesCheck) {
-      if (g.turn === BLACK) g.fullmove++;
-      MCE.advanceTurn(g);
-      g.movesThisTurn = 0;
-      g.lastMovedSq = -1;
-    } else {
-      g.lastMovedSq = to;
-    }
-  } else if (g.variant === 'progressive') {
-    g.movesThisTurn++;
-    undo.movesThisTurn = g.movesThisTurn - 1;
-    undo.progressiveMove = g.progressiveMove;
-    const givesCheck = inCheck(g, g.turn === WHITE ? BLACK : WHITE);
-    if (g.movesThisTurn >= g.progressiveMove || givesCheck) {
-      if (g.turn === BLACK) g.fullmove++;
-      g.progressiveMove++;
-      MCE.advanceTurn(g);
-      g.movesThisTurn = 0;
-    }
-  } else if (g.variant === 'duckChess') {
-    if (!g.duckPhase) {
-      g.duckPhase = true;
-    } else {
-      g.duckPhase = false;
-      if (g.turn === BLACK) g.fullmove++;
-      MCE.advanceTurn(g);
-    }
-    undo.duckPhase = !g.duckPhase;
   } else {
     if (g.turn === BLACK) g.fullmove++;
     MCE.advanceTurn(g);
@@ -227,10 +154,6 @@ function unmakeMove(g, undo) {
   g.halfmove = undo.halfmove;
   g.turn = undo.turn;
   g.turnIndex = undo.turnIndex;
-  if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
-  if (undo.progressiveMove !== undefined) g.progressiveMove = undo.progressiveMove;
-  if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
-  if (undo.duckPhase !== undefined) g.duckPhase = undo.duckPhase;
 
   const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   if (vc && vc.restoreState) {

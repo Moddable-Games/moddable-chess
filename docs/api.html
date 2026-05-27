@@ -110,7 +110,7 @@ const undo = MCE.makeMove(game, move);<br>
   </ul>
 
   <h3>MCE.getVariantStatus(game)</h3>
-  <p>Checks variant-specific win conditions. Returns <code>null</code> if no variant win, or a string like <code>'koth-w'</code>, <code>'race-b'</code>, <code>'antichess-w'</code>.</p>
+  <p>Calls the active variant's <code>winCondition</code> hook. Returns <code>null</code> if no variant win, or a status string like <code>'koth-w'</code>, <code>'race-b'</code>, <code>'antichess-w'</code>.</p>
 
   <h3>MCE.inCheck(game, side)</h3>
   <p>Returns <code>true</code> if the given side's king is in check. <code>side</code> is <code>'w'</code> or <code>'b'</code>.</p>
@@ -210,16 +210,81 @@ MCE.THEMES.forest = {<br>
 MCE.setTheme('forest');
   </div>
 
+  <h2>Plugin Registration</h2>
+
+  <h3>MCE.registerVariant(key, config)</h3>
+  <p>Registers a variant plugin. All variant-specific logic is defined in the config object — no core engine code is modified.</p>
+  <div class="docs-code">
+MCE.registerVariant('myVariant', {<br>
+&nbsp;&nbsp;label: 'My Variant',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// picker display name<br>
+&nbsp;&nbsp;group: 'Tactical',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// picker group<br>
+&nbsp;&nbsp;rows: 8, cols: 8,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// board dimensions<br>
+&nbsp;&nbsp;fen: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// null = standard position<br>
+&nbsp;&nbsp;title: 'My Variant',<br>
+&nbsp;&nbsp;description: 'How this variant works.',<br>
+&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
+&nbsp;&nbsp;// Config flags (all optional):<br>
+&nbsp;&nbsp;noCastling: false,<br>
+&nbsp;&nbsp;noCheck: false,<br>
+&nbsp;&nbsp;torpedo: false,<br>
+&nbsp;&nbsp;// Hook functions (all optional):<br>
+&nbsp;&nbsp;winCondition: function(g) { return null; },<br>
+&nbsp;&nbsp;moveFilter: function(g, moves) { return moves; },<br>
+&nbsp;&nbsp;beforeMove: function(g, move, undo) { },<br>
+&nbsp;&nbsp;turnLogic: function(g, undo) { },<br>
+&nbsp;&nbsp;restoreState: function(g, undo) { },<br>
+&nbsp;&nbsp;init: function(g) { },<br>
+&nbsp;&nbsp;visibility: function(g, side) { return new Set(); },<br>
+});
+  </div>
+  <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>
+
+  <h3>MCE.getVariantConfig(key)</h3>
+  <p>Returns the registered config object for a variant, with inheritance resolved if <code>extends</code> was used. Returns <code>null</code> if not registered.</p>
+  <div class="docs-code">
+const vc = MCE.getVariantConfig('atomic');<br>
+console.log(vc.label);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 'Atomic'<br>
+console.log(vc.noCheck);&nbsp;&nbsp;&nbsp;&nbsp;// undefined (uses standard check rules)<br>
+console.log(vc.beforeMove);&nbsp;// [Function] (explosion logic)
+  </div>
+
+  <h3>MCE.variantRegistry</h3>
+  <p>The raw registry object. Keys are variant camelCase IDs, values are config objects. Used by the game controller to build the picker.</p>
+  <div class="docs-code">
+Object.keys(MCE.variantRegistry);&nbsp;// ['standard', 'chess960', 'atomic', ...]
+  </div>
+
+  <h3>MCE.registerPiece(typeChar, handlers)</h3>
+  <p>Registers a custom piece type for move generation and attack detection.</p>
+  <div class="docs-code">
+MCE.registerPiece('m', {<br>
+&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Return array of { from, to, flag } move objects<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;attacks: function(g, from, target) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Return true if piece at 'from' attacks 'target' square<br>
+&nbsp;&nbsp;}<br>
+});
+  </div>
+  <p>Use the registered character in FEN strings (uppercase = white, lowercase = black).</p>
+
   <h2>Utilities</h2>
 
   <h3>MCE.randomFEN960()</h3>
-  <p>Generates a random Chess960 starting position FEN.</p>
+  <p>Generates a random Chess960 starting position FEN. Bishops on opposite colours, king between rooks.</p>
+  <div class="docs-code">
+const fen = MCE.randomFEN960();<br>
+// e.g. "brnqknrb/pppppppp/8/8/8/8/PPPPPPPP/BRNQKNRB w KQkq - 0 1"
+  </div>
 
   <h3>MCE.pieceColor(char)</h3>
   <p>Returns <code>'w'</code> or <code>'b'</code> based on case.</p>
 
   <h3>MCE.pieceType(char)</h3>
   <p>Returns the lowercase piece letter.</p>
+
+  <h3>MCE.advanceTurn(game)</h3>
+  <p>Advances to the next player's turn. Used in <code>turnLogic</code> hooks to end a player's turn.</p>
 
   <h2>Constants</h2>
   <table class="docs-table">
@@ -228,7 +293,6 @@ MCE.setTheme('forest');
     <tr><td><code>MCE.BLACK</code></td><td><code>'b'</code></td></tr>
     <tr><td><code>MCE.PIECE</code></td><td><code>{ P:'p', N:'n', B:'b', R:'r', Q:'q', K:'k', A:'a', C:'c', S:'s' }</code></td></tr>
     <tr><td><code>MCE.INITIAL_FEN</code></td><td>Standard starting position</td></tr>
-    <tr><td><code>MCE.VARIANT_BOARDS</code></td><td>Config for non-8×8 variants (rows, cols, fen)</td></tr>
   </table>
 
   <h2>Embedding</h2>

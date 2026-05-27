@@ -54,7 +54,7 @@ function negamax(g, depth, alpha, beta) {
 
   const moves = getAIMoves(g);
   if (moves.length === 0) {
-    if (g.variant === 'antichess') return 100000;
+    if (g.stalemateMeaning === 'win') return 100000;
     if (inCheck(g, g.turn)) return -100000;
     return 0;
   }

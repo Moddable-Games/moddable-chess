@@ -352,14 +352,6 @@ function startGame(variant) {
   const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   if (g) openGroup = g.label;
   game = MCE.createGame(variant);
-  if (variant === 'chess960') {
-    MCE.loadFEN(game, MCE.randomFEN960());
-    game.positionHistory = [MCE.positionKey(game)];
-  }
-  if (variant === 'racingKings') {
-    MCE.loadFEN(game, '8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1');
-    game.positionHistory = [MCE.positionKey(game)];
-  }
   selected = null;
   moveNum = 1;
   gameOver = false;

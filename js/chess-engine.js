@@ -11,25 +11,6 @@ const WHITE = 'w', BLACK = 'b';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-const VARIANT_BOARDS = {
-  capablanca: { rows: 8, cols: 10, fen: 'rnabqkbcnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNABQKBCNR w KQkq - 0 1' },
-  grand: { rows: 10, cols: 10, fen: 'r8r/1nbqkcbn1/pppppppppp/10/10/10/10/PPPPPPPPPP/1NBQKCBN1/R8R w - - 0 1' },
-  courier: { rows: 8, cols: 12, fen: 'rnbbqsksbbnr/pppppppppppp/12/12/12/12/PPPPPPPPPPPP/RNBBQSKSBBNR w - - 0 1' },
-  horde: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1' },
-  breakthrough: { rows: 7, cols: 7, fen: 'ppppppp/ppppppp/7/7/7/PPPPPPP/PPPPPPP w - - 0 1' },
-  maharaja: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/8/4M3 w kq - 0 1' },
-  knightmate: { rows: 8, cols: 8, fen: 'rkbqnbkr/pppppppp/8/8/8/8/PPPPPPPP/RKBQNBKR w KQkq - 0 1' },
-  monsterChess: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1' },
-  chigorin: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNNQKNNR w KQkq - 0 1' },
-  almostChess: { rows: 8, cols: 8, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBCKBNR w KQkq - 0 1' },
-  amazonChess: { rows: 8, cols: 8, fen: 'rnbmkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBMKBNR w KQkq - 0 1' },
-  endgameChess: { rows: 8, cols: 8, fen: '4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
-  peasantsRevolt: { rows: 8, cols: 8, fen: '2n1k1n1/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
-  pawnsOnly: { rows: 8, cols: 8, fen: '4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1' },
-  upsideDown: { rows: 8, cols: 8, fen: 'RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr w KQkq - 0 1' },
-  losAlamos: { rows: 6, cols: 6, fen: 'rnqknr/pppppp/6/6/PPPPPP/RNQKNR w - - 0 1' },
-  minichess: { rows: 5, cols: 5, fen: 'kqbnr/ppppp/5/PPPPP/RNBQK w - - 0 1' },
-};
 
 const pieceRegistry = {};
 const variantRegistry = {};
@@ -99,9 +80,8 @@ function createGame(config) {
 
 function createVariantGame(variant) {
   const vc = getVariantConfig(variant);
-  const vb = VARIANT_BOARDS[variant];
-  const rows = (vc && vc.rows) || (vb ? vb.rows : 8);
-  const cols = (vc && vc.cols) || (vb ? vb.cols : 8);
+  const rows = (vc && vc.rows) || 8;
+  const cols = (vc && vc.cols) || 8;
   const total = rows * cols;
   const g = {
     rows: rows,
@@ -147,31 +127,14 @@ function createVariantGame(variant) {
     if (vc.checkThreshold) g.checkThreshold = vc.checkThreshold;
     if (vc.stalemateMeaning) g.stalemateMeaning = vc.stalemateMeaning;
     if (vc.promotionPieces) g.promotionPieces = vc.promotionPieces;
-    if (vc.init) vc.init(g);
-    const fen = vc.fen || (vb ? vb.fen : INITIAL_FEN);
+    const fen = vc.fen || INITIAL_FEN;
     loadFEN(g, fen);
     g.positionHistory.push(positionKey(g));
+    if (vc.init) vc.init(g);
     return g;
   }
 
-  if (variant === 'noCastling') g.noCastling = true;
-  if (variant === 'torpedo') g.torpedo = true;
-  if (variant === 'breakthrough') { g.noCastling = true; g.noEnPassant = true; g.noPromotion = true; }
-  if (variant === 'maharaja') { g.noCastling = true; }
-  if (variant === 'losAlamos') { g.noCastling = true; g.noEnPassant = true; }
-  if (variant === 'minichess') { g.noCastling = true; g.noEnPassant = true; }
-  if (variant === 'endgameChess') { g.noCastling = true; }
-  if (variant === 'peasantsRevolt') { g.noCastling = true; }
-  if (variant === 'pawnsOnly') { g.noCastling = true; }
-  if (variant === 'upsideDown') { g.noCastling = true; g.pawnDirection = (side) => side === WHITE ? 1 : -1; }
-  if (variant === 'chigorin') { g.noCastling = true; }
-  if (variant === 'codrus') { g.noCastling = true; }
-  if (variant === 'knightmate') { g.royalPiece = 'n'; g.pieceRoles = { n: 'k', k: 'n' }; }
-  if (variant === 'monsterChess') { g.maxMovesPerTurn = { w: 2, b: 1 }; g.lastMovedSq = -1; }
-  if (variant === 'progressive') { g.progressiveMove = 1; }
-  if (variant === 'grand') { g.pawnStartRow = (side) => side === WHITE ? 7 : 2; g.promotionPieces = ['q','r','b','n','a','c']; }
-  if (variant === 'capablanca') { g.promotionPieces = ['q','r','b','n','a','c']; }
-  const fen = vb ? vb.fen : INITIAL_FEN;
+  const fen = INITIAL_FEN;
   loadFEN(g, fen);
   g.positionHistory.push(positionKey(g));
   return g;
@@ -323,5 +286,5 @@ function positionKey(g) {
   return parts.slice(0, 4).join(' ');
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, VARIANT_BOARDS, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
+return { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
 })();

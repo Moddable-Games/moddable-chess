@@ -4,180 +4,23 @@
  */
 (function() {
 
-const { WHITE, BLACK, rc, sq, onBoard, pieceColor, pieceType, inCheck, legalMoves, makeMove, unmakeMove } = MCE;
+const { rc, sq, onBoard, pieceColor, legalMoves } = MCE;
 
-const VARIANTS = {
-  standard: { label: 'Regular Chess' },
-  kingOfTheHill: { label: 'King of the Hill' },
-  threeCheck: { label: 'Three-Check' },
-  antichess: { label: 'Antichess' },
-  racingKings: { label: 'Racing Kings' },
-  fogOfWar: { label: 'Fog of War' },
-  atomic: { label: 'Atomic' },
-  duckChess: { label: 'Duck Chess' },
-  rifle: { label: 'Rifle Chess' },
-  marseillais: { label: 'Marseillais' },
-  chess960: { label: 'Fischer Random' },
-  noCastling: { label: 'No Castling' },
-  torpedo: { label: 'Torpedo Chess' },
-  horde: { label: 'Horde Chess' },
-  extinction: { label: 'Extinction Chess' },
-  breakthrough: { label: 'Breakthrough' },
-  maharaja: { label: 'Maharaja' },
-  knightmate: { label: 'Knightmate' },
-  monsterChess: { label: 'Monster Chess' },
-  progressive: { label: 'Progressive' },
-  chigorin: { label: 'Chigorin' },
-  almostChess: { label: 'Almost Chess' },
-  amazonChess: { label: 'Amazon Chess' },
-  endgameChess: { label: 'Endgame Chess' },
-  peasantsRevolt: { label: "Peasants' Revolt" },
-  pawnsOnly: { label: 'Pawns Only' },
-  upsideDown: { label: 'Upside-Down' },
-  singleCheck: { label: 'Single-Check' },
-  fiveCheck: { label: 'Five-Check' },
-  giveaway: { label: 'Giveaway' },
-  suicideChess: { label: 'Suicide Chess' },
-  stalemateWins: { label: 'Stalemate Wins' },
-  codrus: { label: 'Codrus' },
-  makpong: { label: 'Makpong' },
-  losAlamos: { label: 'Los Alamos' },
-  minichess: { label: 'Minichess' },
-};
 
 function getVariantStatus(g) {
   const vc = MCE.getVariantConfig(g.variant);
   if (vc && vc.winCondition) {
-    const result = vc.winCondition(g);
-    if (result) return result;
-  }
-
-  const v = g.variant;
-  if (v === 'kingOfTheHill') {
-    const center = [27, 28, 35, 36]; // d4,e4,d5,e5
-    for (const s of center) {
-      const p = g.board[s];
-      if (p && pieceType(p) === 'k') {
-        const winner = pieceColor(p);
-        if (winner !== g.turn) return 'koth-' + winner;
-      }
-    }
-  }
-  if (v === 'threeCheck') {
-    if (g.checkCount.w >= 3) return 'checkmate';
-    if (g.checkCount.b >= 3) return 'checkmate';
-  }
-  if (v === 'racingKings') {
-    for (let c = 0; c < 8; c++) {
-      const p = g.board[sq(0, c)];
-      if (p && pieceType(p) === 'k') {
-        const winner = pieceColor(p);
-        if (winner !== g.turn) return 'race-' + winner;
-      }
-    }
-  }
-  if (v === 'antichess') {
-    const side = g.turn;
-    const hasPieces = g.board.some(p => p && pieceColor(p) === side);
-    if (!hasPieces) return 'antichess-' + side;
-  }
-  if (v === 'horde') {
-    const whiteHasPieces = g.board.some(p => p && pieceColor(p) === WHITE);
-    if (!whiteHasPieces) return 'horde-b';
-    if (g.turn === WHITE) {
-      const moves = legalMoves(g);
-      if (moves.length === 0) return 'horde-b';
-    }
-  }
-  if (v === 'extinction') {
-    const initial = { w: new Set(['p','n','b','r','q','k']), b: new Set(['p','n','b','r','q','k']) };
-    const current = { w: new Set(), b: new Set() };
-    for (const p of g.board) {
-      if (!p) continue;
-      current[pieceColor(p)].add(pieceType(p));
-    }
-    for (const side of [WHITE, BLACK]) {
-      for (const t of initial[side]) {
-        if (!current[side].has(t)) return 'extinction-' + (side === WHITE ? 'b' : 'w');
-      }
-    }
-  }
-  if (v === 'breakthrough') {
-    for (let c = 0; c < g.cols; c++) {
-      const topPiece = g.board[sq(0, c, g)];
-      if (topPiece === 'P') return 'breakthrough-w';
-      const botPiece = g.board[sq(g.rows - 1, c, g)];
-      if (botPiece === 'p') return 'breakthrough-b';
-    }
-    const whiteHas = g.board.some(p => p && pieceColor(p) === WHITE);
-    if (!whiteHas) return 'breakthrough-b';
-    const blackHas = g.board.some(p => p && pieceColor(p) === BLACK);
-    if (!blackHas) return 'breakthrough-w';
-  }
-  if (v === 'maharaja') {
-    const hasM = g.board.some(p => p === 'M');
-    if (!hasM) return 'maharaja-b';
-  }
-  if (v === 'knightmate') {
-    const royalW = g.board.some(p => p === 'N');
-    if (!royalW) return 'knightmate-b';
-    const royalB = g.board.some(p => p === 'n');
-    if (!royalB) return 'knightmate-w';
-  }
-  if (v === 'singleCheck') {
-    if (g.checkCount.w >= 1) return 'checkmate';
-    if (g.checkCount.b >= 1) return 'checkmate';
-  }
-  if (v === 'fiveCheck') {
-    if (g.checkCount.w >= 5) return 'checkmate';
-    if (g.checkCount.b >= 5) return 'checkmate';
-  }
-  if (v === 'giveaway' || v === 'suicideChess') {
-    const side = g.turn;
-    const hasPieces = g.board.some(p => p && pieceColor(p) === side);
-    if (!hasPieces) return 'antichess-' + side;
-  }
-  if (v === 'codrus') {
-    const hasWhiteK = g.board.some(p => p === 'K');
-    if (!hasWhiteK) return 'codrus-w';
-    const hasBlackK = g.board.some(p => p === 'k');
-    if (!hasBlackK) return 'codrus-b';
+    return vc.winCondition(g);
   }
   return null;
 }
 
 function variantLegalMoves(g) {
   const vc = MCE.getVariantConfig(g.variant);
-  const v = g.variant;
   let moves = legalMoves(g);
-
   if (vc && vc.moveFilter) {
     moves = vc.moveFilter(g, moves);
-    return moves;
   }
-
-  if (v === 'antichess' || v === 'giveaway' || v === 'suicideChess') {
-    const captures = moves.filter(m => g.board[m.to] || m.flag === 'ep');
-    if (captures.length > 0) moves = captures;
-  }
-
-  if (v === 'racingKings') {
-    moves = moves.filter(m => {
-      const undo = makeMove(g, m);
-      const opp = g.turn;
-      const legal = !inCheck(g, opp);
-      unmakeMove(g, undo);
-      return legal;
-    });
-  }
-
-  if (v === 'makpong' && inCheck(g, g.turn)) {
-    moves = moves.filter(m => {
-      const piece = g.board[m.from];
-      return piece && pieceType(piece) !== 'k';
-    });
-  }
-
   return moves;
 }
 
@@ -252,5 +95,5 @@ MCE.registerPiece('m', {
   }
 });
 
-Object.assign(MCE, { VARIANTS, getVariantStatus, variantLegalMoves, randomFEN960 });
+Object.assign(MCE, { getVariantStatus, variantLegalMoves, randomFEN960 });
 })();

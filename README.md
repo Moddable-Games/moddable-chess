@@ -22,7 +22,7 @@ moddable-chess/
 ├── docs/
 │   ├── index.html          ← Documentation hub
 │   ├── api.html            ← Full API reference
-│   └── variants.html       ← "Add a variant" guide
+│   └── variants.html       ← Plugin guide (how to create variants)
 ├── data/
 │   └── variants.json       ← Variant metadata (single source of truth)
 ├── css/
@@ -32,11 +32,16 @@ moddable-chess/
 ├── js/
 │   ├── chess-engine.js     ← Core: board state, FEN, coordinate helpers
 │   ├── chess-moves.js      ← Move generation: pseudo-legal + legal moves
-│   ├── chess-play.js       ← Make/unmake moves, game status detection
-│   ├── chess-variants.js   ← Variant rule modifiers (composable flags)
+│   ├── chess-play.js       ← Make/unmake moves, turn logic dispatch
+│   ├── chess-variants.js   ← Variant status + custom piece registration
 │   ├── board-renderer.js   ← SVG board renderer (variable sizes)
 │   ├── game-controller.js  ← Play page: wires engine to renderer
-│   └── home.js             ← Homepage: variant grid from JSON
+│   ├── home.js             ← Homepage: variant grid from JSON
+│   └── variants/           ← Plugin files (one per variant)
+│       ├── index.js        ← Auto-loader
+│       ├── standard.js
+│       ├── atomic.js
+│       └── ...             ← 39 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -97,8 +102,11 @@ moddable-chess/
 <script src="js/chess-play.js"></script>
 <script src="js/chess-variants.js"></script>
 <script src="js/board-renderer.js"></script>
+<script src="js/variants/standard.js"></script>
+<script src="js/variants/atomic.js"></script>
+<!-- or load all: <script src="js/variants/index.js"></script> -->
 <script>
-const game = MCE.createGame('standard');
+const game = MCE.createGame('atomic');
 const moves = MCE.legalMoves(game);
 MCE.makeMove(game, moves[0]);
 MCE.renderBoard(document.getElementById('board'), game, { size: 480 });
@@ -120,6 +128,13 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-27
+- Complete plugin architecture migration: all 39 variants are now self-contained plugin files using `MCE.registerVariant()`
+- Remove all hardcoded variant if/else chains from core engine (chess-engine, chess-play, chess-moves, chess-variants, chess-ai)
+- Remove legacy `VARIANT_BOARDS` and `VARIANTS` objects — plugins are sole source of truth
+- Add plugin hooks: `winCondition`, `moveFilter`, `beforeMove`, `turnLogic`, `restoreState`, `init`, `visibility`, `statusText`, `aiMoveCount`
+- Add variant inheritance via `extends` property
+- Rewrite docs/variants.html as Plugin Guide with full hook documentation and examples
+- Update docs/api.html with `registerVariant()`, `getVariantConfig()`, `registerPiece()`, `advanceTurn()` API docs
 - Add 6 board colour themes: Classic, Cosmic Dark, Classic Wood, Marble, Neon, Minimal
 - Add theme picker control to play page board controls
 - Add theme API: `MCE.setTheme()`, `MCE.getTheme()`, `MCE.THEMES` with custom theme support

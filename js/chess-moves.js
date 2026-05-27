@@ -215,11 +215,9 @@ function slidesTo(g, from, target, dirs) {
   return false;
 }
 
-const NO_CHECK_VARIANTS = new Set(['antichess', 'giveaway', 'suicideChess', 'codrus']);
-
 function legalMoves(g) {
   const movingSide = g.turn;
-  const skipCheck = g.noCheck || NO_CHECK_VARIANTS.has(g.variant);
+  const skipCheck = g.noCheck;
   return pseudoLegalMoves(g).filter(m => {
     if (g.legalityFilter) {
       const undo = MCE.makeMove(g, m);
