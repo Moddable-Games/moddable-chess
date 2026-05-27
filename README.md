@@ -130,6 +130,7 @@ Open `http://localhost:8000/`
 - Update API reference with full theme documentation and examples
 - Fix variant count in docs (36 → 39)
 - Bump version to 0.6.0
+- Sticky nav: site nav stays pinned on scroll
 
 #### 2026-05-26
 - Add 19 new variants (36 total): Knightmate, Monster Chess, Progressive, Chigorin, Almost Chess, Amazon Chess, Upside-Down, Single-Check, Five-Check, Giveaway, Suicide Chess, Stalemate Wins, Codrus, Makpong, Endgame Chess, Peasants' Revolt, Pawns Only, Los Alamos (6x6), Minichess (5x5)
