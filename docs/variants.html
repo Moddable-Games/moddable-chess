@@ -96,6 +96,11 @@ MCE.registerVariant('noCastling', {<br>
     <tr><td><code>pawnStartRow</code></td><td>function</td><td><code>(side) => row</code> — override double-push start row</td></tr>
     <tr><td><code>maxMovesPerTurn</code></td><td>object</td><td><code>{ w: 2, b: 1 }</code> — moves per turn per side</td></tr>
     <tr><td><code>progressiveMove</code></td><td>number</td><td>Initial move count for progressive variants</td></tr>
+    <tr><td><code>promotionRank</code></td><td>function</td><td><code>(side) => row</code> — override which row triggers pawn promotion (default: row 0 for white, last row for black)</td></tr>
+    <tr><td><code>pawnMoveStyle</code></td><td>string</td><td><code>'standard'</code> (default) or <code>'berolina'</code> — Berolina pawns move diagonally and capture straight</td></tr>
+    <tr><td><code>divergentPieces</code></td><td>object</td><td>Map piece types to separate move/capture patterns. Each entry: <code>{ move, moveStyle, capture, captureStyle }</code></td></tr>
+    <tr><td><code>wrapFiles</code></td><td>boolean</td><td>Files wrap (a-file connects to h-file, cylinder geometry)</td></tr>
+    <tr><td><code>wrapRanks</code></td><td>boolean</td><td>Ranks wrap (rank 1 connects to rank 8, toroidal with <code>wrapFiles</code>)</td></tr>
   </table>
 
   <h3>Example: Flags only</h3>
@@ -112,6 +117,53 @@ MCE.registerVariant('breakthrough', {<br>
 &nbsp;&nbsp;description: 'Race a pawn to the far rank to win.',<br>
 &nbsp;&nbsp;rule: 'Board: 7×7 · Win: Reach far rank',<br>
 &nbsp;&nbsp;winCondition: function(g) { /* ... */ },<br>
+});
+  </div>
+
+  <h3>Example: Custom promotion rank</h3>
+  <div class="docs-code">
+MCE.registerVariant('makruk', {<br>
+&nbsp;&nbsp;// ...config...<br>
+&nbsp;&nbsp;promotionRank: function(side) { return side === MCE.WHITE ? 2 : 5; },<br>
+&nbsp;&nbsp;promotionPieces: ['m'], // promote to Met only<br>
+});
+  </div>
+
+  <h3>Example: Berolina pawns</h3>
+  <div class="docs-code">
+MCE.registerVariant('berolinaChess', {<br>
+&nbsp;&nbsp;// ...config...<br>
+&nbsp;&nbsp;pawnMoveStyle: 'berolina', // pawns move diagonal, capture straight<br>
+});
+  </div>
+
+  <h3>Example: Divergent pieces</h3>
+  <p>Map piece types to different move vs. capture patterns. <code>moveStyle</code>/<code>captureStyle</code> is <code>'slide'</code> or <code>'jump'</code>. Directions use the standard MCE direction arrays.</p>
+  <div class="docs-code">
+MCE.registerVariant('hoppelPoppel', {<br>
+&nbsp;&nbsp;// ...config...<br>
+&nbsp;&nbsp;divergentPieces: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;n: { move: MCE.KNIGHT_OFFSETS, moveStyle: 'jump',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture: MCE.BISHOP_DIRS, captureStyle: 'slide' },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;b: { move: MCE.BISHOP_DIRS, moveStyle: 'slide',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture: MCE.KNIGHT_OFFSETS, captureStyle: 'jump' },<br>
+&nbsp;&nbsp;},<br>
+});
+  </div>
+
+  <h3>Example: Wrap-around board</h3>
+  <div class="docs-code">
+MCE.registerVariant('cylinderChess', {<br>
+&nbsp;&nbsp;// ...config...<br>
+&nbsp;&nbsp;wrapFiles: true, // a-file connects to h-file<br>
+});<br>
+<br>
+MCE.registerVariant('toroidalChess', {<br>
+&nbsp;&nbsp;// ...config...<br>
+&nbsp;&nbsp;wrapFiles: true, // files wrap<br>
+&nbsp;&nbsp;wrapRanks: true, // ranks wrap too (torus)<br>
+&nbsp;&nbsp;noCastling: true,<br>
+&nbsp;&nbsp;noEnPassant: true,<br>
 });
   </div>
 
@@ -286,7 +338,27 @@ visibility: function(g, side) {<br>
   </div>
 
   <h3>afterMove(g, move, undo)</h3>
-  <p>Called after the move is fully executed but before turn logic runs. Use for side effects like incrementing check counters.</p>
+  <p>Called after the move is fully executed but before turn logic runs. Use for side effects like incrementing check counters or transforming pieces. Store original state in <code>undo</code> for reversal via <code>restoreState</code>.</p>
+  <div class="docs-code">
+// Einstein Chess: non-captures demote, captures promote<br>
+afterMove: function(g, move, undo) {<br>
+&nbsp;&nbsp;var p = g.board[move.to];<br>
+&nbsp;&nbsp;if (!p || MCE.pieceType(p) === 'k') return;<br>
+&nbsp;&nbsp;var hierarchy = ['p', 'n', 'b', 'r', 'q'];<br>
+&nbsp;&nbsp;var idx = hierarchy.indexOf(MCE.pieceType(p));<br>
+&nbsp;&nbsp;var isCapture = move.flag === 'capture' || move.flag === 'ep';<br>
+&nbsp;&nbsp;var newIdx = isCapture ? Math.min(idx + 1, 4) : Math.max(idx - 1, 0);<br>
+&nbsp;&nbsp;if (newIdx !== idx) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;undo.originalPiece = p; // save for restoreState<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var newType = hierarchy[newIdx];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = MCE.pieceColor(p) === MCE.WHITE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? newType.toUpperCase() : newType;<br>
+&nbsp;&nbsp;}<br>
+},<br>
+restoreState: function(g, undo) {<br>
+&nbsp;&nbsp;if (undo.originalPiece) g.board[undo.to] = undo.originalPiece;<br>
+}
+  </div>
 
   <h3>statusText(g, helpers)</h3>
   <p>Returns a custom status bar message, or <code>null</code> for default. <code>helpers.nameFor(side)</code> returns the player name for a side.</p>

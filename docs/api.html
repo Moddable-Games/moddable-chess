@@ -124,7 +124,15 @@ const undo = MCE.makeMove(game, move);<br>
   <p>Converts a board index to <code>[row, col]</code>.</p>
 
   <h3>MCE.onBoard(row, col, game)</h3>
-  <p>Returns <code>true</code> if the coordinates are within the board boundaries.</p>
+  <p>Returns <code>true</code> if the coordinates are within the board boundaries. Applies wrap-around normalisation first if <code>game.wrapFiles</code> or <code>game.wrapRanks</code> is set.</p>
+
+  <h3>MCE.wrapCoords(row, col, game)</h3>
+  <p>Normalises coordinates according to the game's wrap settings. If <code>game.wrapFiles</code> is true, columns wrap modulo <code>game.cols</code>. If <code>game.wrapRanks</code> is true, rows wrap modulo <code>game.rows</code>. Returns <code>[row, col]</code>.</p>
+  <div class="docs-code">
+var [r, c] = MCE.wrapCoords(row, col, game);<br>
+// For cylinder chess (wrapFiles): col -1 becomes col 7<br>
+// For toroidal chess (both): row -1 wraps to row 7 too
+  </div>
 
   <h3>MCE.sqToAlgebraic(index, game)</h3>
   <p>Converts an index to algebraic notation (e.g., <code>'e4'</code>).</p>
