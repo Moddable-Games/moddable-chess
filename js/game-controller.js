@@ -53,45 +53,45 @@ const DESCRIPTIONS = {
 const VARIANT_GROUPS = [
   { label: 'Classic', variants: [
     ['standard', 'Standard'],
-    ['chess960', 'Fischer Random'],
-    ['noCastling', 'No Castling'],
-    ['torpedo', 'Torpedo'],
-    ['chigorin', 'Chigorin'],
     ['almostChess', 'Almost Chess'],
     ['amazonChess', 'Amazon Chess'],
+    ['chess960', 'Fischer Random'],
+    ['chigorin', 'Chigorin'],
+    ['noCastling', 'No Castling'],
+    ['torpedo', 'Torpedo'],
     ['upsideDown', 'Upside-Down'],
   ]},
   { label: 'Tactical', variants: [
-    ['kingOfTheHill', 'King of the Hill'],
-    ['threeCheck', 'Three-Check'],
-    ['singleCheck', 'Single-Check'],
-    ['fiveCheck', 'Five-Check'],
     ['atomic', 'Atomic'],
-    ['rifle', 'Rifle'],
     ['extinction', 'Extinction'],
+    ['fiveCheck', 'Five-Check'],
+    ['kingOfTheHill', 'King of the Hill'],
+    ['rifle', 'Rifle'],
+    ['singleCheck', 'Single-Check'],
+    ['threeCheck', 'Three-Check'],
   ]},
   { label: 'Alternate Rules', variants: [
     ['antichess', 'Antichess'],
-    ['giveaway', 'Giveaway'],
-    ['suicideChess', 'Suicide Chess'],
-    ['stalemateWins', 'Stalemate Wins'],
+    ['breakthrough', 'Breakthrough (7×7)'],
     ['codrus', 'Codrus'],
-    ['racingKings', 'Racing Kings'],
-    ['marseillais', 'Marseillais'],
-    ['progressive', 'Progressive'],
-    ['monsterChess', 'Monster Chess'],
     ['duckChess', 'Duck Chess'],
     ['fogOfWar', 'Fog of War'],
+    ['giveaway', 'Giveaway'],
     ['horde', 'Horde'],
-    ['breakthrough', 'Breakthrough (7×7)'],
-    ['maharaja', 'Maharaja & Sepoys'],
     ['knightmate', 'Knightmate'],
+    ['maharaja', 'Maharaja & Sepoys'],
     ['makpong', 'Makpong'],
+    ['marseillais', 'Marseillais'],
+    ['monsterChess', 'Monster Chess'],
+    ['progressive', 'Progressive'],
+    ['racingKings', 'Racing Kings'],
+    ['stalemateWins', 'Stalemate Wins'],
+    ['suicideChess', 'Suicide Chess'],
   ]},
   { label: 'Asymmetric', variants: [
-    ['peasantsRevolt', "Peasants' Revolt"],
     ['endgameChess', 'Endgame Chess'],
     ['pawnsOnly', 'Pawns Only'],
+    ['peasantsRevolt', "Peasants' Revolt"],
   ]},
   { label: 'Small Boards', variants: [
     ['losAlamos', 'Los Alamos (6×6)'],
@@ -99,8 +99,8 @@ const VARIANT_GROUPS = [
   ]},
   { label: 'Large Boards', variants: [
     ['capablanca', 'Capablanca (10×8)'],
-    ['grand', 'Grand Chess (10×10)'],
     ['courier', 'Courier (12×8)'],
+    ['grand', 'Grand Chess (10×10)'],
   ]},
 ];
 
@@ -116,6 +116,13 @@ function getVariantGroups() {
     if (vc.title && vc.description) {
       DESCRIPTIONS[key] = { title: vc.title, text: vc.description, rule: vc.rule || '' };
     }
+  }
+  for (const g of groups) {
+    const first = g.variants[0];
+    const isStandard = first && first[0] === 'standard';
+    const start = isStandard ? 1 : 0;
+    const tail = g.variants.slice(start).sort((a, b) => a[1].localeCompare(b[1]));
+    g.variants = isStandard ? [first, ...tail] : tail;
   }
   return groups;
 }

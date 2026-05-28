@@ -17,6 +17,9 @@
   --mg-font-pixel: "Press Start 2P", monospace;
 }
 
+h1, h2, h3 { text-wrap: pretty; }
+p, li { text-wrap: pretty; }
+
 /* Shared site nav */
 .site-nav {
   background: var(--mg-cosmic-deep);

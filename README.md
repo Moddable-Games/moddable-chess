@@ -41,7 +41,7 @@ moddable-chess/
 │       ├── index.js        ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 39 total
+│       └── ...             ← 54 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -53,59 +53,59 @@ moddable-chess/
 | Status | Variant | Board | Key rule |
 |--------|---------|-------|----------|
 | Done | Standard Chess | 8×8 | Standard FIDE rules |
-| Done | King of the Hill | 8×8 | King reaches centre = win |
-| Done | Three-Check | 8×8 | 3 checks = win |
-| Done | Antichess | 8×8 | Forced captures, lose all pieces = win |
-| Done | Racing Kings | 8×8 | No checks, king to 8th rank = win |
-| Done | Fischer Random (960) | 8×8 | Randomised back rank |
-| Done | Rifle Chess | 8×8 | Capturing piece stays on its square |
-| Done | Atomic | 8×8 | Captures explode adjacent pieces |
-| Done | Marseillais | 8×8 | Two moves per turn, check ends turn |
-| Done | Duck Chess | 8×8 | Place blocker duck after each move |
-| Done | Fog of War | 8×8 | Only see squares you attack |
-| Done | Capablanca | 10×8 | Archbishop + Chancellor |
-| Done | Grand Chess | 10×10 | Same new pieces, bigger board |
-| Done | Courier Chess | 12×8 | Medieval German variant (1200s) |
-| Done | No Castling | 8×8 | Standard chess, castling disabled |
-| Done | Torpedo Chess | 8×8 | Pawns can always double-move |
-| Done | Horde Chess | 8×8 | 36 pawns vs normal army |
-| Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
-| Done | Breakthrough | 7×7 | Pawns only, first to far rank wins |
-| Done | Maharaja & Sepoys | 8×8 | One Queen+Knight piece vs full army |
-| Done | Knightmate | 8×8 | Knight is royal, king moves like knight |
-| Done | Monster Chess | 8×8 | White gets 2 moves per turn |
-| Done | Progressive | 8×8 | Escalating moves: 1, 2, 3, 4... |
-| Done | Chigorin | 8×8 | White has knights instead of bishops |
 | Done | Almost Chess | 8×8 | One queen replaced by chancellor |
 | Done | Amazon Chess | 8×8 | Amazon (Q+N) replaces queen |
-| Done | Upside-Down | 8×8 | Pieces start on opponent's rank |
-| Done | Single-Check | 8×8 | One check wins instantly |
-| Done | Five-Check | 8×8 | Five checks to win |
-| Done | Giveaway | 8×8 | Antichess (stalemate = loss) |
-| Done | Suicide Chess | 8×8 | Antichess (stalemate = draw) |
-| Done | Stalemate Wins | 8×8 | Stalemating opponent wins |
-| Done | Codrus | 8×8 | Lose your king to win |
-| Done | Makpong | 8×8 | King can't move from check |
-| Done | Endgame Chess | 8×8 | Start with only pawns + kings |
-| Done | Peasants' Revolt | 8×8 | King + pawns vs king + knights |
-| Done | Pawns Only | 8×8 | Only pawns, first promotion wins |
-| Done | Los Alamos | 6×6 | No bishops, first computer chess (1956) |
-| Done | Minichess | 5×5 | Full piece types on tiny board |
-| Done | Dice Chess | 8×8 | Die roll constrains which piece type moves |
-| Done | Grid Chess | 8×8 | Moves must cross 2×2 grid lines |
-| Done | Checkless Chess | 8×8 | No check unless it's checkmate |
-| Done | No Retreat | 8×8 | Pieces can't move backward |
-| Done | Weak! | 8×8 | Weakest piece must move first |
-| Done | Patrol Chess | 8×8 | Capture only when defended |
-| Done | Madrasi Chess | 8×8 | Same-type pieces paralyse each other |
-| Done | Omnicide | 8×8 | Lose all pieces, captures not forced |
-| Done | Dark Chess | 8×8 | Total fog, capture king to win |
-| Done | Berserk Chess | 8×8 | Check grants bonus move |
-| Done | Benedict Chess | 8×8 | Convert enemies instead of capturing |
 | Done | Andernach Chess | 8×8 | Captures flip piece colour |
-| Done | Half Chess | 4×8 | Compressed board, instant contact |
+| Done | Antichess | 8×8 | Forced captures, lose all pieces = win |
+| Done | Atomic | 8×8 | Captures explode adjacent pieces |
+| Done | Benedict Chess | 8×8 | Convert enemies instead of capturing |
+| Done | Berserk Chess | 8×8 | Check grants bonus move |
+| Done | Breakthrough | 7×7 | Pawns only, first to far rank wins |
+| Done | Capablanca | 10×8 | Archbishop + Chancellor |
+| Done | Checkless Chess | 8×8 | No check unless it's checkmate |
+| Done | Chigorin | 8×8 | White has knights instead of bishops |
+| Done | Codrus | 8×8 | Lose your king to win |
+| Done | Courier Chess | 12×8 | Medieval German variant (1200s) |
+| Done | Dark Chess | 8×8 | Total fog, capture king to win |
 | Done | Diana Chess | 6×6 | No queens or knights |
+| Done | Dice Chess | 8×8 | Die roll constrains which piece type moves |
+| Done | Duck Chess | 8×8 | Place blocker duck after each move |
+| Done | Endgame Chess | 8×8 | Start with only pawns + kings |
+| Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
+| Done | Fischer Random (960) | 8×8 | Randomised back rank |
+| Done | Five-Check | 8×8 | Five checks to win |
+| Done | Fog of War | 8×8 | Only see squares you attack |
+| Done | Giveaway | 8×8 | Antichess (stalemate = loss) |
+| Done | Grand Chess | 10×10 | Same new pieces, bigger board |
+| Done | Grid Chess | 8×8 | Moves must cross 2×2 grid lines |
+| Done | Half Chess | 4×8 | Compressed board, instant contact |
+| Done | Horde Chess | 8×8 | 36 pawns vs normal army |
+| Done | King of the Hill | 8×8 | King reaches centre = win |
+| Done | Knightmate | 8×8 | Knight is royal, king moves like knight |
+| Done | Los Alamos | 6×6 | No bishops, first computer chess (1956) |
+| Done | Madrasi Chess | 8×8 | Same-type pieces paralyse each other |
+| Done | Maharaja & Sepoys | 8×8 | One Queen+Knight piece vs full army |
+| Done | Makpong | 8×8 | King can't move from check |
+| Done | Marseillais | 8×8 | Two moves per turn, check ends turn |
+| Done | Minichess | 5×5 | Full piece types on tiny board |
+| Done | Monster Chess | 8×8 | White gets 2 moves per turn |
+| Done | No Castling | 8×8 | Standard chess, castling disabled |
+| Done | No Retreat | 8×8 | Pieces can't move backward |
+| Done | Omnicide | 8×8 | Lose all pieces, captures not forced |
+| Done | Patrol Chess | 8×8 | Capture only when defended |
+| Done | Pawns Only | 8×8 | Only pawns, first promotion wins |
+| Done | Peasants' Revolt | 8×8 | King + pawns vs king + knights |
 | Done | Petty Chess | 5×6 | All pieces on compact board |
+| Done | Progressive | 8×8 | Escalating moves: 1, 2, 3, 4... |
+| Done | Racing Kings | 8×8 | No checks, king to 8th rank = win |
+| Done | Rifle Chess | 8×8 | Capturing piece stays on its square |
+| Done | Single-Check | 8×8 | One check wins instantly |
+| Done | Stalemate Wins | 8×8 | Stalemating opponent wins |
+| Done | Suicide Chess | 8×8 | Antichess (stalemate = draw) |
+| Done | Three-Check | 8×8 | 3 checks = win |
+| Done | Torpedo Chess | 8×8 | Pawns can always double-move |
+| Done | Upside-Down | 8×8 | Pieces start on opponent's rank |
+| Done | Weak! | 8×8 | Weakest piece must move first |
 
 ---
 
@@ -142,8 +142,16 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-05-28
+- Sort all variant listings alphabetically within categories (#52)
+- Add "For Developers" section with tabbed code examples and "Moddable Engines" sister project section to homepage
+- Add hero parallax effect (title lag, button fade, glow drift)
+- Fix section colour contrast: dark dev section, mid-tone engines section
+- Consolidate `text-wrap: pretty` into shared.css (DRY)
+
 #### 2026-05-27
-- Complete plugin architecture migration: all 39 variants are now self-contained plugin files using `MCE.registerVariant()`
+- Add 15 Tier 1 plugin-ready variants (54 total): Half Chess, Diana, Petty, Omnicide, Dark Chess, Berserk, Benedict, Andernach, Grid, Checkless, No Retreat, Weak!, Patrol, Madrasi, Dice
+- Complete plugin architecture migration: all 54 variants are now self-contained plugin files using `MCE.registerVariant()`
 - Remove all hardcoded variant if/else chains from core engine (chess-engine, chess-play, chess-moves, chess-variants, chess-ai)
 - Remove legacy `VARIANT_BOARDS` and `VARIANTS` objects — plugins are sole source of truth
 - Add plugin hooks: `winCondition`, `moveFilter`, `beforeMove`, `turnLogic`, `restoreState`, `init`, `visibility`, `statusText`, `aiMoveCount`

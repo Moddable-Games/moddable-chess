@@ -11,8 +11,8 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: var(--mg-font-body, 'Barlow', system-ui, sans-serif); color: var(--mc-ink); background: var(--mc-deep); }
-h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-serif); text-wrap: pretty; }
-p, li { text-wrap: pretty; }
+h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-serif); }
+
 a { color: inherit; text-decoration: none; }
 
 .mc-hero {
