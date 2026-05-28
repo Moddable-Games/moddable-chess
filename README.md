@@ -163,8 +163,8 @@ Open `http://localhost:8000/`
 - Consolidate `text-wrap: pretty` into shared.css (DRY)
 
 #### 2026-05-27
-- Add 15 Tier 1 plugin-ready variants (54 total): Half Chess, Diana, Petty, Omnicide, Dark Chess, Berserk, Benedict, Andernach, Grid, Checkless, No Retreat, Weak!, Patrol, Madrasi, Dice
-- Complete plugin architecture migration: all 54 variants are now self-contained plugin files using `MCE.registerVariant()`
+- Add 15 Tier 1 plugin-ready variants (54 at this point): Half Chess, Diana, Petty, Omnicide, Dark Chess, Berserk, Benedict, Andernach, Grid, Checkless, No Retreat, Weak!, Patrol, Madrasi, Dice
+- Complete plugin architecture migration: all variants are now self-contained plugin files using `MCE.registerVariant()`
 - Remove all hardcoded variant if/else chains from core engine (chess-engine, chess-play, chess-moves, chess-variants, chess-ai)
 - Remove legacy `VARIANT_BOARDS` and `VARIANTS` objects — plugins are sole source of truth
 - Add plugin hooks: `winCondition`, `moveFilter`, `beforeMove`, `turnLogic`, `restoreState`, `init`, `visibility`, `statusText`, `aiMoveCount`
