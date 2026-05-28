@@ -127,6 +127,11 @@ function createVariantGame(variant) {
     if (vc.checkThreshold) g.checkThreshold = vc.checkThreshold;
     if (vc.stalemateMeaning) g.stalemateMeaning = vc.stalemateMeaning;
     if (vc.promotionPieces) g.promotionPieces = vc.promotionPieces;
+    if (vc.promotionRank) g.promotionRank = vc.promotionRank;
+    if (vc.pawnMoveStyle) g.pawnMoveStyle = vc.pawnMoveStyle;
+    if (vc.divergentPieces) g.divergentPieces = vc.divergentPieces;
+    if (vc.wrapFiles) g.wrapFiles = true;
+    if (vc.wrapRanks) g.wrapRanks = true;
     const fen = vc.fen || INITIAL_FEN;
     loadFEN(g, fen);
     g.positionHistory.push(positionKey(g));
@@ -140,6 +145,14 @@ function createVariantGame(variant) {
   return g;
 }
 
+function wrapCoords(r, c, g) {
+  const rows = (g && g.rows) || 8;
+  const cols = (g && g.cols) || 8;
+  if (g && g.wrapFiles) c = ((c % cols) + cols) % cols;
+  if (g && g.wrapRanks) r = ((r % rows) + rows) % rows;
+  return [r, c];
+}
+
 function rc(i, g) {
   const cols = (g && g.cols) || 8;
   return [Math.floor(i / cols), i % cols];
@@ -151,6 +164,7 @@ function sq(r, c, g) {
 function onBoard(r, c, g) {
   const rows = (g && g.rows) || 8;
   const cols = (g && g.cols) || 8;
+  [r, c] = wrapCoords(r, c, g);
   if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
   if (g && g.terrain) {
     return g.terrain[r * cols + c] !== null;
@@ -286,5 +300,5 @@ function positionKey(g) {
   return parts.slice(0, 4).join(' ');
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
+return { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
 })();

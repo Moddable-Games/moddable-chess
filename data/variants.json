@@ -35,6 +35,11 @@
     "desc": "Pieces convert enemies they attack instead of capturing. Win by converting the king."
   },
   {
+    "name": "Berolina Chess",
+    "board": "8×8",
+    "desc": "Pawns move diagonally and capture straight — the inverse of normal."
+  },
+  {
     "name": "Berserk Chess",
     "board": "8×8",
     "desc": "Delivering check grants an immediate bonus move."
@@ -70,6 +75,11 @@
     "desc": "Medieval German variant from the 1200s. Extra bishops and sage pieces."
   },
   {
+    "name": "Cylinder Chess",
+    "board": "8×8",
+    "desc": "Files wrap: a-file connects to h-file. Bishops slide around the cylinder."
+  },
+  {
     "name": "Dark Chess",
     "board": "8×8",
     "desc": "Total fog — you can only see your own pieces. Capture the king to win."
@@ -85,9 +95,19 @@
     "desc": "A die roll determines which piece type must move each turn."
   },
   {
+    "name": "Displacement Chess",
+    "board": "8×8",
+    "desc": "Swap positions with adjacent friendly pieces as an alternative move."
+  },
+  {
     "name": "Duck Chess",
     "board": "8×8",
     "desc": "After each move, place the duck (blocker) on any empty square."
+  },
+  {
+    "name": "Einstein Chess",
+    "board": "8×8",
+    "desc": "Non-capturing moves demote pieces, captures promote them."
   },
   {
     "name": "Endgame Chess",
@@ -135,6 +155,11 @@
     "desc": "Compressed 4-rank board. Armies start adjacent — instant contact."
   },
   {
+    "name": "Hoppel-Poppel",
+    "board": "8×8",
+    "desc": "Knights capture like bishops, bishops capture like knights."
+  },
+  {
     "name": "Horde Chess",
     "board": "8×8",
     "desc": "White has a full army. Black has 36 pawns. Asymmetric survival."
@@ -148,6 +173,11 @@
     "name": "Knightmate",
     "board": "8×8",
     "desc": "Knight and King swap roles. The Knight is royal; Kings move as knights."
+  },
+  {
+    "name": "Legan Chess",
+    "board": "8×8",
+    "desc": "Berolina pawns with swapped king/queen starting squares."
   },
   {
     "name": "Los Alamos",
@@ -168,6 +198,11 @@
     "name": "Makpong",
     "board": "8×8",
     "desc": "King cannot move out of check. You must block or capture instead."
+  },
+  {
+    "name": "Makruk",
+    "board": "8×8",
+    "desc": "Thai chess. Promote on rank 6 to Met. No castling or en passant."
   },
   {
     "name": "Marseillais Chess",
@@ -198,6 +233,11 @@
     "name": "Omnicide",
     "board": "8×8",
     "desc": "Lose all pieces to win. Like Antichess but captures are not forced."
+  },
+  {
+    "name": "Orda Chess",
+    "board": "8×8",
+    "desc": "Asymmetric Mongol army with divergent movers vs standard pieces."
   },
   {
     "name": "Patrol Chess",
@@ -258,6 +298,11 @@
     "name": "Three-Check",
     "board": "8×8",
     "desc": "First to check the opponent three times wins."
+  },
+  {
+    "name": "Toroidal Chess",
+    "board": "8×8",
+    "desc": "Board wraps in both directions forming a torus. No edge exists."
   },
   {
     "name": "Torpedo Chess",

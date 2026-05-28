@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 55 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 64 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -41,7 +41,7 @@ moddable-chess/
 │       ├── index.js        ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 55 total
+│       └── ...             ← 64 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -59,6 +59,7 @@ moddable-chess/
 | Done | Antichess | 8×8 | Forced captures, lose all pieces = win |
 | Done | Atomic | 8×8 | Captures explode adjacent pieces |
 | Done | Benedict Chess | 8×8 | Convert enemies instead of capturing |
+| Done | Berolina Chess | 8×8 | Pawns move diagonally, capture straight |
 | Done | Berserk Chess | 8×8 | Check grants bonus move |
 | Done | Breakthrough | 7×7 | Pawns only, first to far rank wins |
 | Done | Capablanca | 10×8 | Archbishop + Chancellor |
@@ -66,10 +67,13 @@ moddable-chess/
 | Done | Chigorin | 8×8 | White has knights instead of bishops |
 | Done | Codrus | 8×8 | Lose your king to win |
 | Done | Courier Chess | 12×8 | Medieval German variant (1200s) |
+| Done | Cylinder Chess | 8×8 | Files wrap: a connects to h |
 | Done | Dark Chess | 8×8 | Total fog, capture king to win |
 | Done | Diana Chess | 6×6 | No queens or knights |
 | Done | Dice Chess | 8×8 | Die roll constrains which piece type moves |
+| Done | Displacement Chess | 8×8 | Swap with adjacent friendly pieces |
 | Done | Duck Chess | 8×8 | Place blocker duck after each move |
+| Done | Einstein Chess | 8×8 | Moves demote, captures promote pieces |
 | Done | Endgame Chess | 8×8 | Start with only pawns + kings |
 | Done | Extinction Chess | 8×8 | Lose when any piece type is eliminated |
 | Done | Fischer Random (960) | 8×8 | Randomised back rank |
@@ -79,19 +83,23 @@ moddable-chess/
 | Done | Grand Chess | 10×10 | Same new pieces, bigger board |
 | Done | Grid Chess | 8×8 | Moves must cross 2×2 grid lines |
 | Done | Half Chess | 4×8 | Compressed board, instant contact |
+| Done | Hoppel-Poppel | 8×8 | Knights capture like bishops, vice versa |
 | Done | Horde Chess | 8×8 | 36 pawns vs normal army |
 | Done | King of the Hill | 8×8 | King reaches centre = win |
 | Done | Knightmate | 8×8 | Knight is royal, king moves like knight |
+| Done | Legan Chess | 8×8 | Berolina pawns, swapped royals |
 | Done | Los Alamos | 6×6 | No bishops, first computer chess (1956) |
 | Done | Madrasi Chess | 8×8 | Same-type pieces paralyse each other |
 | Done | Maharaja & Sepoys | 8×8 | One Queen+Knight piece vs full army |
 | Done | Makpong | 8×8 | King can't move from check |
+| Done | Makruk | 8×8 | Thai chess, promote on rank 6 to Met |
 | Done | Marseillais | 8×8 | Two moves per turn, check ends turn |
 | Done | Minichess | 5×5 | Full piece types on tiny board |
 | Done | Monster Chess | 8×8 | White gets 2 moves per turn |
 | Done | No Castling | 8×8 | Standard chess, castling disabled |
 | Done | No Retreat | 8×8 | Pieces can't move backward |
 | Done | Omnicide | 8×8 | Lose all pieces, captures not forced |
+| Done | Orda Chess | 8×8 | Asymmetric Mongol army, divergent movers |
 | Done | Patrol Chess | 8×8 | Capture only when defended |
 | Done | Pawns Only | 8×8 | Only pawns, first promotion wins |
 | Done | Peasants' Revolt | 8×8 | King + pawns vs king + knights |
@@ -104,6 +112,7 @@ moddable-chess/
 | Done | Stalemate Wins | 8×8 | Stalemating opponent wins |
 | Done | Suicide Chess | 8×8 | Antichess (stalemate = draw) |
 | Done | Three-Check | 8×8 | 3 checks = win |
+| Done | Toroidal Chess | 8×8 | Board wraps both directions (torus) |
 | Done | Torpedo Chess | 8×8 | Pawns can always double-move |
 | Done | Upside-Down | 8×8 | Pieces start on opponent's rank |
 | Done | Weak! | 8×8 | Weakest piece must move first |
@@ -144,7 +153,9 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-28
-- Add Shatar (Mongolian Chess) variant — bare king win condition (55 total)
+- Add Tier 2 engine extensions: wrap-around geometry, promotionRank, divergent movement, post-move transformation, displacement moves
+- Add 9 new variants (64 total): Cylinder, Toroidal, Berolina, Legan, Hoppel-Poppel, Makruk, Orda, Einstein, Displacement
+- Add Shatar (Mongolian Chess) variant — bare king win condition
 - Sort all variant listings alphabetically within categories (#52)
 - Add "For Developers" section with tabbed code examples and "Moddable Engines" sister project section to homepage
 - Add hero parallax effect (title lag, button fade, glow drift)

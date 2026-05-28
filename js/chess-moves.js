@@ -31,6 +31,12 @@ function pseudoLegalMoves(g) {
     if (registry[type]) {
       const custom = registry[type].genMoves(g, i, side);
       if (custom) custom.forEach(m => moves.push(m));
+    } else if (g.divergentPieces && g.divergentPieces[type]) {
+      const dp = g.divergentPieces[type];
+      const genMove = dp.moveStyle === 'slide' ? genSlides : genJumps;
+      const genCap = dp.captureStyle === 'slide' ? genSlides : genJumps;
+      genMove(g, i, r, c, side, dp.move, moves, { moveOnly: true });
+      genCap(g, i, r, c, side, dp.capture, moves, { attackOnly: true });
     } else if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
     else if (role === 'n') genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
     else if (role === 'b') genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
@@ -50,33 +56,47 @@ function pseudoLegalMoves(g) {
 function genPawnMoves(g, from, r, c, side, moves) {
   const dir = g.pawnDirection ? g.pawnDirection(side) : (side === WHITE ? -1 : 1);
   const defaultStart = side === WHITE ? g.rows - 2 : 1;
-  const promoRow = g.noPromotion ? -1 : (side === WHITE ? 0 : g.rows - 1);
+  const defaultPromo = side === WHITE ? 0 : g.rows - 1;
+  const promoRow = g.noPromotion ? -1 : (g.promotionRank ? g.promotionRank(side) : defaultPromo);
   const actualStart = g.pawnStartRow ? g.pawnStartRow(side) : defaultStart;
+  const style = g.pawnMoveStyle || 'standard';
 
-  const fwd = MCE.sq(r + dir, c, g);
-  if (MCE.onBoard(r + dir, c, g) && !g.board[fwd]) {
-    addPawnMove(from, fwd, r + dir, promoRow, moves);
-    if (r === actualStart || g.torpedo) {
-      const fwd2r = r + dir * 2;
-      if (MCE.onBoard(fwd2r, c, g)) {
-        const fwd2 = MCE.sq(fwd2r, c, g);
-        if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: g.noEnPassant ? null : 'double' });
+  const moveDirs = style === 'berolina' ? [[-1, dir], [1, dir]] : [[0, dir]];
+  const capDirs = style === 'berolina' ? [[0, dir]] : [[-1, dir], [1, dir]];
+
+  for (const [dc, dr] of moveDirs) {
+    let nr = r + dr, nc = c + dc;
+    [nr, nc] = MCE.wrapCoords(nr, nc, g);
+    if (!MCE.onBoard(nr, nc, g)) continue;
+    const fwd = MCE.sq(nr, nc, g);
+    if (!g.board[fwd]) {
+      addPawnMove(from, fwd, nr, promoRow, moves, g);
+      if (r === actualStart || g.torpedo) {
+        let fwd2r = r + dr * 2, fwd2c = c + dc * 2;
+        [fwd2r, fwd2c] = MCE.wrapCoords(fwd2r, fwd2c, g);
+        if (MCE.onBoard(fwd2r, fwd2c, g)) {
+          const fwd2 = MCE.sq(fwd2r, fwd2c, g);
+          if (!g.board[fwd2]) moves.push({ from, to: fwd2, flag: g.noEnPassant ? null : 'double' });
+        }
       }
     }
   }
-  for (const dc of [-1, 1]) {
-    const nc = c + dc;
-    if (!MCE.onBoard(r + dir, nc, g)) continue;
-    const target = MCE.sq(r + dir, nc, g);
+
+  for (const [dc, dr] of capDirs) {
+    let nr = r + dr, nc = c + dc;
+    [nr, nc] = MCE.wrapCoords(nr, nc, g);
+    if (!MCE.onBoard(nr, nc, g)) continue;
+    const target = MCE.sq(nr, nc, g);
     const tp = g.board[target];
-    if (tp && isEnemy(target, side, g)) addPawnMove(from, target, r + dir, promoRow, moves);
+    if (tp && isEnemy(target, side, g)) addPawnMove(from, target, nr, promoRow, moves, g);
     else if (!g.noEnPassant && target === g.enPassant) moves.push({ from, to: target, flag: 'ep' });
   }
 }
 
-function addPawnMove(from, to, toRow, promoRow, moves) {
-  if (toRow === promoRow) {
-    for (const promo of ['q','r','b','n','a','c']) moves.push({ from, to, flag: 'promo', promo });
+function addPawnMove(from, to, toRow, promoRow, moves, g) {
+  if (promoRow >= 0 && toRow === promoRow) {
+    const pieces = (g && g.promotionPieces) || ['q','r','b','n','a','c'];
+    for (const promo of pieces) moves.push({ from, to, flag: 'promo', promo });
   } else {
     moves.push({ from, to, flag: null });
   }
@@ -87,14 +107,21 @@ function genSlides(g, from, r, c, side, dirs, moves, opts) {
   const waterSkip = opts && opts.waterSkip;
   const moveOnly = opts && opts.moveOnly;
   const attackOnly = opts && opts.attackOnly;
+  const maxSteps = Math.max((g && g.rows) || 8, (g && g.cols) || 8);
   for (const [dr, dc] of dirs) {
     let nr = r + dr, nc = c + dc;
-    while (MCE.onBoard(nr, nc, g)) {
+    const visited = new Set();
+    visited.add(from);
+    let steps = 0;
+    while (MCE.onBoard(nr, nc, g) && steps < maxSteps) {
+      [nr, nc] = MCE.wrapCoords(nr, nc, g);
       const target = MCE.sq(nr, nc, g);
+      if (visited.has(target)) break;
+      visited.add(target);
       const terrain = MCE.getTerrain(target, g);
       if (terrain === 'w' || terrain === 2) {
         if (waterBlock) break;
-        if (waterSkip !== false) { nr += dr; nc += dc; continue; }
+        if (waterSkip !== false) { nr += dr; nc += dc; steps++; continue; }
       }
       const tp = g.board[target];
       if (tp) {
@@ -107,6 +134,7 @@ function genSlides(g, from, r, c, side, dirs, moves, opts) {
         moves.push({ from, to: target, flag: null, moveOnly: moveOnly || undefined });
       }
       nr += dr; nc += dc;
+      steps++;
     }
   }
 }
@@ -115,7 +143,8 @@ function genJumps(g, from, r, c, side, offsets, moves, opts) {
   const attackOnly = opts && opts.attackOnly;
   const moveOnly = opts && opts.moveOnly;
   for (const [dr, dc] of offsets) {
-    const nr = r + dr, nc = c + dc;
+    let nr = r + dr, nc = c + dc;
+    [nr, nc] = MCE.wrapCoords(nr, nc, g);
     if (!MCE.onBoard(nr, nc, g)) continue;
     const target = MCE.sq(nr, nc, g);
     const tp = g.board[target];
@@ -177,6 +206,13 @@ function attacks(g, from, target, piece) {
   if (registry[type]) {
     return registry[type].attacks(g, from, target);
   }
+  if (g.divergentPieces && g.divergentPieces[type]) {
+    const dp = g.divergentPieces[type];
+    const [fr, fc] = MCE.rc(from, g);
+    const [tr, tc] = MCE.rc(target, g);
+    if (dp.captureStyle === 'slide') return slidesTo(g, from, target, dp.capture);
+    return dp.capture.some(([dr, dc]) => fr + dr === tr && fc + dc === tc);
+  }
   const role = getRole(g, type);
   const [fr, fc] = MCE.rc(from, g);
   const [tr, tc] = MCE.rc(target, g);
@@ -184,6 +220,8 @@ function attacks(g, from, target, piece) {
   if (type === PIECE.P) {
     const owner = pieceOwner(from, g);
     const dir = g.pawnDirection ? g.pawnDirection(owner) : (owner === WHITE ? -1 : 1);
+    const style = g.pawnMoveStyle || 'standard';
+    if (style === 'berolina') return dr === dir && dc === 0;
     return dr === dir && Math.abs(dc) === 1;
   }
   if (role === 'n') return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
@@ -204,12 +242,21 @@ function attacks(g, from, target, piece) {
 function slidesTo(g, from, target, dirs) {
   const [fr, fc] = MCE.rc(from, g);
   const [tr, tc] = MCE.rc(target, g);
+  const maxSteps = Math.max((g && g.rows) || 8, (g && g.cols) || 8);
   for (const [sdr, sdc] of dirs) {
     let r = fr + sdr, c = fc + sdc;
-    while (MCE.onBoard(r, c, g)) {
+    const visited = new Set();
+    visited.add(from);
+    let steps = 0;
+    while (MCE.onBoard(r, c, g) && steps < maxSteps) {
+      [r, c] = MCE.wrapCoords(r, c, g);
+      const sq = MCE.sq(r, c, g);
+      if (visited.has(sq)) break;
+      visited.add(sq);
       if (r === tr && c === tc) return true;
-      if (g.board[MCE.sq(r, c, g)]) break;
+      if (g.board[sq]) break;
       r += sdr; c += sdc;
+      steps++;
     }
   }
   return false;
@@ -252,12 +299,19 @@ function inCheck(g, side) {
 
 function genCannon(g, from, r, c, side, dirs, moves, opts) {
   const waterSkip = !opts || opts.waterSkip !== false;
+  const maxSteps = Math.max((g && g.rows) || 8, (g && g.cols) || 8);
   for (const [dr, dc] of dirs) {
     let nr = r + dr, nc = c + dc, screen = false;
-    while (MCE.onBoard(nr, nc, g)) {
+    const visited = new Set();
+    visited.add(from);
+    let steps = 0;
+    while (MCE.onBoard(nr, nc, g) && steps < maxSteps) {
+      [nr, nc] = MCE.wrapCoords(nr, nc, g);
       const target = MCE.sq(nr, nc, g);
+      if (visited.has(target)) break;
+      visited.add(target);
       const terrain = MCE.getTerrain(target, g);
-      if ((terrain === 'w' || terrain === 2) && waterSkip) { nr += dr; nc += dc; continue; }
+      if ((terrain === 'w' || terrain === 2) && waterSkip) { nr += dr; nc += dc; steps++; continue; }
       const tp = g.board[target];
       if (!screen) {
         if (tp) { screen = true; }
@@ -269,6 +323,7 @@ function genCannon(g, from, r, c, side, dirs, moves, opts) {
         }
       }
       nr += dr; nc += dc;
+      steps++;
     }
   }
 }
@@ -276,14 +331,21 @@ function genCannon(g, from, r, c, side, dirs, moves, opts) {
 function genGappedSlides(g, from, r, c, side, dirs, moves, opts) {
   const mode = (opts && opts.mode) || 'both';
   const waterBlock = opts && opts.waterBlock;
+  const maxSteps = Math.max((g && g.rows) || 8, (g && g.cols) || 8);
   for (const [dr, dc] of dirs) {
     let nr = r + dr, nc = c + dc, gapped = false;
-    while (MCE.onBoard(nr, nc, g)) {
+    const visited = new Set();
+    visited.add(from);
+    let steps = 0;
+    while (MCE.onBoard(nr, nc, g) && steps < maxSteps) {
+      [nr, nc] = MCE.wrapCoords(nr, nc, g);
       const target = MCE.sq(nr, nc, g);
+      if (visited.has(target)) break;
+      visited.add(target);
       const terrain = MCE.getTerrain(target, g);
       if (terrain === 'w' || terrain === 2) {
         if (waterBlock) break;
-        nr += dr; nc += dc; continue;
+        nr += dr; nc += dc; steps++; continue;
       }
       const tp = g.board[target];
       if (tp) {
@@ -304,6 +366,7 @@ function genGappedSlides(g, from, r, c, side, dirs, moves, opts) {
         }
       }
       nr += dr; nc += dc;
+      steps++;
     }
   }
 }
