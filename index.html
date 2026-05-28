@@ -65,6 +65,15 @@
     <div class="mc-dev__eyebrow">FOR DEVELOPERS</div>
     <h2 class="mc-dev__title">Five lines to a playable board.</h2>
     <p class="mc-dev__text">Load the scripts, create a game, render the board. The engine handles move generation, check detection, variant rules, and board rendering.</p>
+
+    <h3 class="mc-dev__subtitle">Script loading</h3>
+    <div class="mc-dev__code">
+&lt;script src="https://chess.moddable.games/js/chess-engine.js"&gt;&lt;/script&gt;<br>
+&lt;script src="https://chess.moddable.games/js/chess-render.js"&gt;&lt;/script&gt;<br>
+&lt;script src="https://chess.moddable.games/js/variants/standard.js"&gt;&lt;/script&gt;
+    </div>
+
+    <h3 class="mc-dev__subtitle">Create and render</h3>
     <div class="mc-dev__code">
 const game = MCE.createGame('standard');<br>
 const moves = MCE.legalMoves(game);<br>
@@ -72,15 +81,40 @@ MCE.makeMove(game, moves[0]);<br>
 const status = MCE.getStatus(game);<br>
 MCE.renderBoard(el, game, { size: 480 });
     </div>
-    <div class="mc-hero__btns">
+
+    <h3 class="mc-dev__subtitle">Embed via iframe</h3>
+    <div class="mc-dev__code">
+&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;variant=standard&amp;theme=cosmic"<br>
+&nbsp;&nbsp;width="480" height="480" frameborder="0"&gt;&lt;/iframe&gt;
+    </div>
+
+    <div class="mc-dev__btns">
       <a href="docs/" class="mc-btn mc-btn--primary">Read the docs</a>
       <a href="docs/variants.html" class="mc-btn mc-btn--outline">Add a variant</a>
     </div>
   </div>
 </section>
 
+<section class="mc-engines">
+  <div class="mc-engines__inner">
+    <div class="mc-engines__eyebrow">MODDABLE ENGINES</div>
+    <h2 class="mc-engines__title">Part of a family.</h2>
+    <p class="mc-engines__text">Moddable Chess is one of several open-source game engines built with the same architecture: zero dependencies, embeddable, seeded RNG, and GitHub Pages deployment.</p>
+    <div class="mc-engines__grid">
+      <a href="https://hex.moddable.games" target="_blank" rel="noopener" class="mc-engines-card">
+        <div class="mc-engines-card__name">Moddable Hexmaps</div>
+        <p class="mc-engines-card__desc">Hex map engine for Nukes, Talisman, and Twilight Imperium. Canvas rendering, seeded RNG, terrain editing, and a plugin system for custom games.</p>
+      </a>
+      <a href="https://web.moddable.games/engines/" target="_blank" rel="noopener" class="mc-engines-card">
+        <div class="mc-engines-card__name">All Engines</div>
+        <p class="mc-engines-card__desc">Browse all Moddable Games engines and tools at the main site.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
 <footer class="site-footer">
-  <a href="https://moddable.games" target="_blank" rel="noopener"><img src="assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+  <a href="https://web.moddable.games/engines/" target="_blank" rel="noopener"><img src="assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.6.0</p>
 </footer>
 
