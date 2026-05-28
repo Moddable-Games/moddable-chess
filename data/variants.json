@@ -235,6 +235,11 @@
     "desc": "Capturing pieces stay on their square — they 'shoot' the target."
   },
   {
+    "name": "Shatar",
+    "board": "8×8",
+    "desc": "Mongolian chess. No check — win by leaving opponent with a bare king."
+  },
+  {
     "name": "Single-Check",
     "board": "8×8",
     "desc": "One check wins. No checkmate needed — any single check ends the game."

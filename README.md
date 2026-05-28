@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 54 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 55 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -41,7 +41,7 @@ moddable-chess/
 │       ├── index.js        ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 54 total
+│       └── ...             ← 55 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -99,6 +99,7 @@ moddable-chess/
 | Done | Progressive | 8×8 | Escalating moves: 1, 2, 3, 4... |
 | Done | Racing Kings | 8×8 | No checks, king to 8th rank = win |
 | Done | Rifle Chess | 8×8 | Capturing piece stays on its square |
+| Done | Shatar | 8×8 | Mongolian chess, bare king = loss |
 | Done | Single-Check | 8×8 | One check wins instantly |
 | Done | Stalemate Wins | 8×8 | Stalemating opponent wins |
 | Done | Suicide Chess | 8×8 | Antichess (stalemate = draw) |
@@ -143,6 +144,7 @@ Open `http://localhost:8000/`
 ### Changelog
 
 #### 2026-05-28
+- Add Shatar (Mongolian Chess) variant — bare king win condition (55 total)
 - Sort all variant listings alphabetically within categories (#52)
 - Add "For Developers" section with tabbed code examples and "Moddable Engines" sister project section to homepage
 - Add hero parallax effect (title lag, button fade, glow drift)
