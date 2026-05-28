@@ -33,9 +33,18 @@ MCE.registerVariant('displacementChess', {
       var b = g.board[move.to];
       g.board[move.from] = b;
       g.board[move.to] = a;
+      if (g.pieceData) {
+        var pdA = g.pieceData[move.from];
+        g.pieceData[move.from] = g.pieceData[move.to];
+        g.pieceData[move.to] = pdA;
+      }
     } else {
       g.board[move.to] = g.board[move.from];
       g.board[move.from] = null;
+      if (g.pieceData) {
+        g.pieceData[move.to] = g.pieceData[move.from];
+        g.pieceData[move.from] = null;
+      }
     }
   },
 });

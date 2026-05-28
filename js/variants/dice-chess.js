@@ -28,10 +28,7 @@ MCE.registerVariant('diceChess', {
         var piece = g.board[m.from];
         return piece && MCE.pieceType(piece) === requiredType;
       });
-      if (filtered.length > 0) {
-        g.diceRoll = ((roll - 1) + attempt) % 6 + 1;
-        return filtered;
-      }
+      if (filtered.length > 0) return filtered;
     }
     return moves;
   },
