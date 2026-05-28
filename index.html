@@ -66,26 +66,34 @@
     <h2 class="mc-dev__title">Five lines to a playable board.</h2>
     <p class="mc-dev__text">Load the scripts, create a game, render the board. The engine handles move generation, check detection, variant rules, and board rendering.</p>
 
-    <h3 class="mc-dev__subtitle">Script loading</h3>
-    <div class="mc-dev__code">
+    <div class="dev-tabs">
+      <div class="dev-tabs__bar">
+        <button class="dev-tabs__tab active" data-tab="0">Script loading</button>
+        <button class="dev-tabs__tab" data-tab="1">Create and render</button>
+        <button class="dev-tabs__tab" data-tab="2">Embed via iframe</button>
+      </div>
+      <div class="dev-tabs__panel active" data-panel="0">
+        <div class="mc-dev__code">
 &lt;script src="https://chess.moddable.games/js/chess-engine.js"&gt;&lt;/script&gt;<br>
 &lt;script src="https://chess.moddable.games/js/chess-render.js"&gt;&lt;/script&gt;<br>
 &lt;script src="https://chess.moddable.games/js/variants/standard.js"&gt;&lt;/script&gt;
-    </div>
-
-    <h3 class="mc-dev__subtitle">Create and render</h3>
-    <div class="mc-dev__code">
+        </div>
+      </div>
+      <div class="dev-tabs__panel" data-panel="1">
+        <div class="mc-dev__code">
 const game = MCE.createGame('standard');<br>
 const moves = MCE.legalMoves(game);<br>
 MCE.makeMove(game, moves[0]);<br>
 const status = MCE.getStatus(game);<br>
 MCE.renderBoard(el, game, { size: 480 });
-    </div>
-
-    <h3 class="mc-dev__subtitle">Embed via iframe</h3>
-    <div class="mc-dev__code">
+        </div>
+      </div>
+      <div class="dev-tabs__panel" data-panel="2">
+        <div class="mc-dev__code">
 &lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;variant=standard&amp;theme=cosmic"<br>
 &nbsp;&nbsp;width="480" height="480" frameborder="0"&gt;&lt;/iframe&gt;
+        </div>
+      </div>
     </div>
 
     <div class="mc-dev__btns">
@@ -119,6 +127,7 @@ MCE.renderBoard(el, game, { size: 480 });
 </footer>
 
 <script src="js/home.js?v=0.6.0"></script>
-
+<script src="js/dev-tabs.js?v=0.6.0"></script>
+<script src="js/parallax.js?v=0.6.0"></script>
 </body>
 </html>
