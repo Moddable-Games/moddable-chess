@@ -9,6 +9,11 @@ MCE.registerVariant('benedictChess', {
   title: 'Benedict Chess',
   description: 'Pieces never capture — instead, after your move, any enemy piece your moved piece now attacks is converted to your colour. Win by converting the opponent\'s king.',
   rule: 'Board: 8×8 · Win: Convert king',
+  moveFilter: function(g, moves) {
+    return moves.filter(function(m) {
+      return !g.board[m.to] && m.flag !== 'ep';
+    });
+  },
   afterMove: function(g, move, undo) {
     var piece = g.board[move.to];
     if (!piece) return;

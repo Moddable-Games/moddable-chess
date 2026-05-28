@@ -36,7 +36,8 @@ fetch('data/variants.json')
         : variants.filter(v => v.board === activeFilter);
 
       filtered.forEach(v => {
-        const card = document.createElement('div');
+        const card = document.createElement('a');
+        card.href = 'play/?variant=' + encodeURIComponent(v.key);
         card.className = 'mc-variant-card';
         card.innerHTML =
           '<div class="mc-variant-card__name">' + v.name + '</div>' +

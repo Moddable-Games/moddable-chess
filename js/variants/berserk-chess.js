@@ -10,6 +10,7 @@ MCE.registerVariant('berserkChess', {
   rule: 'Board: 8×8 · Win: Checkmate',
   turnLogic: function(g, undo) {
     undo.movesThisTurn = g.movesThisTurn || 0;
+    undo.fullmove = g.fullmove;
     g.movesThisTurn = (g.movesThisTurn || 0) + 1;
     var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
     var givesCheck = MCE.inCheck(g, opp);
@@ -21,6 +22,7 @@ MCE.registerVariant('berserkChess', {
   },
   restoreState: function(g, undo) {
     if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+    if (undo.fullmove !== undefined) g.fullmove = undo.fullmove;
   },
   statusText: function(g, helpers) {
     if (g.movesThisTurn === 1) {

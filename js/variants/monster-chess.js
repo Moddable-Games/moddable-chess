@@ -16,6 +16,7 @@ MCE.registerVariant('monsterChess', {
     g.movesThisTurn++;
     undo.movesThisTurn = g.movesThisTurn - 1;
     undo.lastMovedSq = g.lastMovedSq;
+    undo.fullmove = g.fullmove;
     var max = g.maxMovesPerTurn[g.turn] || 1;
     var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
     var givesCheck = MCE.inCheck(g, opp);
@@ -31,6 +32,7 @@ MCE.registerVariant('monsterChess', {
   restoreState: function(g, undo) {
     if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
     if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
+    if (undo.fullmove !== undefined) g.fullmove = undo.fullmove;
   },
   statusText: function(g, helpers) {
     if (g.movesThisTurn > 0) {

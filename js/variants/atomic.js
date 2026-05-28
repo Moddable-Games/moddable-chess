@@ -5,6 +5,7 @@ MCE.registerVariant('atomic', {
   rows: 8,
   cols: 8,
   fen: null,
+  noCheck: true,
   title: 'Atomic Chess',
   description: 'Captures cause explosions that destroy all non-pawn pieces on adjacent squares, including the capturer. If a king is caught in the blast, that side loses.',
   rule: 'Board: 8×8 · Win: Explode opponent\'s king',
@@ -23,8 +24,8 @@ MCE.registerVariant('atomic', {
       for (var dr = -1; dr <= 1; dr++) {
         for (var dc = -1; dc <= 1; dc++) {
           if (dr === 0 && dc === 0) continue;
-          var r = rc.r + dr;
-          var c = rc.c + dc;
+          var r = rc[0] + dr;
+          var c = rc[1] + dc;
           if (!MCE.onBoard(r, c, g)) continue;
           var sq = MCE.sq(r, c, g);
           if (g.board[sq] && MCE.pieceType(g.board[sq]) !== 'p') {
@@ -42,5 +43,19 @@ MCE.registerVariant('atomic', {
         g.pieceData[move.from] = null;
       }
     }
+  },
+  winCondition: function(g) {
+    var whiteKing = false, blackKing = false;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceType(p) === 'k') {
+        if (MCE.pieceColor(p) === MCE.WHITE) whiteKing = true;
+        else blackKing = true;
+      }
+    }
+    if (!whiteKing) return 'checkmate';
+    if (!blackKing) return 'checkmate';
+    return null;
   },
 });

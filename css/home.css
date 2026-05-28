@@ -153,10 +153,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 .mc-variant-card {
+  display: block;
   background: #fff;
   border: 1px solid var(--mc-hairline);
   border-radius: 12px;
   padding: 20px;
+  text-decoration: none;
+  transition: border-color 200ms, transform 200ms;
+}
+
+.mc-variant-card:hover {
+  border-color: var(--mc-blue);
+  transform: translateY(-2px);
 }
 
 .mc-variant-card__name {

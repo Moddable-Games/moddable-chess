@@ -5,6 +5,7 @@ MCE.registerVariant('extinction', {
   rows: 8,
   cols: 8,
   fen: null,
+  noCheck: true,
   title: 'Extinction Chess',
   description: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.',
   rule: 'Board: 8×8 · Win: Eliminate a piece type',

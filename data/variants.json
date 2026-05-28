@@ -1,320 +1,384 @@
 [
   {
+    "key": "standard",
     "name": "Standard Chess",
     "board": "8×8",
     "desc": "Standard FIDE rules"
   },
   {
+    "key": "almostChess",
     "name": "Almost Chess",
     "board": "8×8",
     "desc": "White's Queen is replaced by a Chancellor (Rook + Knight compound)."
   },
   {
+    "key": "amazonChess",
     "name": "Amazon Chess",
     "board": "8×8",
     "desc": "Queens replaced by Amazons (Queen + Knight). The most powerful piece possible."
   },
   {
+    "key": "andernachChess",
     "name": "Andernach Chess",
     "board": "8×8",
     "desc": "Capturing pieces change colour. Kings are exempt."
   },
   {
+    "key": "antichess",
     "name": "Antichess",
     "board": "8×8",
     "desc": "Captures are mandatory. First to lose all pieces wins."
   },
   {
+    "key": "atomic",
     "name": "Atomic Chess",
     "board": "8×8",
     "desc": "Captures cause explosions destroying all pieces on adjacent squares."
   },
   {
+    "key": "benedictChess",
     "name": "Benedict Chess",
     "board": "8×8",
     "desc": "Pieces convert enemies they attack instead of capturing. Win by converting the king."
   },
   {
+    "key": "berolinaChess",
     "name": "Berolina Chess",
     "board": "8×8",
     "desc": "Pawns move diagonally and capture straight — the inverse of normal."
   },
   {
+    "key": "berserkChess",
     "name": "Berserk Chess",
     "board": "8×8",
     "desc": "Delivering check grants an immediate bonus move."
   },
   {
+    "key": "breakthrough",
     "name": "Breakthrough",
     "board": "7×7",
     "desc": "Pawns only — first to reach the far side wins. No captures backward."
   },
   {
+    "key": "capablanca",
     "name": "Capablanca Chess",
     "board": "10×8",
     "desc": "Two extra pieces: Archbishop (B+N) and Chancellor (R+N). Wider board."
   },
   {
+    "key": "checklessChess",
     "name": "Checkless Chess",
     "board": "8×8",
     "desc": "You cannot give check unless it is checkmate."
   },
   {
+    "key": "chigorin",
     "name": "Chigorin",
     "board": "8×8",
     "desc": "White's Bishops replaced by Knights. Four Knights vs standard army."
   },
   {
+    "key": "codrus",
     "name": "Codrus",
     "board": "8×8",
     "desc": "No check exists. You win by getting your own King captured."
   },
   {
+    "key": "courier",
     "name": "Courier Chess",
     "board": "12×8",
     "desc": "Medieval German variant from the 1200s. Extra bishops and sage pieces."
   },
   {
+    "key": "cylinderChess",
     "name": "Cylinder Chess",
     "board": "8×8",
     "desc": "Files wrap: a-file connects to h-file. Bishops slide around the cylinder."
   },
   {
+    "key": "darkChess",
     "name": "Dark Chess",
     "board": "8×8",
     "desc": "Total fog — you can only see your own pieces. Capture the king to win."
   },
   {
+    "key": "dianaChess",
     "name": "Diana Chess",
     "board": "6×6",
     "desc": "6×6 board with no queens or knights. Bishops and rooks dominate."
   },
   {
+    "key": "diceChess",
     "name": "Dice Chess",
     "board": "8×8",
     "desc": "A die roll determines which piece type must move each turn."
   },
   {
+    "key": "displacementChess",
     "name": "Displacement Chess",
     "board": "8×8",
     "desc": "Swap positions with adjacent friendly pieces as an alternative move."
   },
   {
+    "key": "duckChess",
     "name": "Duck Chess",
     "board": "8×8",
     "desc": "After each move, place the duck (blocker) on any empty square."
   },
   {
+    "key": "einsteinChess",
     "name": "Einstein Chess",
     "board": "8×8",
     "desc": "Non-capturing moves demote pieces, captures promote them."
   },
   {
+    "key": "endgameChess",
     "name": "Endgame Chess",
     "board": "8×8",
     "desc": "Only Kings and pawns. Pure endgame technique from move one."
   },
   {
+    "key": "extinction",
     "name": "Extinction Chess",
     "board": "8×8",
     "desc": "Lose all your knights, bishops, rooks, or pawns — you lose the game."
   },
   {
+    "key": "chess960",
     "name": "Fischer Random (Chess960)",
     "board": "8×8",
     "desc": "Back rank pieces randomised (960 positions). Castling rules adapted."
   },
   {
+    "key": "fiveCheck",
     "name": "Five-Check",
     "board": "8×8",
     "desc": "Extended Three-Check — five checks wins instead of three."
   },
   {
+    "key": "fogOfWar",
     "name": "Fog of War Chess",
     "board": "8×8",
     "desc": "You only see squares your pieces can move to. No check warnings."
   },
   {
+    "key": "giveaway",
     "name": "Giveaway",
     "board": "8×8",
     "desc": "Forced captures. King is not royal. Stalemate is a loss."
   },
   {
+    "key": "grand",
     "name": "Grand Chess",
     "board": "10×10",
     "desc": "Same new pieces as Capablanca, bigger board, pawns start on rank 3."
   },
   {
+    "key": "gridChess",
     "name": "Grid Chess",
     "board": "8×8",
     "desc": "Moves must cross at least one grid line (2×2 cells)."
   },
   {
+    "key": "halfChess",
     "name": "Half Chess",
     "board": "4×8",
     "desc": "Compressed 4-rank board. Armies start adjacent — instant contact."
   },
   {
+    "key": "hoppelPoppel",
     "name": "Hoppel-Poppel",
     "board": "8×8",
     "desc": "Knights capture like bishops, bishops capture like knights."
   },
   {
+    "key": "horde",
     "name": "Horde Chess",
     "board": "8×8",
     "desc": "White has a full army. Black has 36 pawns. Asymmetric survival."
   },
   {
+    "key": "kingOfTheHill",
     "name": "King of the Hill",
     "board": "8×8",
     "desc": "Moving your king to d4/d5/e4/e5 is an instant win."
   },
   {
+    "key": "knightmate",
     "name": "Knightmate",
     "board": "8×8",
     "desc": "Knight and King swap roles. The Knight is royal; Kings move as knights."
   },
   {
+    "key": "leganChess",
     "name": "Legan Chess",
     "board": "8×8",
     "desc": "Berolina pawns with swapped king/queen starting squares."
   },
   {
+    "key": "losAlamos",
     "name": "Los Alamos",
     "board": "6×6",
     "desc": "First computer chess (1956). 6x6 board, no Bishops, no castling."
   },
   {
+    "key": "madrasiChess",
     "name": "Madrasi Chess",
     "board": "8×8",
     "desc": "Same-type opposing pieces that attack each other are paralysed."
   },
   {
+    "key": "maharaja",
     "name": "Maharaja & Sepoys",
     "board": "8×8",
     "desc": "One player has a full army. The other has one piece that moves as queen + knight."
   },
   {
+    "key": "makpong",
     "name": "Makpong",
     "board": "8×8",
     "desc": "King cannot move out of check. You must block or capture instead."
   },
   {
+    "key": "makruk",
     "name": "Makruk",
     "board": "8×8",
     "desc": "Thai chess. Promote on rank 6 to Met. No castling or en passant."
   },
   {
+    "key": "marseillais",
     "name": "Marseillais Chess",
     "board": "8×8",
     "desc": "Each player makes TWO moves per turn (except White's first turn)."
   },
   {
+    "key": "minichess",
     "name": "Minichess",
     "board": "5×5",
     "desc": "Gardner's 5x5 board. All piece types, fast tactical games."
   },
   {
+    "key": "monsterChess",
     "name": "Monster Chess",
     "board": "8×8",
     "desc": "White moves twice per turn but starts with only King, Rooks, and pawns."
   },
   {
+    "key": "noCastling",
     "name": "No Castling Chess",
     "board": "8×8",
     "desc": "Standard chess with castling removed. Kings must develop naturally."
   },
   {
+    "key": "noRetreat",
     "name": "No Retreat",
     "board": "8×8",
     "desc": "Pieces cannot move backward toward their own starting rank."
   },
   {
+    "key": "omnicide",
     "name": "Omnicide",
     "board": "8×8",
     "desc": "Lose all pieces to win. Like Antichess but captures are not forced."
   },
   {
+    "key": "ordaChess",
     "name": "Orda Chess",
     "board": "8×8",
     "desc": "Asymmetric Mongol army with divergent movers vs standard pieces."
   },
   {
+    "key": "patrolChess",
     "name": "Patrol Chess",
     "board": "8×8",
     "desc": "A piece can only capture if defended by a friendly piece."
   },
   {
+    "key": "pawnsOnly",
     "name": "Pawns Only",
     "board": "8×8",
     "desc": "Kings and pawns only. First to promote wins instantly."
   },
   {
+    "key": "peasantsRevolt",
     "name": "Peasants' Revolt",
     "board": "8×8",
     "desc": "White has King + 8 pawns vs Black's King + 2 Knights + 8 pawns."
   },
   {
+    "key": "pettyChess",
     "name": "Petty Chess",
     "board": "5×6",
     "desc": "All piece types on a compact 5×6 board. Fast tactical games."
   },
   {
+    "key": "progressive",
     "name": "Progressive",
     "board": "8×8",
     "desc": "Moves per turn escalate: 1, 2, 3, 4... Check ends your turn early."
   },
   {
+    "key": "racingKings",
     "name": "Racing Kings",
     "board": "8×8",
     "desc": "No checks allowed. Both kings start on 1st rank. Race to the top."
   },
   {
+    "key": "rifle",
     "name": "Rifle Chess",
     "board": "8×8",
     "desc": "Capturing pieces stay on their square — they 'shoot' the target."
   },
   {
+    "key": "shatar",
     "name": "Shatar",
     "board": "8×8",
     "desc": "Mongolian chess. No check — win by leaving opponent with a bare king."
   },
   {
+    "key": "singleCheck",
     "name": "Single-Check",
     "board": "8×8",
     "desc": "One check wins. No checkmate needed — any single check ends the game."
   },
   {
+    "key": "stalemateWins",
     "name": "Stalemate Wins",
     "board": "8×8",
     "desc": "Standard chess but stalemate is a win, not a draw."
   },
   {
+    "key": "suicideChess",
     "name": "Suicide Chess",
     "board": "8×8",
     "desc": "Forced captures like Giveaway, but stalemate is a draw, not a loss."
   },
   {
+    "key": "threeCheck",
     "name": "Three-Check",
     "board": "8×8",
     "desc": "First to check the opponent three times wins."
   },
   {
+    "key": "toroidalChess",
     "name": "Toroidal Chess",
     "board": "8×8",
     "desc": "Board wraps in both directions forming a torus. No edge exists."
   },
   {
+    "key": "torpedo",
     "name": "Torpedo Chess",
     "board": "8×8",
     "desc": "Pawns can move two squares forward from any rank, not just the starting rank."
   },
   {
+    "key": "upsideDown",
     "name": "Upside-Down",
     "board": "8×8",
     "desc": "Pieces start on the opponent's back rank. Instant tactical chaos."
   },
   {
+    "key": "weakChess",
     "name": "Weak!",
     "board": "8×8",
     "desc": "The weakest piece type with a legal move must move first."

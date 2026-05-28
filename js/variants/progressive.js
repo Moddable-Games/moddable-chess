@@ -16,6 +16,7 @@ MCE.registerVariant('progressive', {
     g.movesThisTurn++;
     undo.movesThisTurn = g.movesThisTurn - 1;
     undo.progressiveMove = g.progressiveMove;
+    undo.fullmove = g.fullmove;
     var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
     var givesCheck = MCE.inCheck(g, opp);
     if (g.movesThisTurn >= g.progressiveMove || givesCheck) {
@@ -28,6 +29,7 @@ MCE.registerVariant('progressive', {
   restoreState: function(g, undo) {
     if (undo.progressiveMove !== undefined) g.progressiveMove = undo.progressiveMove;
     if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+    if (undo.fullmove !== undefined) g.fullmove = undo.fullmove;
   },
   statusText: function(g, helpers) {
     if (g.movesThisTurn > 0) {

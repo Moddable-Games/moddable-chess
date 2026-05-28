@@ -11,6 +11,7 @@ MCE.registerVariant('marseillais', {
   turnLogic: function(g, undo) {
     g.movesThisTurn++;
     undo.movesThisTurn = g.movesThisTurn - 1;
+    undo.fullmove = g.fullmove;
     var isFirstMove = g.fullmove === 1 && g.turn === MCE.WHITE;
     var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
     var givesCheck = MCE.inCheck(g, opp);
@@ -22,6 +23,7 @@ MCE.registerVariant('marseillais', {
   },
   restoreState: function(g, undo) {
     if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+    if (undo.fullmove !== undefined) g.fullmove = undo.fullmove;
   },
   statusText: function(g, helpers) {
     if (g.movesThisTurn === 1) {

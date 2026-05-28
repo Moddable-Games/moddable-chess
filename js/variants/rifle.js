@@ -9,9 +9,11 @@ MCE.registerVariant('rifle', {
   description: 'When you capture a piece, your piece stays on its original square — it \'shoots\' the target from a distance.',
   rule: 'Board: 8×8 · Win: Checkmate',
   beforeMove: function(g, move, undo) {
-    if (g.board[move.to] && move.flag !== 'ep') {
-      g.board[move.to] = null;
-      if (g.pieceData) g.pieceData[move.to] = null;
+    if (g.board[move.to] || move.flag === 'ep') {
+      if (g.board[move.to]) {
+        g.board[move.to] = null;
+        if (g.pieceData) g.pieceData[move.to] = null;
+      }
       g.board[move.from] = undo.piece;
       if (g.pieceData) g.pieceData[move.from] = undo.pieceData || null;
     } else {

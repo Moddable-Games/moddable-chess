@@ -31,9 +31,4 @@ MCE.registerVariant('einsteinChess', {
       g.board[to] = isWhite ? newType.toUpperCase() : newType;
     }
   },
-  restoreState: function(g, undo) {
-    if (undo.einsteinOriginal) {
-      g.board[undo.to] = undo.einsteinOriginal;
-    }
-  },
 });

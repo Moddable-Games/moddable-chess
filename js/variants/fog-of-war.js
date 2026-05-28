@@ -24,4 +24,18 @@ MCE.registerVariant('fogOfWar', {
     }
     return visible;
   },
+  winCondition: function(g) {
+    var whiteKing = false, blackKing = false;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceType(p) === 'k') {
+        if (MCE.pieceColor(p) === MCE.WHITE) whiteKing = true;
+        else blackKing = true;
+      }
+    }
+    if (!whiteKing) return 'checkmate';
+    if (!blackKing) return 'checkmate';
+    return null;
+  },
 });
