@@ -161,6 +161,8 @@ if (embedMode) {
     MCE.setTheme(themeParam);
   }
 
+  setupEmbedBridge();
+
   if (themeParam === 'light') {
     root.style.setProperty('--play-bg', '#ffffff');
     root.style.setProperty('--play-text', '#14161c');
@@ -939,6 +941,40 @@ function addMoveToList(move, side) {
   movesEl.appendChild(entry);
   movesEl.scrollTop = movesEl.scrollHeight;
   if (side === MCE.BLACK) moveNum++;
+}
+
+function setupEmbedBridge() {
+  window.addEventListener('message', function(e) {
+    if (!e.data || typeof e.data.type !== 'string') return;
+    const root = document.documentElement;
+
+    switch (e.data.type) {
+      case 'chess:setVariant': {
+        const v = e.data.variant;
+        if (v && (DESCRIPTIONS[v] || (MCE.variantRegistry && MCE.variantRegistry[v]))) {
+          startGame(v);
+        }
+        break;
+      }
+      case 'chess:setTheme': {
+        const t = e.data.theme;
+        if (t && MCE.THEMES && MCE.THEMES[t]) {
+          MCE.setTheme(t);
+          render();
+        }
+        break;
+      }
+      case 'chess:setBg': {
+        const bg = e.data.bg;
+        if (bg) root.style.setProperty('--play-bg', bg);
+        break;
+      }
+      case 'chess:newGame': {
+        startGame(currentVariant || 'standard');
+        break;
+      }
+    }
+  });
 }
 
 })();

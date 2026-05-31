@@ -152,6 +152,11 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-05-31
+- Add postMessage embed API: `chess:setVariant`, `chess:setTheme`, `chess:setBg`, `chess:newGame` (#65)
+- Add transparent theme for seamless embedding on any background (#64)
+- Bump to v0.6.9
+
 #### 2026-05-28
 - Add Tier 2 engine extensions: wrap-around geometry, promotionRank, divergent movement, post-move transformation, displacement moves
 - Add 9 new variants (64 total): Cylinder, Toroidal, Berolina, Legan, Hoppel-Poppel, Makruk, Orda, Einstein, Displacement
