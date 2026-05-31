@@ -200,6 +200,7 @@ fetch(basePath + 'assets/pieces.svg')
 
 let game, selected, moveNum, currentVariant;
 let gameMode = paramMode === 'pass' ? 'pass' : 'solo';
+let aiDifficulty = params.get('difficulty') || 'medium';
 let aiColor = MCE.BLACK;
 const playerNames = { w: paramP1, b: paramP2 };
 let aiThinking = false;
@@ -330,6 +331,23 @@ function renderControls() {
   controlsEl.appendChild(flipBtn);
   controlsEl.appendChild(undoBtn);
   controlsEl.appendChild(newBtn);
+
+  if (gameMode === 'solo') {
+    const diffSelect = document.createElement('select');
+    diffSelect.className = 'ctrl-select';
+    const diffLabels = { beginner: 'Beginner', easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert' };
+    Object.entries(diffLabels).forEach(([key, label]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = label;
+      if (key === aiDifficulty) opt.selected = true;
+      diffSelect.appendChild(opt);
+    });
+    diffSelect.addEventListener('change', () => {
+      aiDifficulty = diffSelect.value;
+    });
+    controlsEl.appendChild(diffSelect);
+  }
 
   const themeSelect = document.createElement('select');
   themeSelect.className = 'ctrl-select';
@@ -744,7 +762,7 @@ function doAIMove() {
     return;
   }
 
-  const move = MCE.aiPickMove(game, getAIDepth());
+  const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
   if (!move) { aiThinking = false; render(); return; }
 
   const side = game.turn;
@@ -766,7 +784,7 @@ function doAIMove() {
 }
 
 function doAIMoveMarseillais() {
-  const move1 = MCE.aiPickMove(game, getAIDepth());
+  const move1 = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
   if (!move1) { aiThinking = false; render(); return; }
 
   const side = game.turn;
@@ -777,7 +795,7 @@ function doAIMoveMarseillais() {
   addMoveToList(move1, side);
 
   if (game.turn === side && game.movesThisTurn === 1) {
-    const move2 = MCE.aiPickMove(game, getAIDepth());
+    const move2 = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
     if (move2) {
       trackCaptures(move2, side);
       const undo2 = MCE.makeMove(game, move2);
@@ -801,7 +819,7 @@ function doAIMoveMulti() {
 
   for (let i = 0; i < maxMoves; i++) {
     if (isGameOver() || game.turn !== side) break;
-    const move = MCE.aiPickMove(game, getAIDepth());
+    const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
     if (!move) break;
     trackCaptures(move, side);
     const undo = MCE.makeMove(game, move);
@@ -820,7 +838,7 @@ function doAIMoveMultiPlugin(count) {
   const side = game.turn;
   for (let i = 0; i < count; i++) {
     if (isGameOver() || game.turn !== side) break;
-    const move = MCE.aiPickMove(game, getAIDepth());
+    const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
     if (!move) break;
     trackCaptures(move, side);
     const undo = MCE.makeMove(game, move);
@@ -834,12 +852,6 @@ function doAIMoveMultiPlugin(count) {
   render();
 }
 
-function getAIDepth() {
-  const total = game.rows * game.cols;
-  if (total > 80) return 1;
-  if (total > 64) return 2;
-  return 3;
-}
 
 function trackCaptures(move, movingSide) {
   const capturedPiece = game.board[move.to];

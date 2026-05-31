@@ -5,6 +5,14 @@ const { WHITE, BLACK, pieceColor, pieceType, legalMoves, makeMove, unmakeMove, i
 
 const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000, a: 650, c: 830, s: 150 };
 
+const DIFFICULTIES = {
+  beginner: { depth: 1, topN: 0, blunder: 0.3 },
+  easy: { depth: 2, topN: 5, blunder: 0.15 },
+  medium: { depth: 3, topN: 3, blunder: 0 },
+  hard: { depth: 4, topN: 1, blunder: 0 },
+  expert: { depth: 5, topN: 1, blunder: 0 }
+};
+
 function evaluate(g) {
   let score = 0;
   const total = g.rows * g.cols;
@@ -18,35 +26,43 @@ function evaluate(g) {
 }
 
 function getAIMoves(g) {
-  const v = g.variant;
-  if (v === 'antichess' || v === 'racingKings') {
-    return MCE.variantLegalMoves(g);
-  }
+  const vc = MCE.getVariantConfig(g.variant);
+  if (vc && vc.moveFilter) return MCE.variantLegalMoves(g);
   return legalMoves(g);
 }
 
-function pickMove(g, depth) {
-  depth = depth || 2;
+function pickMove(g, depth, opts) {
+  opts = opts || {};
+  const diff = opts.difficulty ? DIFFICULTIES[opts.difficulty] : null;
+  let searchDepth = diff ? diff.depth : (depth || 3);
+  const topN = diff ? diff.topN : 1;
+  const blunder = diff ? diff.blunder : 0;
+
+  const total = g.rows * g.cols;
+  if (total > 80) searchDepth = Math.min(searchDepth, 2);
+  else if (total > 64) searchDepth = Math.min(searchDepth, 3);
+
   const moves = getAIMoves(g);
   if (moves.length === 0) return null;
   if (moves.length === 1) return moves[0];
 
-  let bestScore = -Infinity;
-  let bestMoves = [];
-
-  for (const move of moves) {
-    const undo = makeMove(g, move);
-    const score = -negamax(g, depth - 1, -Infinity, Infinity);
-    unmakeMove(g, undo);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMoves = [move];
-    } else if (score === bestScore) {
-      bestMoves.push(move);
-    }
+  if (blunder > 0 && Math.random() < blunder) {
+    return moves[Math.floor(Math.random() * moves.length)];
   }
 
-  return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  const scored = [];
+  for (const move of moves) {
+    const undo = makeMove(g, move);
+    const score = -negamax(g, searchDepth - 1, -Infinity, Infinity);
+    unmakeMove(g, undo);
+    scored.push({ move, score });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+
+  const pool = topN > 0 ? scored.slice(0, topN) : scored;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  return pick.move;
 }
 
 function negamax(g, depth, alpha, beta) {
@@ -79,5 +95,9 @@ function pickDuckSquare(g) {
   return empties[Math.floor(Math.random() * empties.length)];
 }
 
-Object.assign(MCE, { aiPickMove: pickMove, aiPickDuckSquare: pickDuckSquare });
+Object.assign(MCE, {
+  aiPickMove: pickMove,
+  aiPickDuckSquare: pickDuckSquare,
+  AI_DIFFICULTIES: DIFFICULTIES
+});
 })();
