@@ -187,6 +187,61 @@ if (embedMode) {
 }
 
 const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
+
+let aiWorker = null;
+let aiWorkerReady = false;
+let aiMoveId = 0;
+
+function initWorker() {
+  try {
+    aiWorker = new Worker(basePath + 'js/ai-worker.js');
+    aiWorker.addEventListener('message', onWorkerMessage);
+    const variantPaths = Array.from(document.querySelectorAll('script[src*="variants/"]'))
+      .map(s => s.src.replace(/\?.*/, ''));
+    aiWorker.postMessage({ type: 'init', variantPaths: variantPaths });
+  } catch (e) {
+    aiWorker = null;
+  }
+}
+
+function onWorkerMessage(e) {
+  const msg = e.data;
+  if (msg.type === 'ready') { aiWorkerReady = true; return; }
+  if (msg.type === 'move') {
+    handleAIResult(msg.move);
+    return;
+  }
+  if (msg.type === 'duck') {
+    if (msg.sq >= 0) placeDuck(msg.sq);
+    aiThinking = false;
+    renderControls();
+    renderCaptured();
+    render();
+    return;
+  }
+}
+
+function serializeGame(g) {
+  const snap = {};
+  const keys = ['rows', 'cols', 'board', 'terrain', 'pieceData', 'turn', 'players',
+    'turnIndex', 'castling', 'enPassant', 'halfmove', 'fullmove', 'variant',
+    'checkCount', 'movesThisTurn', 'duckSq', 'duckPhase', 'status',
+    'noCastling', 'noEnPassant', 'noPromotion', 'noCheck', 'torpedo',
+    'pawnDirection', 'pawnStartRow', 'royalPiece', 'pieceRoles',
+    'maxMovesPerTurn', 'progressiveMove', 'checkThreshold', 'stalemateMeaning',
+    'promotionPieces', 'promotionRank', 'pawnMoveStyle', 'divergentPieces',
+    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode'];
+  for (let i = 0; i < keys.length; i++) {
+    if (g[keys[i]] !== undefined) snap[keys[i]] = g[keys[i]];
+  }
+  snap._eliminated = Array.from(g.eliminated || []);
+  snap.positionHistory = g.positionHistory ? g.positionHistory.slice() : [];
+  snap.history = [];
+  return snap;
+}
+
+initWorker();
+
 fetch(basePath + 'assets/pieces.svg')
   .then(r => r.text())
   .then(svg => {
@@ -762,7 +817,22 @@ function doAIMove() {
     return;
   }
 
+  if (aiWorker && aiWorkerReady) {
+    aiMoveId++;
+    aiWorker.postMessage({
+      type: 'pickMove',
+      game: serializeGame(game),
+      difficulty: aiDifficulty,
+      id: aiMoveId
+    });
+    return;
+  }
+
   const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
+  handleAIResult(move);
+}
+
+function handleAIResult(move) {
   if (!move) { aiThinking = false; render(); return; }
 
   const side = game.turn;
@@ -773,6 +843,14 @@ function doAIMove() {
   addMoveToList(move, side);
 
   if (currentVariant === 'duckChess' && game.duckPhase) {
+    if (aiWorker && aiWorkerReady) {
+      aiWorker.postMessage({
+        type: 'pickDuck',
+        game: serializeGame(game),
+        id: ++aiMoveId
+      });
+      return;
+    }
     const duckSq = MCE.aiPickDuckSquare(game);
     if (duckSq >= 0) placeDuck(duckSq);
   }
