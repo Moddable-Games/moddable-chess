@@ -11,7 +11,7 @@ const THEMES = {
   marble: { light: '#f2f0ec', dark: '#b8b5af', highlight: 'rgba(100, 149, 237, 0.35)', lastMove: 'rgba(100, 149, 237, 0.2)', dot: 'rgba(0, 0, 0, 0.15)', ring: 'rgba(0, 0, 0, 0.2)', border: '#9e9b95', label: 'Marble' },
   neon: { light: '#1a1a2e', dark: '#0f0f1a', highlight: 'rgba(0, 255, 136, 0.3)', lastMove: 'rgba(0, 200, 255, 0.25)', dot: 'rgba(0, 255, 136, 0.4)', ring: 'rgba(255, 0, 128, 0.5)', border: '#00ff88', label: 'Neon' },
   minimal: { light: '#fafafa', dark: '#e8e8e8', highlight: 'rgba(66, 133, 244, 0.3)', lastMove: 'rgba(66, 133, 244, 0.15)', dot: 'rgba(0, 0, 0, 0.12)', ring: 'rgba(0, 0, 0, 0.15)', border: '#ddd', label: 'Minimal' },
-  transparent: { light: 'rgba(255, 255, 255, 0.08)', dark: 'rgba(255, 255, 255, 0.15)', highlight: 'rgba(111, 181, 255, 0.3)', lastMove: 'rgba(111, 181, 255, 0.18)', dot: 'rgba(255, 255, 255, 0.35)', ring: 'rgba(255, 255, 255, 0.4)', border: 'rgba(255, 255, 255, 0.12)', label: 'Transparent' },
+  transparent: { light: 'rgba(255, 255, 255, 0.12)', dark: 'rgba(255, 255, 255, 0.22)', highlight: 'rgba(111, 181, 255, 0.35)', lastMove: 'rgba(111, 181, 255, 0.2)', dot: 'rgba(255, 255, 255, 0.4)', ring: 'rgba(255, 255, 255, 0.45)', border: 'rgba(255, 255, 255, 0.15)', label: 'Transparent' },
 };
 
 let currentTheme = 'classic';
