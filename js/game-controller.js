@@ -741,7 +741,7 @@ function placeDuck(sq) {
 function scheduleAIMove() {
   aiThinking = true;
   render();
-  setTimeout(doAIMove, 300);
+  setTimeout(doAIMove, 150);
 }
 
 function doAIMove() {
