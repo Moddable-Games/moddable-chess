@@ -243,6 +243,20 @@ var move = MCE.aiPickMove(game, null, { timeMs: 2000 });
     <tr><td><code>expert</code></td><td>3s</td><td>Always picks best move, deepest search</td></tr>
   </table>
 
+  <h3>MCE.loadOpeningBook(basePath)</h3>
+  <p>Loads the opening book from <code>basePath + 'data/openings.json'</code>. Called automatically on page load. The AI probes the book before searching — if the current position has a book entry, it plays instantly.</p>
+  <div class="docs-code">
+// Book format (data/openings.json):<br>
+{<br>
+&nbsp;&nbsp;"standard": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"rnbqkbnr/.../RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"...position key...": ["move1", "move2"]<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;"atomic": { ... }<br>
+}
+  </div>
+  <p>Moves are in coordinate notation (<code>e2e4</code>, <code>g1f3</code>, <code>e7e8q</code> for promotion). Multiple moves per position enables variety — one is chosen randomly.</p>
+
   <h3>Variant evaluators</h3>
   <p>Variants can provide custom position evaluation via the <code>evaluate</code> hook:</p>
   <div class="docs-code">
