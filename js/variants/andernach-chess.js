@@ -17,12 +17,8 @@ MCE.registerVariant('andernachChess', {
     }
     if ((undo.captured || move.flag === 'ep') && MCE.pieceType(undo.piece) !== 'k') {
       var p = g.board[move.to];
-      if (p === p.toUpperCase()) {
-        g.board[move.to] = p.toLowerCase();
-      } else {
-        g.board[move.to] = p.toUpperCase();
-      }
-      undo.colorFlipped = true;
+      var flipped = (p === p.toUpperCase()) ? p.toLowerCase() : p.toUpperCase();
+      MCE.mutateBoard(g, undo, [{ sq: move.to, piece: flipped }]);
     }
   },
 });

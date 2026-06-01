@@ -382,5 +382,29 @@
     "name": "Weak!",
     "board": "8×8",
     "desc": "The weakest piece type with a legal move must move first."
+  },
+  {
+    "key": "crazyhouse",
+    "name": "Crazyhouse",
+    "board": "8×8",
+    "desc": "Captured pieces switch sides and can be dropped back onto the board."
+  },
+  {
+    "key": "recruitmentChess",
+    "name": "Recruitment Chess",
+    "board": "8×8",
+    "desc": "Captured pieces defect to the captor and appear on the vacated square."
+  },
+  {
+    "key": "teleportChess",
+    "name": "Teleportation Chess",
+    "board": "8×8",
+    "desc": "Each side has 3 teleports — move any piece to any empty square."
+  },
+  {
+    "key": "poisonChess",
+    "name": "Poison Chess",
+    "board": "8×8",
+    "desc": "Capture squares become toxic for 3 turns — landing on poison destroys pieces."
   }
 ]

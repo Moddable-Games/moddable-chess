@@ -28,24 +28,19 @@ MCE.registerVariant('benedictChess', {
         attacked.add(moves[i].to);
       }
     }
-    undo.flipped = [];
+    var mutations = [];
     attacked.forEach(function(sq) {
       var target = g.board[sq];
       if (target && MCE.pieceColor(target) === opp) {
-        undo.flipped.push({ sq: sq, piece: target });
         if (target === target.toUpperCase()) {
-          g.board[sq] = target.toLowerCase();
+          mutations.push({ sq: sq, piece: target.toLowerCase() });
         } else {
-          g.board[sq] = target.toUpperCase();
+          mutations.push({ sq: sq, piece: target.toUpperCase() });
         }
       }
     });
-  },
-  restoreState: function(g, undo) {
-    if (undo.flipped) {
-      for (var i = 0; i < undo.flipped.length; i++) {
-        g.board[undo.flipped[i].sq] = undo.flipped[i].piece;
-      }
+    if (mutations.length) {
+      MCE.mutateBoard(g, undo, mutations);
     }
   },
   evaluate: function(g, defaultEval) {

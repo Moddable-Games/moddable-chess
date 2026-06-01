@@ -27,8 +27,7 @@ MCE.registerVariant('einsteinChess', {
     }
     if (newIdx !== idx) {
       var newType = hierarchy[newIdx];
-      undo.einsteinOriginal = p;
-      g.board[to] = isWhite ? newType.toUpperCase() : newType;
+      MCE.mutateBoard(g, undo, [{ sq: to, piece: isWhite ? newType.toUpperCase() : newType }]);
     }
   },
 });
