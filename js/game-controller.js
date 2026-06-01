@@ -1064,6 +1064,13 @@ function setupEmbedBridge() {
         startGame(currentVariant || 'standard');
         break;
       }
+      case 'chess:setDifficulty': {
+        const d = e.data.difficulty;
+        if (d && MCE.AI_DIFFICULTIES && MCE.AI_DIFFICULTIES[d]) {
+          aiDifficulty = d;
+        }
+        break;
+      }
     }
   });
 }
