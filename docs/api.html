@@ -60,10 +60,25 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board
   <p>Exports the current game state as a FEN string.</p>
 
   <h3>MCE.positionKey(game)</h3>
-  <p>Returns a string key representing the current position (board + turn + castling + en passant) for repetition detection. Excludes halfmove and fullmove counters.</p>
+  <p>Returns a string key representing the current position for repetition detection and transposition table lookups. Excludes halfmove and fullmove counters.</p>
   <div class="docs-code">
 const key = MCE.positionKey(game);<br>
 // e.g. "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3"
+  </div>
+  <p>When <code>ownershipMode === 'pieceData'</code>, automatically includes pieceData keys and owners in the hash (prevents TT collisions for custom-piece games).</p>
+  <p>Variants can override with a custom <code>positionKey</code> hook:</p>
+  <div class="docs-code">
+MCE.registerVariant('myGame', {<br>
+&nbsp;&nbsp;ownershipMode: 'pieceData',<br>
+&nbsp;&nbsp;positionKey: function(g) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var key = '';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; g.rows * g.cols; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var pd = g.pieceData[i];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key += pd ? pd.key + pd.owner[0] : '.';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return key + ' ' + g.turn;<br>
+&nbsp;&nbsp;}<br>
+});
   </div>
 
   <h2>Move Generation</h2>
@@ -161,6 +176,10 @@ MCE.renderBoard(el, game, {<br>
 &nbsp;&nbsp;animEasing: 'ease-out',// CSS easing (slide mode only)<br>
 &nbsp;&nbsp;animArcHeight: 0.25,&nbsp;&nbsp;&nbsp;// arc peak as fraction of distance (arc mode)<br>
 &nbsp;&nbsp;animCaptureBurst: false,// show particle burst on captures<br>
+&nbsp;&nbsp;// Extension points (v0.7.0):<br>
+&nbsp;&nbsp;tilePainter: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// custom tile rendering function<br>
+&nbsp;&nbsp;pieceProvider: null,&nbsp;&nbsp;&nbsp;// custom piece rendering function<br>
+&nbsp;&nbsp;afterRender: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// post-render callback for overlays<br>
 });
   </div>
 
@@ -171,6 +190,63 @@ MCE.renderBoard(el, game, {<br>
 
   <h3>MCE.captureBurst(svg, cx, cy, tileSize)</h3>
   <p>Triggers a capture burst animation at the given SVG coordinates. Can be called independently for custom capture effects.</p>
+
+  <h3>Renderer Extension Points</h3>
+  <p>Consumer games can extend the board renderer without replacing it. All callbacks are optional — returning <code>null</code>/undefined falls through to default rendering.</p>
+
+  <h4>tilePainter(svg, sqIdx, row, col, tileSize, isLight, game)</h4>
+  <p>Called per-square instead of the default flat colour fill. Return an SVG element to replace the default tile, or <code>null</code> to use default.</p>
+  <div class="docs-code">
+tilePainter: function(svg, sq, r, c, tileSize, isLight, game) {<br>
+&nbsp;&nbsp;var terrain = game.terrain &amp;&amp; game.terrain[sq];<br>
+&nbsp;&nbsp;if (terrain === 'water') {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('width', tileSize);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('height', tileSize);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('fill', '#2196f3');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return rect;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;return null; // use default for non-water tiles<br>
+}
+  </div>
+
+  <h4>pieceProvider(game, sqIdx, tileSize)</h4>
+  <p>Returns a custom SVG element for the piece at a square. Useful for non-standard sprites (faction colours, custom symbols). Return <code>null</code> to use default chess pieces.</p>
+  <div class="docs-code">
+pieceProvider: function(game, sq, tileSize) {<br>
+&nbsp;&nbsp;var pd = game.pieceData &amp;&amp; game.pieceData[sq];<br>
+&nbsp;&nbsp;if (!pd) return null;<br>
+&nbsp;&nbsp;var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');<br>
+&nbsp;&nbsp;var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');<br>
+&nbsp;&nbsp;use.setAttribute('href', '#sprite-' + pd.key);<br>
+&nbsp;&nbsp;use.setAttribute('width', tileSize * 0.9);<br>
+&nbsp;&nbsp;use.setAttribute('height', tileSize * 0.9);<br>
+&nbsp;&nbsp;g.appendChild(use);<br>
+&nbsp;&nbsp;return g;<br>
+}
+  </div>
+  <p>Custom pieces work with the animation system (slide and arc). The renderer sets <code>x</code>, <code>y</code>, and <code>transform</code> attributes on the returned element.</p>
+
+  <h4>afterRender(svg, game, tileSize, opts)</h4>
+  <p>Called after all squares, pieces, and overlays are drawn. Use for custom overlays (selection rings, terrain markers, hex indicators).</p>
+  <div class="docs-code">
+afterRender: function(svg, game, tileSize, opts) {<br>
+&nbsp;&nbsp;// Draw a red border around poisoned squares<br>
+&nbsp;&nbsp;game.effects.forEach(function(e) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (e.type !== 'poison') return;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var [r, c] = MCE.rc(e.sq, game);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('x', c * tileSize + 2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('y', r * tileSize + 2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('width', tileSize - 4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('height', tileSize - 4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('fill', 'none');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('stroke', 'rgba(255,0,0,0.6)');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('stroke-width', '2');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;svg.appendChild(rect);<br>
+&nbsp;&nbsp;});<br>
+}
+  </div>
 
   <h2>Board Themes</h2>
 
@@ -348,6 +424,134 @@ beforeMove: function(g, move, undo) {<br>
   </div>
   <p>Return values: <code>{ cancelCapture: true }</code> or <code>{ redirectCapture: squareIndex }</code>. Existing variants that return nothing are unaffected.</p>
 
+  <h2>Multi-Step Turns</h2>
+
+  <p>Some variants require multiple moves per turn conditionally (e.g., a piece must retreat after capturing). The <code>pendingAction</code> pattern enables this without custom turn logic.</p>
+
+  <h3>Setting a pending action</h3>
+  <p>In your variant's <code>afterMove</code> hook, set <code>g._pendingAction</code> to signal that the current player must make a follow-up move before the turn ends:</p>
+  <div class="docs-code">
+afterMove: function(g, move, undo) {<br>
+&nbsp;&nbsp;var pd = g.pieceData &amp;&amp; g.pieceData[move.to];<br>
+&nbsp;&nbsp;if (pd &amp;&amp; pd.key === 'salamander' &amp;&amp; undo.captured) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g._pendingAction = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: move.to,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filter: function(m, g) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Only allow moves to adjacent empty squares<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return isAdjacent(m.to, move.to, g);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'Salamander must retreat'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;};<br>
+&nbsp;&nbsp;}<br>
+}
+  </div>
+
+  <h3>How it works</h3>
+  <ul>
+    <li>When <code>g._pendingAction</code> is set, the turn does NOT advance</li>
+    <li><code>MCE.legalMoves()</code> restricts moves to: only from <code>pendingAction.from</code>, and only those passing <code>pendingAction.filter</code></li>
+    <li>The game controller shows legal follow-up targets and highlights the pending piece</li>
+    <li>After the follow-up move executes, <code>afterMove</code> does NOT set a new pending action, so the turn advances normally</li>
+    <li>Undo fully restores the pending state (both the initial move and the follow-up can be undone)</li>
+    <li>AI handles pending actions automatically (picks a random legal follow-up)</li>
+  </ul>
+
+  <h3>pendingAction object</h3>
+  <table class="docs-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>from</code></td><td>number</td><td>Square index the follow-up move must originate from</td></tr>
+    <tr><td><code>filter</code></td><td>function(move, game) → boolean</td><td>Optional filter for which targets are valid</td></tr>
+    <tr><td><code>label</code></td><td>string</td><td>Optional UI label describing the required action</td></tr>
+  </table>
+
+  <h2>Game Controller</h2>
+
+  <h3>MCE.createGameController(container, game, opts)</h3>
+  <p>Mounts a full game interaction loop (select → move → animate → AI → repeat) on a DOM container. Consumer games use this instead of reimplementing click handling, AI scheduling, and undo logic.</p>
+  <div class="docs-code">
+var ctrl = MCE.createGameController(boardEl, game, {<br>
+&nbsp;&nbsp;players: { w: 'human', b: 'ai' },<br>
+&nbsp;&nbsp;aiDifficulty: 'medium',<br>
+&nbsp;&nbsp;workerPath: 'lib/mce/js/ai-worker.js',<br>
+&nbsp;&nbsp;variantPaths: ['lib/mce/js/variants/standard.js'],<br>
+&nbsp;&nbsp;renderOpts: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size: 480,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;animate: true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;animStyle: 'arc',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tilePainter: myTilePainter,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pieceProvider: myPieceProvider,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;afterRender: myOverlays,<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;onMove: function(move, undo, captured) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;console.log('Move:', move.from, '->', move.to);<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;onGameEnd: function(result) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;console.log('Game over:', result);<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;onTurnChange: function(turn, turnIndex) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;updateTurnPanel(turn);<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;onPendingAction: function(action) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;showMessage(action.label);<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;onPromotionNeeded: function(candidates, side, callback) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;showPromotionUI(candidates, callback);<br>
+&nbsp;&nbsp;},<br>
+});
+  </div>
+
+  <h3>Controller methods</h3>
+  <table class="docs-table">
+    <tr><th>Method</th><th>Description</th></tr>
+    <tr><td><code>ctrl.undo()</code></td><td>Undo last move (or pair if playing vs AI)</td></tr>
+    <tr><td><code>ctrl.redo()</code></td><td>Redo an undone move</td></tr>
+    <tr><td><code>ctrl.forfeit()</code></td><td>End the game immediately</td></tr>
+    <tr><td><code>ctrl.setDifficulty(level)</code></td><td>Change AI difficulty mid-game</td></tr>
+    <tr><td><code>ctrl.setFlipped(bool)</code></td><td>Flip the board perspective</td></tr>
+    <tr><td><code>ctrl.getGame()</code></td><td>Returns the game object</td></tr>
+    <tr><td><code>ctrl.isThinking()</code></td><td>Returns true if AI is currently searching</td></tr>
+    <tr><td><code>ctrl.render()</code></td><td>Force a re-render</td></tr>
+    <tr><td><code>ctrl.destroy()</code></td><td>Cleanup: terminates AI worker, removes listeners</td></tr>
+  </table>
+
+  <h3>Player configuration</h3>
+  <p>The <code>players</code> object maps colour keys to <code>'human'</code> or <code>'ai'</code>. For multi-player games:</p>
+  <div class="docs-code">
+players: { w: 'human', b: 'ai', r: 'ai', g: 'ai' }
+  </div>
+
+  <h2>Replay</h2>
+
+  <h3>MCE.createReplay(completedGame)</h3>
+  <p>Creates a replay controller for stepping through a completed game's move history.</p>
+  <div class="docs-code">
+var replay = MCE.createReplay(completedGame);<br>
+<br>
+replay.stepForward();&nbsp;&nbsp;// advance one move<br>
+replay.stepBack();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// go back one move<br>
+replay.goToMove(10);&nbsp;&nbsp;&nbsp;// jump to move 10<br>
+replay.isAtEnd();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// true if at last move<br>
+replay.isAtStart();&nbsp;&nbsp;&nbsp;&nbsp;// true if at initial position<br>
+replay.currentMove();&nbsp;&nbsp;// current move index (0-based)<br>
+replay.totalMoves();&nbsp;&nbsp;&nbsp;// total moves in history<br>
+replay.getGame();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// game object at current state<br>
+replay.getMove(n);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// get move object at index n
+  </div>
+  <p>The replay manages its own internal game state. Use <code>replay.getGame()</code> with <code>MCE.renderBoard()</code> to display the board at each step.</p>
+  <div class="docs-code">
+// Render the replay board at each step:<br>
+function renderReplay() {<br>
+&nbsp;&nbsp;MCE.renderBoard(container, replay.getGame(), {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size: 480,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;animate: true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;animStyle: 'slide'<br>
+&nbsp;&nbsp;});<br>
+}<br>
+<br>
+nextBtn.onclick = function() { replay.stepForward(); renderReplay(); };<br>
+prevBtn.onclick = function() { replay.stepBack(); renderReplay(); };
+  </div>
+
   <h2>Plugin Registration</h2>
 
   <h3>MCE.registerVariant(key, config)</h3>
@@ -376,6 +580,7 @@ MCE.registerVariant('myVariant', {<br>
 &nbsp;&nbsp;evaluate: function(g, defaultEval) { return defaultEval(g); },<br>
 &nbsp;&nbsp;visibility: function(g, side) { return new Set(); },<br>
 &nbsp;&nbsp;statusText: function(g, helpers) { return null; },<br>
+&nbsp;&nbsp;positionKey: function(g) { return customHash(g); },<br>
 });
   </div>
   <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>

@@ -380,6 +380,36 @@ aiMoveCount: function(g) {<br>
 }
   </div>
 
+  <h3>positionKey(g)</h3>
+  <p>Custom position hashing for the transposition table. Required when pieces aren't distinguishable from FEN alone (e.g., all pieces are <code>'X'</code> with types in pieceData).</p>
+  <div class="docs-code">
+positionKey: function(g) {<br>
+&nbsp;&nbsp;var key = '';<br>
+&nbsp;&nbsp;for (var i = 0; i &lt; g.rows * g.cols; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var pd = g.pieceData[i];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;key += pd ? pd.key[0] + pd.owner[0] : '.';<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;return key + ' ' + g.turn;<br>
+}
+  </div>
+  <p>If not provided but <code>ownershipMode === 'pieceData'</code>, MCE auto-generates a pieceData-aware hash. Only provide this hook if you need custom hashing beyond the default.</p>
+
+  <h3>Using pendingAction in afterMove</h3>
+  <p>Set <code>g._pendingAction</code> in <code>afterMove</code> to require a follow-up move before the turn ends:</p>
+  <div class="docs-code">
+afterMove: function(g, move, undo) {<br>
+&nbsp;&nbsp;var pd = g.pieceData &amp;&amp; g.pieceData[move.to];<br>
+&nbsp;&nbsp;if (pd &amp;&amp; pd.mustRetreat &amp;&amp; undo.captured) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g._pendingAction = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: move.to,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filter: function(m) { return isAdjacent(m.to, move.to, g); },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'Must retreat after capture'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;};<br>
+&nbsp;&nbsp;}<br>
+}
+  </div>
+  <p>The engine automatically suppresses turn advancement, restricts legal moves to the follow-up, and restores state on undo. See <a href="api.html#multi-step-turns">Multi-Step Turns</a> in the API reference for full details.</p>
+
   <h2>Variant Inheritance</h2>
   <p>A plugin can extend another variant using the <code>extends</code> property. All config from the parent is inherited, and the child can override any property.</p>
   <div class="docs-code">
