@@ -136,6 +136,8 @@ function orderMoves(moves, g, ttBestMove) {
       s = 9000 + (PIECE_VALUES[m.promo] || 0);
     } else if (m.flag === 'castle-k' || m.flag === 'castle-q') {
       s = 500;
+    } else if (m.flag === 'action') {
+      s = 300;
     }
     scored.push({ m, s });
   }
@@ -225,7 +227,9 @@ function pickMove(g, depth, opts) {
   const diff = opts.difficulty ? DIFFICULTIES[opts.difficulty] : null;
   const topN = diff ? diff.topN : 1;
   const blunder = diff ? diff.blunder : 0;
-  const timeMs = diff ? diff.timeMs : (opts.timeMs || 1500);
+  const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
+  const timeMult = (vc && vc.aiTimeMult) || 1;
+  const timeMs = (diff ? diff.timeMs : (opts.timeMs || 1500)) * timeMult;
 
   const moves = getAIMoves(g);
   if (moves.length === 0) return null;

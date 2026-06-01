@@ -230,7 +230,7 @@ function serializeGame(g) {
     'pawnDirection', 'pawnStartRow', 'royalPiece', 'pieceRoles',
     'maxMovesPerTurn', 'progressiveMove', 'checkThreshold', 'stalemateMeaning',
     'promotionPieces', 'promotionRank', 'pawnMoveStyle', 'divergentPieces',
-    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode'];
+    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode', 'effects'];
   for (let i = 0; i < keys.length; i++) {
     if (g[keys[i]] !== undefined) snap[keys[i]] = g[keys[i]];
   }

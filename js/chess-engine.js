@@ -70,6 +70,7 @@ function createGame(config) {
     noEnPassant: config.noEnPassant || false,
     noPromotion: config.noPromotion || false,
     ownershipMode: config.ownershipMode || 'case',
+    effects: [],
     legalityFilter: null,
     winCondition: null,
   };
@@ -108,6 +109,7 @@ function createVariantGame(variant) {
     noCastling: false,
     noEnPassant: false,
     noPromotion: false,
+    effects: [],
     legalityFilter: null,
     winCondition: null,
   };
@@ -300,5 +302,44 @@ function positionKey(g) {
   return parts.slice(0, 4).join(' ');
 }
 
-return { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry };
+function getEffects(g, sq) {
+  if (!g.effects) return [];
+  return g.effects.filter(function(e) { return e.sq === sq; });
+}
+
+function hasEffect(g, sq, type) {
+  if (!g.effects) return false;
+  return g.effects.some(function(e) { return e.sq === sq && e.type === type; });
+}
+
+function addEffect(g, undo, effect) {
+  if (!undo._effectsSnapshot) undo._effectsSnapshot = g.effects.map(function(e) { return Object.assign({}, e); });
+  g.effects.push(effect);
+}
+
+function removeEffect(g, undo, sq, type) {
+  if (!undo._effectsSnapshot) undo._effectsSnapshot = g.effects.map(function(e) { return Object.assign({}, e); });
+  g.effects = g.effects.filter(function(e) { return !(e.sq === sq && e.type === type); });
+}
+
+function tickEffects(g, undo) {
+  if (!g.effects || g.effects.length === 0) return;
+  if (!undo._effectsSnapshot) undo._effectsSnapshot = g.effects.map(function(e) { return Object.assign({}, e); });
+  for (var i = g.effects.length - 1; i >= 0; i--) {
+    if (g.effects[i].duration !== undefined && g.effects[i].duration !== null) {
+      g.effects[i].duration--;
+      if (g.effects[i].duration <= 0) g.effects.splice(i, 1);
+    }
+  }
+}
+
+function mutateBoard(g, undo, mutations) {
+  if (!undo._boardMutations) undo._boardMutations = [];
+  for (var i = 0; i < mutations.length; i++) {
+    undo._boardMutations.push({ sq: mutations[i].sq, prev: g.board[mutations[i].sq] });
+    g.board[mutations[i].sq] = mutations[i].piece;
+  }
+}
+
+return { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry, getEffects, hasEffect, addEffect, removeEffect, tickEffects, mutateBoard };
 })();

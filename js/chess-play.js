@@ -27,67 +27,83 @@ function makeMove(g, move) {
 
   const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   const isCapture = captured || flag === 'ep';
+  const isAction = flag === 'action';
 
+  let interceptResult = null;
   if (vc && vc.beforeMove) {
-    vc.beforeMove(g, move, undo);
+    interceptResult = vc.beforeMove(g, move, undo);
+  } else if (isAction) {
+    // Action moves don't move the piece
   } else {
     g.board[to] = piece;
     g.board[from] = null;
     if (g.pieceData) { g.pieceData[to] = g.pieceData[from]; g.pieceData[from] = null; }
   }
 
-  if (flag === 'ep') {
-    const [fr] = MCE.rc(from, g);
-    const [, tc] = MCE.rc(to, g);
-    const epCapSq = MCE.sq(fr, tc, g);
-    undo.epCaptured = g.board[epCapSq];
-    undo.epCapSq = epCapSq;
-    undo.capturedAt = epCapSq;
-    if (g.pieceData) {
-      undo.pieceDataEp = g.pieceData[epCapSq];
-      g.pieceData[epCapSq] = null;
+  if (interceptResult && interceptResult.cancelCapture) {
+    undo.captureIntercepted = true;
+  }
+  if (interceptResult && interceptResult.redirectCapture !== undefined) {
+    undo.captureRedirected = true;
+    undo.redirectedSq = interceptResult.redirectCapture;
+    undo.redirectedPiece = g.board[interceptResult.redirectCapture];
+    g.board[interceptResult.redirectCapture] = null;
+  }
+
+  if (!isAction) {
+    if (flag === 'ep') {
+      const [fr] = MCE.rc(from, g);
+      const [, tc] = MCE.rc(to, g);
+      const epCapSq = MCE.sq(fr, tc, g);
+      undo.epCaptured = g.board[epCapSq];
+      undo.epCapSq = epCapSq;
+      undo.capturedAt = epCapSq;
+      if (g.pieceData) {
+        undo.pieceDataEp = g.pieceData[epCapSq];
+        g.pieceData[epCapSq] = null;
+      }
+      g.board[epCapSq] = null;
     }
-    g.board[epCapSq] = null;
-  }
 
-  if (flag === 'double') {
-    const [fr, fc] = MCE.rc(from, g);
-    const [tr] = MCE.rc(to, g);
-    g.enPassant = MCE.sq((fr + tr) / 2, fc, g);
-  } else {
-    g.enPassant = -1;
-  }
-
-  if (flag === 'promo') {
-    g.board[to] = g.turn === WHITE ? promo.toUpperCase() : promo;
-  }
-
-  if (flag === 'castle-k') {
-    const [row, kc] = MCE.rc(from, g);
-    const rookFrom = MCE.sq(row, g.cols - 1, g);
-    const rookTo = MCE.sq(row, kc + 1, g);
-    g.board[rookTo] = g.board[rookFrom];
-    g.board[rookFrom] = null;
-    if (g.pieceData) {
-      g.pieceData[rookTo] = g.pieceData[rookFrom];
-      g.pieceData[rookFrom] = null;
+    if (flag === 'double') {
+      const [fr, fc] = MCE.rc(from, g);
+      const [tr] = MCE.rc(to, g);
+      g.enPassant = MCE.sq((fr + tr) / 2, fc, g);
+    } else {
+      g.enPassant = -1;
     }
-  }
-  if (flag === 'castle-q') {
-    const [row, kc] = MCE.rc(from, g);
-    const rookFrom = MCE.sq(row, 0, g);
-    const rookTo = MCE.sq(row, kc - 1, g);
-    g.board[rookTo] = g.board[rookFrom];
-    g.board[rookFrom] = null;
-    if (g.pieceData) {
-      g.pieceData[rookTo] = g.pieceData[rookFrom];
-      g.pieceData[rookFrom] = null;
+
+    if (flag === 'promo') {
+      g.board[to] = g.turn === WHITE ? promo.toUpperCase() : promo;
     }
+
+    if (flag === 'castle-k') {
+      const [row, kc] = MCE.rc(from, g);
+      const rookFrom = MCE.sq(row, g.cols - 1, g);
+      const rookTo = MCE.sq(row, kc + 1, g);
+      g.board[rookTo] = g.board[rookFrom];
+      g.board[rookFrom] = null;
+      if (g.pieceData) {
+        g.pieceData[rookTo] = g.pieceData[rookFrom];
+        g.pieceData[rookFrom] = null;
+      }
+    }
+    if (flag === 'castle-q') {
+      const [row, kc] = MCE.rc(from, g);
+      const rookFrom = MCE.sq(row, 0, g);
+      const rookTo = MCE.sq(row, kc - 1, g);
+      g.board[rookTo] = g.board[rookFrom];
+      g.board[rookFrom] = null;
+      if (g.pieceData) {
+        g.pieceData[rookTo] = g.pieceData[rookFrom];
+        g.pieceData[rookFrom] = null;
+      }
+    }
+
+    updateCastlingRights(g, from, to, piece);
   }
 
-  updateCastlingRights(g, from, to, piece);
-
-  if (pieceType(piece) === 'p' || captured) g.halfmove = 0;
+  if (!isAction && (pieceType(piece) === 'p' || captured)) g.halfmove = 0;
   else g.halfmove++;
 
   if (vc && vc.afterMove) {
@@ -97,6 +113,7 @@ function makeMove(g, move) {
   if (vc && vc.turnLogic) {
     vc.turnLogic(g, undo);
   } else {
+    if (g.effects && g.effects.length > 0) MCE.tickEffects(g, undo);
     if (g.turn === BLACK) g.fullmove++;
     MCE.advanceTurn(g);
   }
@@ -108,6 +125,16 @@ function makeMove(g, move) {
 
 function unmakeMove(g, undo) {
   const { from, to, piece, captured, flag } = undo;
+
+  if (undo._boardMutations) {
+    for (let i = undo._boardMutations.length - 1; i >= 0; i--) {
+      g.board[undo._boardMutations[i].sq] = undo._boardMutations[i].prev;
+    }
+  }
+  if (undo.captureRedirected) {
+    g.board[undo.redirectedSq] = undo.redirectedPiece;
+  }
+
   g.board[from] = piece;
   g.board[to] = captured || null;
 
@@ -158,6 +185,10 @@ function unmakeMove(g, undo) {
   const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   if (vc && vc.restoreState) {
     vc.restoreState(g, undo);
+  }
+
+  if (undo._effectsSnapshot) {
+    g.effects = undo._effectsSnapshot;
   }
 
   g.history.pop();
