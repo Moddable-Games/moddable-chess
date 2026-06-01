@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Build a Variant — Moddable Chess</title>
+<title>Guides — Moddable Chess</title>
 <link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Moddable Chess">
-<meta property="og:title" content="Build a Variant — Moddable Chess">
-<meta property="og:description" content="Step-by-step guide to building a complete chess variant plugin from scratch using Orda Chess.">
+<meta property="og:title" content="Guides — Moddable Chess">
+<meta property="og:description" content="Three step-by-step guides covering every hook in the engine. Custom pieces, action moves, and the effects system.">
 <meta property="og:url" content="https://chess.moddable.games/docs/guide.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Build a Variant — Moddable Chess">
-<meta name="twitter:description" content="Step-by-step guide to building a complete chess variant plugin from scratch using Orda Chess.">
+<meta name="twitter:title" content="Guides — Moddable Chess">
+<meta name="twitter:description" content="Three step-by-step guides covering every hook in the engine. Custom pieces, action moves, and the effects system.">
 <meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.15">
 <meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.15">
 <meta property="og:image:width" content="1200">
@@ -32,7 +32,7 @@
     <a href="./">Docs</a>
     <a href="api.html">API</a>
     <a href="variants.html">Variants</a>
-    <a href="guide.html" class="active">Guide</a>
+    <a href="guide.html" class="active">Guides</a>
     <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
   </div>
 </nav>
@@ -40,276 +40,82 @@
 <div class="docs-layout">
 <nav class="docs-toc" id="docs-toc"></nav>
 <div class="docs-body">
-  <h1>Variant Guides</h1>
-  <p class="docs-lede">Three guides covering every hook and utility in the engine. Each builds a real variant from scratch.</p>
+  <h1>Developer Guides</h1>
+  <p class="docs-lede">Three step-by-step guides that together cover every hook, utility, and pattern in the engine. Each builds a real variant from an empty file to a working plugin.</p>
 
-  <table class="docs-table">
-    <tr><th>Guide</th><th>Concepts covered</th></tr>
-    <tr><td><strong>Orda Chess</strong> (below)</td><td>registerPiece, custom movement, attack functions, divergentPieces, asymmetric FEN</td></tr>
-    <tr><td><a href="guide-crazyhouse.html">Crazyhouse</a></td><td>Action moves, moveFilter, afterMove, mutateBoard, restoreState, evaluate, statusText, init</td></tr>
-    <tr><td><a href="guide-poison.html">Poison Chess</a></td><td>Effects system (addEffect, hasEffect, tickEffects), moveFilter, afterMove, mutateBoard, evaluate</td></tr>
-  </table>
-
-  <h2>Building Orda Chess</h2>
-  <p>This guide builds Orda Chess step by step, using custom pieces, divergent movement, attack functions, asymmetric FEN, and variant registration.</p>
-
-  <section id="prerequisites">
-    <h2>Prerequisites</h2>
-    <p>You need a local copy of the moddable-chess repository and a browser. No build tools required.</p>
-    <div class="docs-code">
-git clone https://github.com/Moddable-Games/moddable-chess.git<br>
-cd moddable-chess
-    </div>
-    <p>Open <code>play/index.html</code> in your browser to verify the engine loads. You should see the variant picker with existing variants.</p>
-  </section>
-
-  <section id="step1">
-    <h2>Step 1: Create the Plugin File</h2>
-    <p>Create <code>js/variants/orda-chess.js</code>. Every plugin starts with <code>'use strict'</code> and ends with a call to <code>MCE.registerVariant()</code>:</p>
-    <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('ordaChess', {<br>
-&nbsp;&nbsp;label: 'Orda Chess',<br>
-&nbsp;&nbsp;group: 'Asymmetric',<br>
-&nbsp;&nbsp;rows: 8,<br>
-&nbsp;&nbsp;cols: 8,<br>
-&nbsp;&nbsp;fen: 'rnbqkbnr/pppppppp/8/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',<br>
-&nbsp;&nbsp;noCastling: false,<br>
-&nbsp;&nbsp;title: 'Orda Chess',<br>
-&nbsp;&nbsp;description: 'Asymmetric variant.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-});
-    </div>
-    <p>Add a script tag in <code>play/index.html</code> before <code>game-controller.js</code>:</p>
-    <div class="docs-code">
-&lt;script src="../js/variants/orda-chess.js?v=0.6.15"&gt;&lt;/script&gt;
-    </div>
-    <p>Reload the page. "Orda Chess" now appears in the picker under the Asymmetric group — but it plays like standard chess. The custom pieces don't exist yet.</p>
-  </section>
-
-  <section id="step2">
-    <h2>Step 2: The Yurt (Divergent Mover)</h2>
-    <p>Orda Chess introduces three custom pieces for Black's army. Each has a <strong>divergent</strong> movement pattern: they move one way but capture a different way. We start with the Yurt.</p>
-    <p>The Yurt moves one square diagonally (like a Ferz) but captures one square orthogonally (like a Wazir). This is the simplest divergent piece — no sliding, just single-step moves.</p>
-    <p>Register the piece <em>before</em> the <code>registerVariant</code> call in the same file:</p>
-    <div class="docs-code">
-MCE.registerPiece('y', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: diagonal (Ferz pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; moveDirs.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[i][0], nc = c + moveDirs[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: orthogonal (Wazir pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capDirs = [[-1,0],[1,0],[0,-1],[0,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capDirs.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capDirs[i][0], nc = c + capDirs[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr + dc === 1);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
-    <p>Key concepts:</p>
+  <section id="why-three">
+    <h2>Why Three Guides?</h2>
+    <p>The engine has three layers of extension points, and no single variant uses them all:</p>
     <ul>
-      <li><code>MCE.rc(sq, g)</code> converts a square index to <code>[row, col]</code></li>
-      <li><code>MCE.sq(row, col, g)</code> converts back to a square index</li>
-      <li><code>MCE.onBoard(r, c, g)</code> checks bounds</li>
-      <li><code>MCE.isEnemy(sq, side, g)</code> checks if a square holds an opponent piece</li>
-      <li>Non-capture moves skip occupied squares; captures require an enemy</li>
-      <li>The <code>attacks</code> function only cares about the <em>capture</em> pattern — it's used for check detection</li>
+      <li><strong>Custom pieces</strong> — new movement patterns, attack functions, piece registration</li>
+      <li><strong>Game hooks</strong> — action moves, turn logic, move filtering, board mutations</li>
+      <li><strong>Effects system</strong> — timed status effects, square-based state, automatic expiry</li>
     </ul>
+    <p>Each guide targets one layer so you can learn exactly what you need without wading through concepts that do not apply to your variant.</p>
   </section>
 
-  <section id="step3">
-    <h2>Step 3: The Lancer (Slider + Jumper)</h2>
-    <p>The Lancer moves by sliding along ranks and files (like a Rook) but captures by jumping like a Knight. This demonstrates combining a sliding movement pattern with a leaping capture pattern.</p>
-    <div class="docs-code">
-MCE.registerPiece('l', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: slide orthogonally (Rook pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,0],[1,0],[0,-1],[0,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var d = 0; d &lt; moveDirs.length; d++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (MCE.onBoard(nr, nc, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr += moveDirs[d][0]; nc += moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: Knight jumps<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,-2],[1,2],[2,-1],[2,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capOffsets.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr * dc === 2 &amp;&amp; dr + dc === 3);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
-    <p>Notice the sliding pattern: use a <code>while</code> loop that advances in one direction until hitting a piece or the board edge. Only empty squares generate moves — the first occupied square stops the slide.</p>
-    <p>The Knight capture check uses the identity <code>dr * dc === 2 &amp;&amp; dr + dc === 3</code> — this matches exactly the eight L-shaped offsets without listing them individually.</p>
-  </section>
-
-  <section id="step4">
-    <h2>Step 4: The Archer (Diagonal Slider + Jumper)</h2>
-    <p>The Archer is the diagonal counterpart of the Lancer: it moves by sliding diagonally (like a Bishop) but captures by jumping like a Knight. The structure is identical — just swap the slide directions.</p>
-    <div class="docs-code">
-MCE.registerPiece('h', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: slide diagonally (Bishop pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var d = 0; d &lt; moveDirs.length; d++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (MCE.onBoard(nr, nc, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr += moveDirs[d][0]; nc += moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: Knight jumps (same as Lancer)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,-2],[1,2],[2,-1],[2,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capOffsets.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr * dc === 2 &amp;&amp; dr + dc === 3);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
-    <p>Both the Lancer and Archer share the same <code>attacks</code> function — they both capture like a Knight. If you were building multiple pieces with the same capture pattern, you could extract this into a shared function, but keeping it inline keeps each piece self-contained.</p>
-  </section>
-
-  <section id="step5">
-    <h2>Step 5: The Asymmetric FEN</h2>
-    <p>Orda Chess is asymmetric: White plays standard chess pieces, Black commands the Horde. The FEN encodes this by using the custom piece characters for Black's back rank:</p>
-    <div class="docs-code">
-lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
-    </div>
-    <p>Breaking this down:</p>
+  <section id="orda">
+    <h2>Guide 1: Orda Chess — Custom Pieces</h2>
+    <p>Build three custom pieces with divergent movement (move one way, capture another). Covers:</p>
     <ul>
-      <li><code>l</code> — Black Lancer (slides like Rook, captures like Knight)</li>
-      <li><code>h</code> — Black Archer (slides like Bishop, captures like Knight)</li>
-      <li><code>a</code> — this is actually the standard Archbishop if registered, but here we use <code>y</code> for Yurt in the actual positions</li>
-      <li><code>y</code> — Black Yurt (steps diagonal, captures orthogonal)</li>
-      <li><code>k</code> — Black Khan (identical to King — it's the royal piece)</li>
+      <li><code>MCE.registerPiece()</code> — define new piece types with movement and attack logic</li>
+      <li><code>genMoves(g, from, side)</code> — generate pseudo-legal moves (slides, jumps, divergent patterns)</li>
+      <li><code>attacks(g, from, target)</code> — check detection for custom pieces</li>
+      <li><code>pieceRoles</code> — map piece characters to handlers</li>
+      <li>Asymmetric FEN — different armies for each side</li>
     </ul>
-    <p>The corrected FEN for Orda is:</p>
-    <div class="docs-code">
-lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
-    </div>
-    <p>Uppercase letters are White (standard army), lowercase are Black (Horde). The engine automatically recognises registered piece characters in the FEN.</p>
-    <p>Notice <code>KQ</code> in the castling field — only White can castle. Black has no rooks on their starting squares, so no castling rights.</p>
+    <p><a href="guide-orda.html">Start the Orda Chess guide</a></p>
   </section>
 
-  <section id="step6">
-    <h2>Step 6: Wire It Together</h2>
-    <p>Now update the <code>registerVariant</code> call with the full description and the <code>pieceRoles</code> mapping that tells the engine which custom pieces exist:</p>
-    <div class="docs-code">
-MCE.registerVariant('ordaChess', {<br>
-&nbsp;&nbsp;label: 'Orda Chess',<br>
-&nbsp;&nbsp;group: 'Asymmetric',<br>
-&nbsp;&nbsp;rows: 8,<br>
-&nbsp;&nbsp;cols: 8,<br>
-&nbsp;&nbsp;fen: 'lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',<br>
-&nbsp;&nbsp;noCastling: false,<br>
-&nbsp;&nbsp;title: 'Orda Chess',<br>
-&nbsp;&nbsp;description: 'Asymmetric: White plays standard chess. Black commands the Horde — Yurt (moves diagonal, captures orthogonal), Lancer and Archer (move like rook/bishop, capture like knight). Khan replaces king.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-&nbsp;&nbsp;pieceRoles: { y: 'y', l: 'l', h: 'h' },<br>
-});
-    </div>
-    <p>The <code>pieceRoles</code> object maps piece characters to their registered handlers. This tells the engine "when you encounter a <code>y</code> on the board, use the <code>registerPiece('y', ...)</code> handler for move generation and attacks."</p>
-  </section>
-
-  <section id="step7">
-    <h2>Step 7: Load and Test</h2>
-    <p>Add the script tag to <code>play/index.html</code> (if you haven't already) and reload. Verify:</p>
+  <section id="crazyhouse">
+    <h2>Guide 2: Crazyhouse — Action Moves and State</h2>
+    <p>Build the most popular variant online. Captured pieces go into your hand and can be dropped back. Covers:</p>
     <ul>
-      <li>The variant appears in the picker under "Asymmetric"</li>
-      <li>Black's back rank shows Lancer, Archer, Yurt, and Khan pieces</li>
-      <li>Clicking a Yurt shows diagonal movement squares and orthogonal capture squares</li>
-      <li>Clicking a Lancer shows sliding orthogonal movement and Knight-jump captures</li>
-      <li>The Khan (king) can be checked by Horde pieces via their capture patterns</li>
-      <li>White plays standard chess — castling works, pawns promote normally</li>
+      <li><code>init</code> — initialize custom game state (hand arrays)</li>
+      <li><code>moveFilter</code> — generate non-standard moves (drops) alongside normal moves</li>
+      <li><code>afterMove</code> — respond to moves (place drops, capture to hand)</li>
+      <li><code>MCE.mutateBoard()</code> — board changes with automatic undo</li>
+      <li><code>restoreState</code> — restore custom state for AI search</li>
+      <li><code>evaluate</code> — teach the AI to value hand pieces</li>
+      <li><code>statusText</code> — display custom information to the player</li>
     </ul>
-    <p>Test the AI by switching to "vs Computer" mode. The engine's make/unmake cycle uses your <code>genMoves</code> and <code>attacks</code> functions automatically — no additional AI integration is needed.</p>
+    <p><a href="guide-crazyhouse.html">Start the Crazyhouse guide</a></p>
   </section>
 
-  <section id="summary">
-    <h2>Summary</h2>
-    <p>A complete variant with custom pieces uses these components:</p>
+  <section id="poison">
+    <h2>Guide 3: Poison Chess — Effects System</h2>
+    <p>Build a variant with timed square effects. Capture squares become toxic, destroying pieces that land on them. Covers:</p>
+    <ul>
+      <li><code>MCE.addEffect()</code> — create timed effects on squares</li>
+      <li><code>MCE.hasEffect()</code> — query effects during move filtering</li>
+      <li><code>MCE.tickEffects()</code> — automatic duration countdown</li>
+      <li><code>MCE.mutateBoard()</code> — destroy pieces with undo support</li>
+      <li><code>moveFilter</code> — restrict movement based on effects</li>
+      <li><code>evaluate</code> — score positions considering effect proximity</li>
+    </ul>
+    <p><a href="guide-poison.html">Start the Poison Chess guide</a></p>
+  </section>
+
+  <section id="which">
+    <h2>Which Guide Do I Need?</h2>
     <table class="docs-table">
-      <thead><tr><th>Component</th><th>Purpose</th></tr></thead>
-      <tbody>
-        <tr><td><code>registerPiece(char, handler)</code></td><td>Define move generation and attack detection for a new piece type</td></tr>
-        <tr><td><code>genMoves(g, from, side)</code></td><td>Return all pseudo-legal moves (both movement and captures)</td></tr>
-        <tr><td><code>attacks(g, from, target)</code></td><td>Return true if the piece at <code>from</code> threatens <code>target</code> (used for check detection)</td></tr>
-        <tr><td><code>registerVariant(key, config)</code></td><td>Register the variant with its FEN, metadata, and piece mappings</td></tr>
-        <tr><td><code>pieceRoles</code></td><td>Map custom piece characters to their registered handlers</td></tr>
-        <tr><td>FEN string</td><td>Encode the starting position using standard + custom piece characters</td></tr>
-      </tbody>
+      <tr><th>If you want to...</th><th>Read</th></tr>
+      <tr><td>Add new piece types with custom movement</td><td><a href="guide-orda.html">Orda Chess</a></td></tr>
+      <tr><td>Add abilities, drops, or non-movement actions</td><td><a href="guide-crazyhouse.html">Crazyhouse</a></td></tr>
+      <tr><td>Add timed effects, auras, or square states</td><td><a href="guide-poison.html">Poison Chess</a></td></tr>
+      <tr><td>Override how captures work</td><td><a href="guide-crazyhouse.html">Crazyhouse</a> + <a href="api.html#capture-interception">API: Capture Interception</a></td></tr>
+      <tr><td>Control turn advancement (multi-move, phases)</td><td><a href="guide-crazyhouse.html">Crazyhouse</a> (turnLogic concept) + <a href="api.html">API Reference</a></td></tr>
+      <tr><td>Add fog of war or visibility restrictions</td><td><a href="api.html">API Reference</a> (visibility hook)</td></tr>
     </table>
-    <p>The complete file is approximately 100 lines. Every piece is self-contained: movement logic, capture logic, and attack detection live together. The variant registration ties them to a specific starting position.</p>
-    <p>See the <a href="variants.html">Plugin Guide</a> for the full config flag and hook reference, or the <a href="api.html">API Reference</a> for all MCE namespace methods.</p>
   </section>
 
+  <section id="reference">
+    <h2>Reference</h2>
+    <ul>
+      <li><a href="api.html">API Reference</a> — every method on the MCE namespace</li>
+      <li><a href="variants.html">Plugin Reference</a> — all config flags and hooks for registerVariant()</li>
+    </ul>
+  </section>
 </div>
 </div>
 
