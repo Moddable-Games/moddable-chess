@@ -18,6 +18,7 @@ importScripts(
       if (msg.variantPaths && msg.variantPaths.length) {
         importScripts.apply(self, msg.variantPaths);
       }
+      MCE.loadOpeningBook(self.location.href.replace(/js\/ai-worker\.js.*/, ''));
       self.postMessage({ type: 'ready' });
       return;
     }

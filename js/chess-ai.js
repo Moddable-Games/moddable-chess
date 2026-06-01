@@ -5,6 +5,47 @@ const { WHITE, BLACK, pieceColor, pieceType, legalMoves, makeMove, unmakeMove, i
 
 const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000, a: 650, c: 830, s: 150 };
 
+let openingBook = null;
+
+function loadOpeningBook(basePath) {
+  if (typeof fetch !== 'undefined') {
+    fetch(basePath + 'data/openings.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) { openingBook = data; })
+      .catch(function() {});
+  }
+}
+
+function probeBook(g) {
+  if (!openingBook) return null;
+  var variant = g.variant || 'standard';
+  var book = openingBook[variant];
+  if (!book) return null;
+  var key = MCE.positionKey(g);
+  var entries = book[key];
+  if (!entries || entries.length === 0) return null;
+  var pick = entries[Math.floor(Math.random() * entries.length)];
+  return parseBookMove(g, pick);
+}
+
+function parseBookMove(g, notation) {
+  var fromCol = notation.charCodeAt(0) - 97;
+  var fromRow = g.rows - parseInt(notation[1]);
+  var toCol = notation.charCodeAt(2) - 97;
+  var toRow = g.rows - parseInt(notation[3]);
+  var from = MCE.sq(fromRow, fromCol, g);
+  var to = MCE.sq(toRow, toCol, g);
+  var promo = notation.length > 4 ? notation[4] : null;
+  var moves = legalMoves(g);
+  for (var i = 0; i < moves.length; i++) {
+    if (moves[i].from === from && moves[i].to === to) {
+      if (promo && moves[i].promo !== promo) continue;
+      return moves[i];
+    }
+  }
+  return null;
+}
+
 const DIFFICULTIES = {
   beginner: { timeMs: 200, topN: 0, blunder: 0.3 },
   easy: { timeMs: 400, topN: 5, blunder: 0.15 },
@@ -239,6 +280,9 @@ function pickMove(g, depth, opts) {
     return moves[Math.floor(Math.random() * moves.length)];
   }
 
+  var bookMove = probeBook(g);
+  if (bookMove) return bookMove;
+
   ttGeneration++;
   const deadline = Date.now() + timeMs;
 
@@ -307,6 +351,7 @@ function pickDuckSquare(g) {
 Object.assign(MCE, {
   aiPickMove: pickMove,
   aiPickDuckSquare: pickDuckSquare,
-  AI_DIFFICULTIES: DIFFICULTIES
+  AI_DIFFICULTIES: DIFFICULTIES,
+  loadOpeningBook: loadOpeningBook
 });
 })();

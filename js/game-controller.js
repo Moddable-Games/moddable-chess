@@ -187,6 +187,7 @@ if (embedMode) {
 }
 
 const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
+MCE.loadOpeningBook(basePath);
 
 let aiWorker = null;
 let aiWorkerReady = false;
