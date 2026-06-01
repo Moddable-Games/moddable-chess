@@ -19,6 +19,7 @@
 <meta property="og:image:height" content="630">
 <link rel="stylesheet" href="../css/shared.css?v=0.7.0">
 <link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
 </head>
 <body>
 
@@ -47,10 +48,8 @@
 
   <h3>MCE.createGame(variant)</h3>
   <p>Creates a new game object with the board set to the starting position for the given variant.</p>
-  <div class="docs-code">
-const game = MCE.createGame('standard');<br>
-const capablanca = MCE.createGame('capablanca'); // 10×8 board
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const game = MCE.createGame('standard');
+const capablanca = MCE.createGame('capablanca'); // 10×8 board</code></pre>
   <p>Returns a game object with properties: <code>board</code>, <code>rows</code>, <code>cols</code>, <code>turn</code>, <code>castling</code>, <code>enPassant</code>, <code>halfmove</code>, <code>fullmove</code>, <code>history</code>, <code>variant</code>.</p>
 
   <h3>MCE.loadFEN(game, fen)</h3>
@@ -61,33 +60,27 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board
 
   <h3>MCE.positionKey(game)</h3>
   <p>Returns a string key representing the current position for repetition detection and transposition table lookups. Excludes halfmove and fullmove counters.</p>
-  <div class="docs-code">
-const key = MCE.positionKey(game);<br>
-// e.g. "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3"
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const key = MCE.positionKey(game);
+// e.g. "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3"</code></pre>
   <p>When <code>ownershipMode === 'pieceData'</code>, automatically includes pieceData keys and owners in the hash (prevents TT collisions for custom-piece games).</p>
   <p>Variants can override with a custom <code>positionKey</code> hook:</p>
-  <div class="docs-code">
-MCE.registerVariant('myGame', {<br>
-&nbsp;&nbsp;ownershipMode: 'pieceData',<br>
-&nbsp;&nbsp;positionKey: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var key = '';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; g.rows * g.cols; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var pd = g.pieceData[i];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key += pd ? pd.key + pd.owner[0] : '.';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return key + ' ' + g.turn;<br>
-&nbsp;&nbsp;}<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('myGame', {
+  ownershipMode: 'pieceData',
+  positionKey: function(g) {
+    var key = '';
+    for (var i = 0; i &lt; g.rows * g.cols; i++) {
+      var pd = g.pieceData[i];
+      key += pd ? pd.key + pd.owner[0] : '.';
+    }
+    return key + ' ' + g.turn;
+  }
+});</code></pre>
 
   <h2>Move Generation</h2>
 
   <h3>MCE.legalMoves(game)</h3>
   <p>Returns an array of all legal moves for the current side. Each move is an object:</p>
-  <div class="docs-code">
-{ from: 52, to: 36, flag: 'double', promo: null }
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">{ from: 52, to: 36, flag: 'double', promo: null }</code></pre>
   <p>Flags: <code>null</code> (quiet), <code>'capture'</code>, <code>'double'</code> (pawn double push), <code>'ep'</code> (en passant), <code>'promo'</code>, <code>'castle-k'</code>, <code>'castle-q'</code>.</p>
 
   <h3>MCE.pseudoLegalMoves(game)</h3>
@@ -100,10 +93,8 @@ MCE.registerVariant('myGame', {<br>
 
   <h3>MCE.makeMove(game, move)</h3>
   <p>Executes a move on the game. Mutates the game state. Returns an undo object for <code>unmakeMove</code>.</p>
-  <div class="docs-code">
-const undo = MCE.makeMove(game, move);<br>
-// game.turn has now flipped
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const undo = MCE.makeMove(game, move);
+// game.turn has now flipped</code></pre>
 
   <h3>MCE.unmakeMove(game, undo)</h3>
   <p>Reverses a move. Restores the game to its previous state.</p>
@@ -144,11 +135,9 @@ const undo = MCE.makeMove(game, move);<br>
 
   <h3>MCE.wrapCoords(row, col, game)</h3>
   <p>Normalises coordinates according to the game's wrap settings. If <code>game.wrapFiles</code> is true, columns wrap modulo <code>game.cols</code>. If <code>game.wrapRanks</code> is true, rows wrap modulo <code>game.rows</code>. Returns <code>[row, col]</code>.</p>
-  <div class="docs-code">
-var [r, c] = MCE.wrapCoords(row, col, game);<br>
-// For cylinder chess (wrapFiles): col -1 becomes col 7<br>
-// For toroidal chess (both): row -1 wraps to row 7 too
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">var [r, c] = MCE.wrapCoords(row, col, game);
+// For cylinder chess (wrapFiles): col -1 becomes col 7
+// For toroidal chess (both): row -1 wraps to row 7 too</code></pre>
 
   <h3>MCE.sqToAlgebraic(index, game)</h3>
   <p>Converts an index to algebraic notation (e.g., <code>'e4'</code>).</p>
@@ -160,28 +149,26 @@ var [r, c] = MCE.wrapCoords(row, col, game);<br>
 
   <h3>MCE.renderBoard(container, game, opts)</h3>
   <p>Renders an SVG chess board into a DOM element.</p>
-  <div class="docs-code">
-MCE.renderBoard(el, game, {<br>
-&nbsp;&nbsp;size: 480,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// width in px (height auto from rows/cols)<br>
-&nbsp;&nbsp;flipped: false,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// flip board for black's perspective<br>
-&nbsp;&nbsp;selected: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// highlighted square index<br>
-&nbsp;&nbsp;legalMoves: [],&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// array of moves to show indicators for<br>
-&nbsp;&nbsp;onSquareClick: fn,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// callback(squareIndex)<br>
-&nbsp;&nbsp;fogMask: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Set of visible square indices (Fog of War)<br>
-&nbsp;&nbsp;duckSq: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// duck position index (Duck Chess)<br>
-&nbsp;&nbsp;lastMove: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// { from, to } — highlights last move squares<br>
-&nbsp;&nbsp;animate: false,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// enable piece movement animation<br>
-&nbsp;&nbsp;animStyle: 'slide',&nbsp;&nbsp;&nbsp;&nbsp;// 'slide' (CSS transition) or 'arc' (parabolic jump)<br>
-&nbsp;&nbsp;animDuration: 200,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// animation duration in ms<br>
-&nbsp;&nbsp;animEasing: 'ease-out',// CSS easing (slide mode only)<br>
-&nbsp;&nbsp;animArcHeight: 0.25,&nbsp;&nbsp;&nbsp;// arc peak as fraction of distance (arc mode)<br>
-&nbsp;&nbsp;animCaptureBurst: false,// show particle burst on captures<br>
-&nbsp;&nbsp;// Extension points (v0.7.0):<br>
-&nbsp;&nbsp;tilePainter: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// custom tile rendering function<br>
-&nbsp;&nbsp;pieceProvider: null,&nbsp;&nbsp;&nbsp;// custom piece rendering function<br>
-&nbsp;&nbsp;afterRender: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// post-render callback for overlays<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.renderBoard(el, game, {
+  size: 480,             // width in px (height auto from rows/cols)
+  flipped: false,        // flip board for black's perspective
+  selected: null,        // highlighted square index
+  legalMoves: [],        // array of moves to show indicators for
+  onSquareClick: fn,     // callback(squareIndex)
+  fogMask: null,         // Set of visible square indices (Fog of War)
+  duckSq: null,          // duck position index (Duck Chess)
+  lastMove: null,        // { from, to } — highlights last move squares
+  animate: false,        // enable piece movement animation
+  animStyle: 'slide',    // 'slide' (CSS transition) or 'arc' (parabolic jump)
+  animDuration: 200,     // animation duration in ms
+  animEasing: 'ease-out',// CSS easing (slide mode only)
+  animArcHeight: 0.25,   // arc peak as fraction of distance (arc mode)
+  animCaptureBurst: false,// show particle burst on captures
+  // Extension points (v0.7.0):
+  tilePainter: null,     // custom tile rendering function
+  pieceProvider: null,   // custom piece rendering function
+  afterRender: null,     // post-render callback for overlays
+});</code></pre>
 
   <h3>Animation styles</h3>
   <p><code>animStyle: 'slide'</code> — Piece slides smoothly from origin to destination using a CSS transform transition. Clean and minimal.</p>
@@ -196,77 +183,67 @@ MCE.renderBoard(el, game, {<br>
 
   <h4>tilePainter(svg, sqIdx, row, col, tileSize, isLight, game)</h4>
   <p>Called per-square instead of the default flat colour fill. Return an SVG element to replace the default tile, or <code>null</code> to use default.</p>
-  <div class="docs-code">
-tilePainter: function(svg, sq, r, c, tileSize, isLight, game) {<br>
-&nbsp;&nbsp;var terrain = game.terrain &amp;&amp; game.terrain[sq];<br>
-&nbsp;&nbsp;if (terrain === 'water') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('width', tileSize);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('height', tileSize);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('fill', '#2196f3');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return rect;<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return null; // use default for non-water tiles<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">tilePainter: function(svg, sq, r, c, tileSize, isLight, game) {
+  var terrain = game.terrain && game.terrain[sq];
+  if (terrain === 'water') {
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', tileSize);
+    rect.setAttribute('height', tileSize);
+    rect.setAttribute('fill', '#2196f3');
+    return rect;
+  }
+  return null; // use default for non-water tiles
+}</code></pre>
 
   <h4>pieceProvider(game, sqIdx, tileSize)</h4>
   <p>Returns a custom SVG element for the piece at a square. Useful for non-standard sprites (faction colours, custom symbols). Return <code>null</code> to use default chess pieces.</p>
-  <div class="docs-code">
-pieceProvider: function(game, sq, tileSize) {<br>
-&nbsp;&nbsp;var pd = game.pieceData &amp;&amp; game.pieceData[sq];<br>
-&nbsp;&nbsp;if (!pd) return null;<br>
-&nbsp;&nbsp;var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');<br>
-&nbsp;&nbsp;var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');<br>
-&nbsp;&nbsp;use.setAttribute('href', '#sprite-' + pd.key);<br>
-&nbsp;&nbsp;use.setAttribute('width', tileSize * 0.9);<br>
-&nbsp;&nbsp;use.setAttribute('height', tileSize * 0.9);<br>
-&nbsp;&nbsp;g.appendChild(use);<br>
-&nbsp;&nbsp;return g;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">pieceProvider: function(game, sq, tileSize) {
+  var pd = game.pieceData && game.pieceData[sq];
+  if (!pd) return null;
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', '#sprite-' + pd.key);
+  use.setAttribute('width', tileSize * 0.9);
+  use.setAttribute('height', tileSize * 0.9);
+  g.appendChild(use);
+  return g;
+}</code></pre>
   <p>Custom pieces work with the animation system (slide and arc). The renderer sets <code>x</code>, <code>y</code>, and <code>transform</code> attributes on the returned element.</p>
 
   <h4>afterRender(svg, game, tileSize, opts)</h4>
   <p>Called after all squares, pieces, and overlays are drawn. Use for custom overlays (selection rings, terrain markers, hex indicators).</p>
-  <div class="docs-code">
-afterRender: function(svg, game, tileSize, opts) {<br>
-&nbsp;&nbsp;// Draw a red border around poisoned squares<br>
-&nbsp;&nbsp;game.effects.forEach(function(e) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (e.type !== 'poison') return;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var [r, c] = MCE.rc(e.sq, game);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('x', c * tileSize + 2);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('y', r * tileSize + 2);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('width', tileSize - 4);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('height', tileSize - 4);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('fill', 'none');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('stroke', 'rgba(255,0,0,0.6)');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rect.setAttribute('stroke-width', '2');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;svg.appendChild(rect);<br>
-&nbsp;&nbsp;});<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">afterRender: function(svg, game, tileSize, opts) {
+  // Draw a red border around poisoned squares
+  game.effects.forEach(function(e) {
+    if (e.type !== 'poison') return;
+    var [r, c] = MCE.rc(e.sq, game);
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', c * tileSize + 2);
+    rect.setAttribute('y', r * tileSize + 2);
+    rect.setAttribute('width', tileSize - 4);
+    rect.setAttribute('height', tileSize - 4);
+    rect.setAttribute('fill', 'none');
+    rect.setAttribute('stroke', 'rgba(255,0,0,0.6)');
+    rect.setAttribute('stroke-width', '2');
+    svg.appendChild(rect);
+  });
+}</code></pre>
 
   <h2>Board Themes</h2>
 
   <h3>MCE.setTheme(name)</h3>
   <p>Sets the active board colour theme. Affects all subsequent <code>renderBoard</code> calls.</p>
-  <div class="docs-code">
-MCE.setTheme('cosmic');&nbsp;&nbsp;// deep navy squares<br>
-MCE.setTheme('wood');&nbsp;&nbsp;&nbsp;&nbsp;// warm brown tones<br>
-MCE.setTheme('marble');&nbsp;&nbsp;// grey/white stone<br>
-MCE.setTheme('neon');&nbsp;&nbsp;&nbsp;&nbsp;// dark bg, bright accents<br>
-MCE.setTheme('minimal');&nbsp;// near-white, subtle contrast<br>
-MCE.setTheme('classic');&nbsp;// default tan/brown
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.setTheme('cosmic');  // deep navy squares
+MCE.setTheme('wood');    // warm brown tones
+MCE.setTheme('marble');  // grey/white stone
+MCE.setTheme('neon');    // dark bg, bright accents
+MCE.setTheme('minimal'); // near-white, subtle contrast
+MCE.setTheme('classic'); // default tan/brown</code></pre>
 
   <h3>MCE.getTheme()</h3>
   <p>Returns the current theme object with colour values:</p>
-  <div class="docs-code">
-const t = MCE.getTheme();<br>
-// { light, dark, highlight, lastMove, dot, ring, border, label }
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const t = MCE.getTheme();
+// { light, dark, highlight, lastMove, dot, ring, border, label }</code></pre>
 
   <h3>MCE.THEMES</h3>
   <p>Object containing all available theme definitions. Keys: <code>classic</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>, <code>transparent</code>.</p>
@@ -283,30 +260,26 @@ const t = MCE.getTheme();<br>
 
   <h3>Custom themes</h3>
   <p>Add your own theme by extending <code>MCE.THEMES</code> before calling <code>setTheme</code>:</p>
-  <div class="docs-code">
-MCE.THEMES.forest = {<br>
-&nbsp;&nbsp;light: '#4a7c59', dark: '#2d5a3a',<br>
-&nbsp;&nbsp;highlight: 'rgba(255,215,0,0.35)',<br>
-&nbsp;&nbsp;lastMove: 'rgba(144,238,144,0.25)',<br>
-&nbsp;&nbsp;dot: 'rgba(255,255,255,0.2)',<br>
-&nbsp;&nbsp;ring: 'rgba(255,255,255,0.3)',<br>
-&nbsp;&nbsp;border: '#1a3d2a',<br>
-&nbsp;&nbsp;label: 'Forest'<br>
-};<br>
-MCE.setTheme('forest');
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.THEMES.forest = {
+  light: '#4a7c59', dark: '#2d5a3a',
+  highlight: 'rgba(255,215,0,0.35)',
+  lastMove: 'rgba(144,238,144,0.25)',
+  dot: 'rgba(255,255,255,0.2)',
+  ring: 'rgba(255,255,255,0.3)',
+  border: '#1a3d2a',
+  label: 'Forest'
+};
+MCE.setTheme('forest');</code></pre>
 
   <h2>AI System</h2>
 
   <h3>MCE.aiPickMove(game, depth, opts)</h3>
   <p>Returns the best move found by the AI. Uses iterative deepening with alpha-beta pruning, quiescence search, transposition table, and move ordering.</p>
-  <div class="docs-code">
-// Use difficulty preset (recommended):<br>
-var move = MCE.aiPickMove(game, null, { difficulty: 'hard' });<br>
-<br>
-// Or specify time budget directly:<br>
-var move = MCE.aiPickMove(game, null, { timeMs: 2000 });
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Use difficulty preset (recommended):
+var move = MCE.aiPickMove(game, null, { difficulty: 'hard' });
+
+// Or specify time budget directly:
+var move = MCE.aiPickMove(game, null, { timeMs: 2000 });</code></pre>
 
   <h3>MCE.AI_DIFFICULTIES</h3>
   <p>Available difficulty presets:</p>
@@ -321,29 +294,25 @@ var move = MCE.aiPickMove(game, null, { timeMs: 2000 });
 
   <h3>MCE.loadOpeningBook(basePath)</h3>
   <p>Loads the opening book from <code>basePath + 'data/openings.json'</code>. Called automatically on page load. The AI probes the book before searching — if the current position has a book entry, it plays instantly.</p>
-  <div class="docs-code">
-// Book format (data/openings.json):<br>
-{<br>
-&nbsp;&nbsp;"standard": {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"rnbqkbnr/.../RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"...position key...": ["move1", "move2"]<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;"atomic": { ... }<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Book format (data/openings.json):
+{
+  "standard": {
+    "rnbqkbnr/.../RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],
+    "...position key...": ["move1", "move2"]
+  },
+  "atomic": { ... }
+}</code></pre>
   <p>Moves are in coordinate notation (<code>e2e4</code>, <code>g1f3</code>, <code>e7e8q</code> for promotion). Multiple moves per position enables variety — one is chosen randomly.</p>
 
   <h3>Variant evaluators</h3>
   <p>Variants can provide custom position evaluation via the <code>evaluate</code> hook:</p>
-  <div class="docs-code">
-MCE.registerVariant('myVariant', {<br>
-&nbsp;&nbsp;evaluate: function(g, defaultEval) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var material = defaultEval(g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Add custom scoring logic<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return material + customBonus;<br>
-&nbsp;&nbsp;}<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('myVariant', {
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    // Add custom scoring logic
+    return material + customBonus;
+  }
+});</code></pre>
   <p>The AI automatically uses the variant's evaluator if defined. The <code>defaultEval</code> parameter provides material + piece-square table scoring as a baseline.</p>
 
   <h2>Effects System</h2>
@@ -352,14 +321,12 @@ MCE.registerVariant('myVariant', {<br>
 
   <h3>MCE.addEffect(game, undo, effect)</h3>
   <p>Adds an effect to the game. Call from <code>afterMove</code> or <code>beforeMove</code> hooks.</p>
-  <div class="docs-code">
-MCE.addEffect(g, undo, {<br>
-&nbsp;&nbsp;sq: targetSquare,<br>
-&nbsp;&nbsp;type: 'poison',<br>
-&nbsp;&nbsp;duration: 3,&nbsp;&nbsp;&nbsp;&nbsp;// turns until expiry (null = permanent)<br>
-&nbsp;&nbsp;owner: g.turn<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.addEffect(g, undo, {
+  sq: targetSquare,
+  type: 'poison',
+  duration: 3,    // turns until expiry (null = permanent)
+  owner: g.turn
+});</code></pre>
 
   <h3>MCE.hasEffect(game, sq, type)</h3>
   <p>Returns <code>true</code> if the square has an active effect of the given type.</p>
@@ -377,51 +344,45 @@ MCE.addEffect(g, undo, {<br>
 
   <h3>MCE.mutateBoard(game, undo, mutations)</h3>
   <p>Batch-modifies board squares with automatic undo tracking. Use in <code>afterMove</code> or <code>beforeMove</code> hooks instead of manually tracking changes.</p>
-  <div class="docs-code">
-// In afterMove: transform a piece and clear a square<br>
-MCE.mutateBoard(g, undo, [<br>
-&nbsp;&nbsp;{ sq: 27, piece: 'Q' },&nbsp;&nbsp;// place white queen on d5<br>
-&nbsp;&nbsp;{ sq: 35, piece: null }&nbsp;&nbsp;// clear e4<br>
-]);<br>
-// Automatically restored on unmakeMove — no restoreState needed
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// In afterMove: transform a piece and clear a square
+MCE.mutateBoard(g, undo, [
+  { sq: 27, piece: 'Q' },  // place white queen on d5
+  { sq: 35, piece: null }  // clear e4
+]);
+// Automatically restored on unmakeMove — no restoreState needed</code></pre>
 
   <h2>Action Moves</h2>
 
   <p>Moves that consume a turn without physical board movement. Generate them in <code>moveFilter</code> and handle them in <code>afterMove</code>.</p>
-  <div class="docs-code">
-// In moveFilter — generate action moves:<br>
-moves.push({<br>
-&nbsp;&nbsp;from: pieceSq,<br>
-&nbsp;&nbsp;to: targetSq,<br>
-&nbsp;&nbsp;flag: 'action',<br>
-&nbsp;&nbsp;action: 'hex'<br>
-});<br>
-<br>
-// In afterMove — apply the action's effect:<br>
-if (move.flag === 'action' && move.action === 'hex') {<br>
-&nbsp;&nbsp;MCE.addEffect(g, undo, { sq: move.to, type: 'hex', duration: 2 });<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// In moveFilter — generate action moves:
+moves.push({
+  from: pieceSq,
+  to: targetSq,
+  flag: 'action',
+  action: 'hex'
+});
+
+// In afterMove — apply the action's effect:
+if (move.flag === 'action' && move.action === 'hex') {
+  MCE.addEffect(g, undo, { sq: move.to, type: 'hex', duration: 2 });
+}</code></pre>
   <p>Action moves skip all standard board mutation (no piece movement, en passant, castling, or promotion). The AI evaluates them alongside normal moves in the search tree.</p>
 
   <h2>Capture Interception</h2>
 
   <p>The <code>beforeMove</code> hook can return a signal to modify capture behaviour:</p>
-  <div class="docs-code">
-beforeMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;if (MCE.hasEffect(g, move.to, 'shield')) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Move attacker but don't remove target<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = g.board[move.from];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.removeEffect(g, undo, move.to, 'shield');<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return { cancelCapture: true };<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;// Normal move<br>
-&nbsp;&nbsp;g.board[move.to] = g.board[move.from];<br>
-&nbsp;&nbsp;g.board[move.from] = null;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">beforeMove: function(g, move, undo) {
+  if (MCE.hasEffect(g, move.to, 'shield')) {
+    // Move attacker but don't remove target
+    g.board[move.to] = g.board[move.from];
+    g.board[move.from] = null;
+    MCE.removeEffect(g, undo, move.to, 'shield');
+    return { cancelCapture: true };
+  }
+  // Normal move
+  g.board[move.to] = g.board[move.from];
+  g.board[move.from] = null;
+}</code></pre>
   <p>Return values: <code>{ cancelCapture: true }</code> or <code>{ redirectCapture: squareIndex }</code>. Existing variants that return nothing are unaffected.</p>
 
   <h2>Multi-Step Turns</h2>
@@ -430,21 +391,19 @@ beforeMove: function(g, move, undo) {<br>
 
   <h3>Setting a pending action</h3>
   <p>In your variant's <code>afterMove</code> hook, set <code>g._pendingAction</code> to signal that the current player must make a follow-up move before the turn ends:</p>
-  <div class="docs-code">
-afterMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;var pd = g.pieceData &amp;&amp; g.pieceData[move.to];<br>
-&nbsp;&nbsp;if (pd &amp;&amp; pd.key === 'salamander' &amp;&amp; undo.captured) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g._pendingAction = {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: move.to,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filter: function(m, g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Only allow moves to adjacent empty squares<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return isAdjacent(m.to, move.to, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'Salamander must retreat'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;};<br>
-&nbsp;&nbsp;}<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">afterMove: function(g, move, undo) {
+  var pd = g.pieceData && g.pieceData[move.to];
+  if (pd && pd.key === 'salamander' && undo.captured) {
+    g._pendingAction = {
+      from: move.to,
+      filter: function(m, g) {
+        // Only allow moves to adjacent empty squares
+        return isAdjacent(m.to, move.to, g);
+      },
+      label: 'Salamander must retreat'
+    };
+  }
+}</code></pre>
 
   <h3>How it works</h3>
   <ul>
@@ -468,37 +427,35 @@ afterMove: function(g, move, undo) {<br>
 
   <h3>MCE.createGameController(container, game, opts)</h3>
   <p>Mounts a full game interaction loop (select → move → animate → AI → repeat) on a DOM container. Consumer games use this instead of reimplementing click handling, AI scheduling, and undo logic.</p>
-  <div class="docs-code">
-var ctrl = MCE.createGameController(boardEl, game, {<br>
-&nbsp;&nbsp;players: { w: 'human', b: 'ai' },<br>
-&nbsp;&nbsp;aiDifficulty: 'medium',<br>
-&nbsp;&nbsp;workerPath: 'lib/mce/js/ai-worker.js',<br>
-&nbsp;&nbsp;variantPaths: ['lib/mce/js/variants/standard.js'],<br>
-&nbsp;&nbsp;renderOpts: {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size: 480,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;animate: true,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;animStyle: 'arc',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;tilePainter: myTilePainter,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;pieceProvider: myPieceProvider,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;afterRender: myOverlays,<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;onMove: function(move, undo, captured) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;console.log('Move:', move.from, '->', move.to);<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;onGameEnd: function(result) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;console.log('Game over:', result);<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;onTurnChange: function(turn, turnIndex) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;updateTurnPanel(turn);<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;onPendingAction: function(action) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;showMessage(action.label);<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;onPromotionNeeded: function(candidates, side, callback) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;showPromotionUI(candidates, callback);<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">var ctrl = MCE.createGameController(boardEl, game, {
+  players: { w: 'human', b: 'ai' },
+  aiDifficulty: 'medium',
+  workerPath: 'lib/mce/js/ai-worker.js',
+  variantPaths: ['lib/mce/js/variants/standard.js'],
+  renderOpts: {
+    size: 480,
+    animate: true,
+    animStyle: 'arc',
+    tilePainter: myTilePainter,
+    pieceProvider: myPieceProvider,
+    afterRender: myOverlays,
+  },
+  onMove: function(move, undo, captured) {
+    console.log('Move:', move.from, '->', move.to);
+  },
+  onGameEnd: function(result) {
+    console.log('Game over:', result);
+  },
+  onTurnChange: function(turn, turnIndex) {
+    updateTurnPanel(turn);
+  },
+  onPendingAction: function(action) {
+    showMessage(action.label);
+  },
+  onPromotionNeeded: function(candidates, side, callback) {
+    showPromotionUI(candidates, callback);
+  },
+});</code></pre>
 
   <h3>Controller methods</h3>
   <table class="docs-table">
@@ -516,112 +473,96 @@ var ctrl = MCE.createGameController(boardEl, game, {<br>
 
   <h3>Player configuration</h3>
   <p>The <code>players</code> object maps colour keys to <code>'human'</code> or <code>'ai'</code>. For multi-player games:</p>
-  <div class="docs-code">
-players: { w: 'human', b: 'ai', r: 'ai', g: 'ai' }
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">players: { w: 'human', b: 'ai', r: 'ai', g: 'ai' }</code></pre>
 
   <h2>Replay</h2>
 
   <h3>MCE.createReplay(completedGame)</h3>
   <p>Creates a replay controller for stepping through a completed game's move history.</p>
-  <div class="docs-code">
-var replay = MCE.createReplay(completedGame);<br>
-<br>
-replay.stepForward();&nbsp;&nbsp;// advance one move<br>
-replay.stepBack();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// go back one move<br>
-replay.goToMove(10);&nbsp;&nbsp;&nbsp;// jump to move 10<br>
-replay.isAtEnd();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// true if at last move<br>
-replay.isAtStart();&nbsp;&nbsp;&nbsp;&nbsp;// true if at initial position<br>
-replay.currentMove();&nbsp;&nbsp;// current move index (0-based)<br>
-replay.totalMoves();&nbsp;&nbsp;&nbsp;// total moves in history<br>
-replay.getGame();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// game object at current state<br>
-replay.getMove(n);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// get move object at index n
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">var replay = MCE.createReplay(completedGame);
+
+replay.stepForward();  // advance one move
+replay.stepBack();     // go back one move
+replay.goToMove(10);   // jump to move 10
+replay.isAtEnd();      // true if at last move
+replay.isAtStart();    // true if at initial position
+replay.currentMove();  // current move index (0-based)
+replay.totalMoves();   // total moves in history
+replay.getGame();      // game object at current state
+replay.getMove(n);     // get move object at index n</code></pre>
   <p>The replay manages its own internal game state. Use <code>replay.getGame()</code> with <code>MCE.renderBoard()</code> to display the board at each step.</p>
-  <div class="docs-code">
-// Render the replay board at each step:<br>
-function renderReplay() {<br>
-&nbsp;&nbsp;MCE.renderBoard(container, replay.getGame(), {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size: 480,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;animate: true,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;animStyle: 'slide'<br>
-&nbsp;&nbsp;});<br>
-}<br>
-<br>
-nextBtn.onclick = function() { replay.stepForward(); renderReplay(); };<br>
-prevBtn.onclick = function() { replay.stepBack(); renderReplay(); };
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Render the replay board at each step:
+function renderReplay() {
+  MCE.renderBoard(container, replay.getGame(), {
+    size: 480,
+    animate: true,
+    animStyle: 'slide'
+  });
+}
+
+nextBtn.onclick = function() { replay.stepForward(); renderReplay(); };
+prevBtn.onclick = function() { replay.stepBack(); renderReplay(); };</code></pre>
 
   <h2>Plugin Registration</h2>
 
   <h3>MCE.registerVariant(key, config)</h3>
   <p>Registers a variant plugin. All variant-specific logic is defined in the config object — no core engine code is modified.</p>
-  <div class="docs-code">
-MCE.registerVariant('myVariant', {<br>
-&nbsp;&nbsp;label: 'My Variant',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// picker display name<br>
-&nbsp;&nbsp;group: 'Tactical',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// picker group<br>
-&nbsp;&nbsp;rows: 8, cols: 8,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// board dimensions<br>
-&nbsp;&nbsp;fen: null,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// null = standard position<br>
-&nbsp;&nbsp;title: 'My Variant',<br>
-&nbsp;&nbsp;description: 'How this variant works.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-&nbsp;&nbsp;// Config flags (all optional):<br>
-&nbsp;&nbsp;noCastling: false,<br>
-&nbsp;&nbsp;noCheck: false,<br>
-&nbsp;&nbsp;torpedo: false,<br>
-&nbsp;&nbsp;// Hook functions (all optional):<br>
-&nbsp;&nbsp;init: function(g) { },<br>
-&nbsp;&nbsp;moveFilter: function(g, moves) { return moves; },<br>
-&nbsp;&nbsp;beforeMove: function(g, move, undo) { },<br>
-&nbsp;&nbsp;afterMove: function(g, move, undo) { },<br>
-&nbsp;&nbsp;turnLogic: function(g, undo) { },<br>
-&nbsp;&nbsp;restoreState: function(g, undo) { },<br>
-&nbsp;&nbsp;winCondition: function(g) { return null; },<br>
-&nbsp;&nbsp;evaluate: function(g, defaultEval) { return defaultEval(g); },<br>
-&nbsp;&nbsp;visibility: function(g, side) { return new Set(); },<br>
-&nbsp;&nbsp;statusText: function(g, helpers) { return null; },<br>
-&nbsp;&nbsp;positionKey: function(g) { return customHash(g); },<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('myVariant', {
+  label: 'My Variant',       // picker display name
+  group: 'Tactical',        // picker group
+  rows: 8, cols: 8,         // board dimensions
+  fen: null,                // null = standard position
+  title: 'My Variant',
+  description: 'How this variant works.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+  // Config flags (all optional):
+  noCastling: false,
+  noCheck: false,
+  torpedo: false,
+  // Hook functions (all optional):
+  init: function(g) { },
+  moveFilter: function(g, moves) { return moves; },
+  beforeMove: function(g, move, undo) { },
+  afterMove: function(g, move, undo) { },
+  turnLogic: function(g, undo) { },
+  restoreState: function(g, undo) { },
+  winCondition: function(g) { return null; },
+  evaluate: function(g, defaultEval) { return defaultEval(g); },
+  visibility: function(g, side) { return new Set(); },
+  statusText: function(g, helpers) { return null; },
+  positionKey: function(g) { return customHash(g); },
+});</code></pre>
   <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>
 
   <h3>MCE.getVariantConfig(key)</h3>
   <p>Returns the registered config object for a variant, with inheritance resolved if <code>extends</code> was used. Returns <code>null</code> if not registered.</p>
-  <div class="docs-code">
-const vc = MCE.getVariantConfig('atomic');<br>
-console.log(vc.label);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 'Atomic'<br>
-console.log(vc.noCheck);&nbsp;&nbsp;&nbsp;&nbsp;// undefined (uses standard check rules)<br>
-console.log(vc.beforeMove);&nbsp;// [Function] (explosion logic)
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const vc = MCE.getVariantConfig('atomic');
+console.log(vc.label);      // 'Atomic'
+console.log(vc.noCheck);    // undefined (uses standard check rules)
+console.log(vc.beforeMove); // [Function] (explosion logic)</code></pre>
 
   <h3>MCE.variantRegistry</h3>
   <p>The raw registry object. Keys are variant camelCase IDs, values are config objects. Used by the game controller to build the picker.</p>
-  <div class="docs-code">
-Object.keys(MCE.variantRegistry);&nbsp;// ['standard', 'chess960', 'atomic', ...]
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">Object.keys(MCE.variantRegistry); // ['standard', 'chess960', 'atomic', ...]</code></pre>
 
   <h3>MCE.registerPiece(typeChar, handlers)</h3>
   <p>Registers a custom piece type for move generation and attack detection.</p>
-  <div class="docs-code">
-MCE.registerPiece('m', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Return array of { from, to, flag } move objects<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Return true if piece at 'from' attacks 'target' square<br>
-&nbsp;&nbsp;}<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerPiece('m', {
+  genMoves: function(g, from, side) {
+    // Return array of { from, to, flag } move objects
+  },
+  attacks: function(g, from, target) {
+    // Return true if piece at 'from' attacks 'target' square
+  }
+});</code></pre>
   <p>Use the registered character in FEN strings (uppercase = white, lowercase = black).</p>
 
   <h2>Utilities</h2>
 
   <h3>MCE.randomFEN960()</h3>
   <p>Generates a random Chess960 starting position FEN. Bishops on opposite colours, king between rooks.</p>
-  <div class="docs-code">
-const fen = MCE.randomFEN960();<br>
-// e.g. "brnqknrb/pppppppp/8/8/8/8/PPPPPPPP/BRNQKNRB w KQkq - 0 1"
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const fen = MCE.randomFEN960();
+// e.g. "brnqknrb/pppppppp/8/8/8/8/PPPPPPPP/BRNQKNRB w KQkq - 0 1"</code></pre>
 
   <h3>MCE.pieceColor(char)</h3>
   <p>Returns <code>'w'</code> or <code>'b'</code> based on case.</p>
@@ -668,56 +609,42 @@ const fen = MCE.randomFEN960();<br>
 
   <h3>Examples</h3>
   <p>Minimal embed — board only, atomic variant:</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;variant=atomic"<br>
-&nbsp;&nbsp;width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&boardonly=1&variant=atomic"
+  width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <p>Full game UI in light theme with custom names:</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;theme=light&amp;p1=Alice&amp;p2=Bob&amp;variant=standard"<br>
-&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&theme=light&p1=Alice&p2=Bob&variant=standard"
+  width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <p>Custom styling — green accent, rounded corners:</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;accent=%233a9928&amp;radius=16px&amp;variant=kingOfTheHill"<br>
-&nbsp;&nbsp;width="600" height="500" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&accent=%233a9928&radius=16px&variant=kingOfTheHill"
+  width="600" height="500" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <p>Pass-and-play with player names (no AI):</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;mode=pass&amp;p1=Magnus&amp;p2=Hikaru"<br>
-&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&mode=pass&p1=Magnus&p2=Hikaru"
+  width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <h3>postMessage API</h3>
   <p>Control embedded iframes without reloading. Send messages to the iframe's <code>contentWindow</code>:</p>
-  <div class="docs-code">
-// Switch variant (resets board):<br>
-iframe.contentWindow.postMessage({ type: 'chess:setVariant', variant: 'atomic' }, '*');<br>
-<br>
-// Switch theme (preserves game state):<br>
-iframe.contentWindow.postMessage({ type: 'chess:setTheme', theme: 'cosmic' }, '*');<br>
-<br>
-// Change background colour:<br>
-iframe.contentWindow.postMessage({ type: 'chess:setBg', bg: '#1a1a2e' }, '*');<br>
-<br>
-// Reset current variant to starting position:<br>
-iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Switch variant (resets board):
+iframe.contentWindow.postMessage({ type: 'chess:setVariant', variant: 'atomic' }, '*');
+
+// Switch theme (preserves game state):
+iframe.contentWindow.postMessage({ type: 'chess:setTheme', theme: 'cosmic' }, '*');
+
+// Change background colour:
+iframe.contentWindow.postMessage({ type: 'chess:setBg', bg: '#1a1a2e' }, '*');
+
+// Reset current variant to starting position:
+iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');</code></pre>
 
   <p>Cosmic dark board theme with Capablanca variant:</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;theme=cosmic&amp;variant=capablanca"<br>
-&nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&theme=cosmic&variant=capablanca"
+  width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <p>Neon theme, board only:</p>
-  <div class="docs-code">
-&lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;boardonly=1&amp;theme=neon&amp;variant=standard"<br>
-&nbsp;&nbsp;width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&boardonly=1&theme=neon&variant=standard"
+  width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 </div>
 </div>
 
@@ -726,5 +653,8 @@ iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
 </footer>
 <script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
 </body>
 </html>

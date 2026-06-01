@@ -19,6 +19,7 @@
 <meta property="og:image:height" content="630">
 <link rel="stylesheet" href="../css/shared.css?v=0.7.0">
 <link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
 </head>
 <body>
 
@@ -61,9 +62,7 @@
   <section id="step1">
     <h2>Step 1: Understanding the Effects System</h2>
     <p>Every game object has an <code>effects</code> array. Each effect is an object:</p>
-    <div class="docs-code">
-{ sq: 28, type: 'poison', duration: 3, owner: 'w', data: null }
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">{ sq: 28, type: 'poison', duration: 3, owner: 'w', data: null }</code></pre>
     <ul>
       <li><code>sq</code> — the board square this effect is on</li>
       <li><code>type</code> — a string identifier (you define these per variant)</li>
@@ -77,48 +76,41 @@
   <section id="step2">
     <h2>Step 2: Create Poison on Capture</h2>
     <p>In <code>afterMove</code>, when a capture occurs we poison the capture square:</p>
-    <div class="docs-code">
-afterMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;var isCapture = undo.captured || move.flag === 'ep';<br>
-&nbsp;&nbsp;var moverSide = undo.turn;<br>
-<br>
-&nbsp;&nbsp;if (isCapture) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.addEffect(g, undo, {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sq: move.to,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: 'poison',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;duration: 3,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;owner: moverSide<br>
-&nbsp;&nbsp;&nbsp;&nbsp;});<br>
-&nbsp;&nbsp;}<br>
-}
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">afterMove: function(g, move, undo) {
+  var isCapture = undo.captured || move.flag === 'ep';
+  var moverSide = undo.turn;
+  if (isCapture) {
+    MCE.addEffect(g, undo, {
+      sq: move.to,
+      type: 'poison',
+      duration: 3,
+      owner: moverSide
+    });
+  }
+}</code></pre>
     <p><code>MCE.addEffect</code> takes care of undo tracking. The first call in a move snapshots the entire effects array into <code>undo._effectsSnapshot</code>. Subsequent calls in the same move reuse the same snapshot.</p>
   </section>
 
   <section id="step3">
     <h2>Step 3: Destroy Pieces on Poison</h2>
     <p>We also check in <code>afterMove</code> whether the moving piece landed on an existing poison square. If it did (and it is not a king), destroy it:</p>
-    <div class="docs-code">
-afterMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;var isCapture = undo.captured || move.flag === 'ep';<br>
-&nbsp;&nbsp;var moverSide = undo.turn;<br>
-<br>
-&nbsp;&nbsp;// Create poison on capture<br>
-&nbsp;&nbsp;if (isCapture) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.addEffect(g, undo, {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sq: move.to, type: 'poison', duration: 3, owner: moverSide<br>
-&nbsp;&nbsp;&nbsp;&nbsp;});<br>
-&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;// Destroy non-king pieces that land on poison<br>
-&nbsp;&nbsp;if (!isCapture &amp;&amp; MCE.hasEffect(g, move.to, 'poison')) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var landed = g.board[move.to];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (landed &amp;&amp; MCE.pieceType(landed) !== 'k') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MCE.mutateBoard(g, undo, [{ sq: move.to, piece: null }]);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
-}
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">afterMove: function(g, move, undo) {
+  var isCapture = undo.captured || move.flag === 'ep';
+  var moverSide = undo.turn;
+  // Create poison on capture
+  if (isCapture) {
+    MCE.addEffect(g, undo, {
+      sq: move.to, type: 'poison', duration: 3, owner: moverSide
+    });
+  }
+  // Destroy non-king pieces that land on poison
+  if (!isCapture && MCE.hasEffect(g, move.to, 'poison')) {
+    var landed = g.board[move.to];
+    if (landed && MCE.pieceType(landed) !== 'k') {
+      MCE.mutateBoard(g, undo, [{ sq: move.to, piece: null }]);
+    }
+  }
+}</code></pre>
     <p>We skip destruction on capture moves because the capturing piece created the poison — it should not be destroyed by its own poison. Only subsequent pieces that enter the square are affected.</p>
     <p><code>MCE.mutateBoard</code> removes the piece and tracks the change for automatic undo. No <code>restoreState</code> hook needed.</p>
   </section>
@@ -126,62 +118,55 @@ afterMove: function(g, move, undo) {<br>
   <section id="step4">
     <h2>Step 4: Protect the King</h2>
     <p>Kings must not be allowed to move onto poisoned squares. We enforce this in <code>moveFilter</code>:</p>
-    <div class="docs-code">
-moveFilter: function(g, moves) {<br>
-&nbsp;&nbsp;return moves.filter(function(m) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var piece = g.board[m.from];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (piece &amp;&amp; MCE.pieceType(piece) === 'k') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (MCE.hasEffect(g, m.to, 'poison')) return false;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return true;<br>
-&nbsp;&nbsp;});<br>
-}
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">moveFilter: function(g, moves) {
+  return moves.filter(function(m) {
+    var piece = g.board[m.from];
+    if (piece && MCE.pieceType(piece) === 'k') {
+      if (MCE.hasEffect(g, m.to, 'poison')) return false;
+    }
+    return true;
+  });
+}</code></pre>
     <p>We filter in <code>moveFilter</code> rather than <code>beforeMove</code> because <code>moveFilter</code> removes moves from the legal list entirely — the player cannot even attempt to move their king to a poisoned square. This is also what the AI sees, so it will never consider illegal king moves.</p>
   </section>
 
   <section id="step5">
     <h2>Step 5: Custom Evaluation</h2>
     <p>The AI should avoid moving pieces near poison and value poison near enemy pieces:</p>
-    <div class="docs-code">
-evaluate: function(g, defaultEval) {<br>
-&nbsp;&nbsp;var score = defaultEval(g);<br>
-&nbsp;&nbsp;if (!g.effects || g.effects.length === 0) return score;<br>
-<br>
-&nbsp;&nbsp;for (var i = 0; i &lt; g.effects.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var eff = g.effects[i];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (eff.type !== 'poison') continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var rc = MCE.rc(eff.sq, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Penalize own pieces adjacent to poison<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var dr = -1; dr &lt;= 1; dr++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (var dc = -1; dc &lt;= 1; dc++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(rc[0]+dr, rc[1]+dc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var sq = MCE.sq(rc[0]+dr, rc[1]+dc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var p = g.board[sq];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!p) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (MCE.pieceColor(p) === g.turn) score -= 20;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else score += 20;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return score;<br>
-}
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">evaluate: function(g, defaultEval) {
+  var score = defaultEval(g);
+  if (!g.effects || g.effects.length === 0) return score;
+  for (var i = 0; i &lt; g.effects.length; i++) {
+    var eff = g.effects[i];
+    if (eff.type !== 'poison') continue;
+    var rc = MCE.rc(eff.sq, g);
+    // Penalize own pieces adjacent to poison
+    for (var dr = -1; dr &lt;= 1; dr++) {
+      for (var dc = -1; dc &lt;= 1; dc++) {
+        if (!MCE.onBoard(rc[0]+dr, rc[1]+dc, g)) continue;
+        var sq = MCE.sq(rc[0]+dr, rc[1]+dc, g);
+        var p = g.board[sq];
+        if (!p) continue;
+        if (MCE.pieceColor(p) === g.turn) score -= 20;
+        else score += 20;
+      }
+    }
+  }
+  return score;
+}</code></pre>
   </section>
 
   <section id="step6">
     <h2>Step 6: Status Text</h2>
     <p>Show the player how many poisoned squares are active:</p>
-    <div class="docs-code">
-statusText: function(g, helpers) {<br>
-&nbsp;&nbsp;if (!g.effects || g.effects.length === 0) return null;<br>
-&nbsp;&nbsp;var count = g.effects.filter(function(e) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return e.type === 'poison';<br>
-&nbsp;&nbsp;}).length;<br>
-&nbsp;&nbsp;if (count === 0) return null;<br>
-&nbsp;&nbsp;return helpers.nameFor(g.turn) + ' to move (' + count + ' poisoned square' + (count > 1 ? 's' : '') + ')';<br>
-}
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">statusText: function(g, helpers) {
+  if (!g.effects || g.effects.length === 0) return null;
+  var count = g.effects.filter(function(e) {
+    return e.type === 'poison';
+  }).length;
+  if (count === 0) return null;
+  return helpers.nameFor(g.turn) + ' to move (' + count + ' poisoned square' + (count > 1 ? 's' : '') + ')';
+}</code></pre>
   </section>
 
   <section id="tips">
@@ -223,5 +208,8 @@ statusText: function(g, helpers) {<br>
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
 </footer>
 <script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
 </body>
 </html>

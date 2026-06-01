@@ -19,6 +19,7 @@
 <meta property="og:image:height" content="630">
 <link rel="stylesheet" href="../css/shared.css?v=0.7.0">
 <link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
 </head>
 <body>
 
@@ -47,34 +48,28 @@
   <section id="prerequisites">
     <h2>Prerequisites</h2>
     <p>You need a local copy of the moddable-chess repository and a browser. No build tools required.</p>
-    <div class="docs-code">
-git clone https://github.com/Moddable-Games/moddable-chess.git<br>
-cd moddable-chess
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">git clone https://github.com/Moddable-Games/moddable-chess.git
+cd moddable-chess</code></pre>
     <p>Open <code>play/index.html</code> in your browser to verify the engine loads. You should see the variant picker with existing variants.</p>
   </section>
 
   <section id="step1">
     <h2>Step 1: Create the Plugin File</h2>
     <p>Create <code>js/variants/orda-chess.js</code>. Every plugin starts with <code>'use strict'</code> and ends with a call to <code>MCE.registerVariant()</code>:</p>
-    <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('ordaChess', {<br>
-&nbsp;&nbsp;label: 'Orda Chess',<br>
-&nbsp;&nbsp;group: 'Asymmetric',<br>
-&nbsp;&nbsp;rows: 8,<br>
-&nbsp;&nbsp;cols: 8,<br>
-&nbsp;&nbsp;fen: 'rnbqkbnr/pppppppp/8/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',<br>
-&nbsp;&nbsp;noCastling: false,<br>
-&nbsp;&nbsp;title: 'Orda Chess',<br>
-&nbsp;&nbsp;description: 'Asymmetric variant.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-});
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('ordaChess', {
+  label: 'Orda Chess',
+  group: 'Asymmetric',
+  rows: 8,
+  cols: 8,
+  fen: 'rnbqkbnr/pppppppp/8/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',
+  noCastling: false,
+  title: 'Orda Chess',
+  description: 'Asymmetric variant.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+});</code></pre>
     <p>Add a script tag in <code>play/index.html</code> before <code>game-controller.js</code>:</p>
-    <div class="docs-code">
-&lt;script src="../js/variants/orda-chess.js?v=0.7.0"&gt;&lt;/script&gt;
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">&lt;script src="../js/variants/orda-chess.js?v=0.7.0"&gt;&lt;/script&gt;</code></pre>
     <p>Reload the page. "Orda Chess" now appears in the picker under the Asymmetric group — but it plays like standard chess. The custom pieces don't exist yet.</p>
   </section>
 
@@ -83,44 +78,38 @@ MCE.registerVariant('ordaChess', {<br>
     <p>Orda Chess introduces three custom pieces for Black's army. Each has a <strong>divergent</strong> movement pattern: they move one way but capture a different way. We start with the Yurt.</p>
     <p>The Yurt moves one square diagonally (like a Ferz) but captures one square orthogonally (like a Wazir). This is the simplest divergent piece — no sliding, just single-step moves.</p>
     <p>Register the piece <em>before</em> the <code>registerVariant</code> call in the same file:</p>
-    <div class="docs-code">
-MCE.registerPiece('y', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: diagonal (Ferz pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; moveDirs.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[i][0], nc = c + moveDirs[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: orthogonal (Wazir pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capDirs = [[-1,0],[1,0],[0,-1],[0,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capDirs.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capDirs[i][0], nc = c + capDirs[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr + dc === 1);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerPiece('y', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];
+    // Non-capture moves: diagonal (Ferz pattern)
+    var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];
+    for (var i = 0; i &lt; moveDirs.length; i++) {
+      var nr = r + moveDirs[i][0], nc = c + moveDirs[i][1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target]) continue;
+      moves.push({ from: from, to: target, flag: null });
+    }
+    // Captures: orthogonal (Wazir pattern)
+    var capDirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var i = 0; i &lt; capDirs.length; i++) {
+      var nr = r + capDirs[i][0], nc = c + capDirs[i][1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target] && MCE.isEnemy(target, side, g)) {
+        moves.push({ from: from, to: target, flag: 'capture' });
+      }
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];
+    var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];
+    var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);
+    return (dr + dc === 1);
+  }
+});</code></pre>
     <p>Key concepts:</p>
     <ul>
       <li><code>MCE.rc(sq, g)</code> converts a square index to <code>[row, col]</code></li>
@@ -135,47 +124,41 @@ MCE.registerPiece('y', {<br>
   <section id="step3">
     <h2>Step 3: The Lancer (Slider + Jumper)</h2>
     <p>The Lancer moves by sliding along ranks and files (like a Rook) but captures by jumping like a Knight. This demonstrates combining a sliding movement pattern with a leaping capture pattern.</p>
-    <div class="docs-code">
-MCE.registerPiece('l', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: slide orthogonally (Rook pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,0],[1,0],[0,-1],[0,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var d = 0; d &lt; moveDirs.length; d++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (MCE.onBoard(nr, nc, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr += moveDirs[d][0]; nc += moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: Knight jumps<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,-2],[1,2],[2,-1],[2,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capOffsets.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr * dc === 2 &amp;&amp; dr + dc === 3);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerPiece('l', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];
+    // Non-capture moves: slide orthogonally (Rook pattern)
+    var moveDirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var d = 0; d &lt; moveDirs.length; d++) {
+      var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];
+      while (MCE.onBoard(nr, nc, g)) {
+        var target = MCE.sq(nr, nc, g);
+        if (g.board[target]) break;
+        moves.push({ from: from, to: target, flag: null });
+        nr += moveDirs[d][0]; nc += moveDirs[d][1];
+      }
+    }
+    // Captures: Knight jumps
+    var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],
+                    [1,-2],[1,2],[2,-1],[2,1]];
+    for (var i = 0; i &lt; capOffsets.length; i++) {
+      var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target] && MCE.isEnemy(target, side, g)) {
+        moves.push({ from: from, to: target, flag: 'capture' });
+      }
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];
+    var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];
+    var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);
+    return (dr * dc === 2 && dr + dc === 3);
+  }
+});</code></pre>
     <p>Notice the sliding pattern: use a <code>while</code> loop that advances in one direction until hitting a piece or the board edge. Only empty squares generate moves — the first occupied square stops the slide.</p>
     <p>The Knight capture check uses the identity <code>dr * dc === 2 &amp;&amp; dr + dc === 3</code> — this matches exactly the eight L-shaped offsets without listing them individually.</p>
   </section>
@@ -183,56 +166,48 @@ MCE.registerPiece('l', {<br>
   <section id="step4">
     <h2>Step 4: The Archer (Diagonal Slider + Jumper)</h2>
     <p>The Archer is the diagonal counterpart of the Lancer: it moves by sliding diagonally (like a Bishop) but captures by jumping like a Knight. The structure is identical — just swap the slide directions.</p>
-    <div class="docs-code">
-MCE.registerPiece('h', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Non-capture moves: slide diagonally (Bishop pattern)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var d = 0; d &lt; moveDirs.length; d++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (MCE.onBoard(nr, nc, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target]) break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr += moveDirs[d][0]; nc += moveDirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Captures: Knight jumps (same as Lancer)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,-2],[1,2],[2,-1],[2,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; capOffsets.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(nr, nc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[target] &amp;&amp; MCE.isEnemy(target, side, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: 'capture' });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return (dr * dc === 2 &amp;&amp; dr + dc === 3);<br>
-&nbsp;&nbsp;}<br>
-});
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerPiece('h', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];
+    // Non-capture moves: slide diagonally (Bishop pattern)
+    var moveDirs = [[-1,-1],[-1,1],[1,-1],[1,1]];
+    for (var d = 0; d &lt; moveDirs.length; d++) {
+      var nr = r + moveDirs[d][0], nc = c + moveDirs[d][1];
+      while (MCE.onBoard(nr, nc, g)) {
+        var target = MCE.sq(nr, nc, g);
+        if (g.board[target]) break;
+        moves.push({ from: from, to: target, flag: null });
+        nr += moveDirs[d][0]; nc += moveDirs[d][1];
+      }
+    }
+    // Captures: Knight jumps (same as Lancer)
+    var capOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],
+                    [1,-2],[1,2],[2,-1],[2,1]];
+    for (var i = 0; i &lt; capOffsets.length; i++) {
+      var nr = r + capOffsets[i][0], nc = c + capOffsets[i][1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target] && MCE.isEnemy(target, side, g)) {
+        moves.push({ from: from, to: target, flag: 'capture' });
+      }
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];
+    var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];
+    var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);
+    return (dr * dc === 2 && dr + dc === 3);
+  }
+});</code></pre>
     <p>Both the Lancer and Archer share the same <code>attacks</code> function — they both capture like a Knight. If you were building multiple pieces with the same capture pattern, you could extract this into a shared function, but keeping it inline keeps each piece self-contained.</p>
   </section>
 
   <section id="step5">
     <h2>Step 5: The Asymmetric FEN</h2>
     <p>Orda Chess is asymmetric: White plays standard chess pieces, Black commands the Horde. The FEN encodes this by using the custom piece characters for Black's back rank:</p>
-    <div class="docs-code">
-lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1</code></pre>
     <p>Breaking this down:</p>
     <ul>
       <li><code>l</code> — Black Lancer (slides like Rook, captures like Knight)</li>
@@ -242,9 +217,7 @@ lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
       <li><code>k</code> — Black Khan (identical to King — it's the royal piece)</li>
     </ul>
     <p>The corrected FEN for Orda is:</p>
-    <div class="docs-code">
-lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1</code></pre>
     <p>Uppercase letters are White (standard army), lowercase are Black (Horde). The engine automatically recognises registered piece characters in the FEN.</p>
     <p>Notice <code>KQ</code> in the castling field — only White can castle. Black has no rooks on their starting squares, so no castling rights.</p>
   </section>
@@ -252,20 +225,18 @@ lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1
   <section id="step6">
     <h2>Step 6: Wire It Together</h2>
     <p>Now update the <code>registerVariant</code> call with the full description and the <code>pieceRoles</code> mapping that tells the engine which custom pieces exist:</p>
-    <div class="docs-code">
-MCE.registerVariant('ordaChess', {<br>
-&nbsp;&nbsp;label: 'Orda Chess',<br>
-&nbsp;&nbsp;group: 'Asymmetric',<br>
-&nbsp;&nbsp;rows: 8,<br>
-&nbsp;&nbsp;cols: 8,<br>
-&nbsp;&nbsp;fen: 'lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',<br>
-&nbsp;&nbsp;noCastling: false,<br>
-&nbsp;&nbsp;title: 'Orda Chess',<br>
-&nbsp;&nbsp;description: 'Asymmetric: White plays standard chess. Black commands the Horde — Yurt (moves diagonal, captures orthogonal), Lancer and Archer (move like rook/bishop, capture like knight). Khan replaces king.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-&nbsp;&nbsp;pieceRoles: { y: 'y', l: 'l', h: 'h' },<br>
-});
-    </div>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('ordaChess', {
+  label: 'Orda Chess',
+  group: 'Asymmetric',
+  rows: 8,
+  cols: 8,
+  fen: 'lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',
+  noCastling: false,
+  title: 'Orda Chess',
+  description: 'Asymmetric: White plays standard chess. Black commands the Horde — Yurt (moves diagonal, captures orthogonal), Lancer and Archer (move like rook/bishop, capture like knight). Khan replaces king.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+  pieceRoles: { y: 'y', l: 'l', h: 'h' },
+});</code></pre>
     <p>The <code>pieceRoles</code> object maps piece characters to their registered handlers. This tells the engine "when you encounter a <code>y</code> on the board, use the <code>registerPiece('y', ...)</code> handler for move generation and attacks."</p>
   </section>
 
@@ -309,5 +280,8 @@ MCE.registerVariant('ordaChess', {<br>
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
 </footer>
 <script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
 </body>
 </html>

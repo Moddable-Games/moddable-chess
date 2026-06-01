@@ -19,6 +19,7 @@
 <meta property="og:image:height" content="630">
 <link rel="stylesheet" href="../css/shared.css?v=0.7.0">
 <link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
 </head>
 <body>
 
@@ -45,22 +46,18 @@
 
   <h2>Quick Start</h2>
   <p>Include the engine scripts in your HTML (order matters):</p>
-  <div class="docs-code">
-&lt;script src="js/chess-engine.js"&gt;&lt;/script&gt;<br>
-&lt;script src="js/chess-moves.js"&gt;&lt;/script&gt;<br>
-&lt;script src="js/chess-play.js"&gt;&lt;/script&gt;<br>
-&lt;script src="js/chess-variants.js"&gt;&lt;/script&gt;<br>
-&lt;script src="js/board-renderer.js"&gt;&lt;/script&gt;
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">&lt;script src="js/chess-engine.js"&gt;&lt;/script&gt;
+&lt;script src="js/chess-moves.js"&gt;&lt;/script&gt;
+&lt;script src="js/chess-play.js"&gt;&lt;/script&gt;
+&lt;script src="js/chess-variants.js"&gt;&lt;/script&gt;
+&lt;script src="js/board-renderer.js"&gt;&lt;/script&gt;</code></pre>
 
   <p>Create a game and render it:</p>
-  <div class="docs-code">
-const game = MCE.createGame('standard');<br>
-MCE.renderBoard(document.getElementById('board'), game, {<br>
-&nbsp;&nbsp;size: 480,<br>
-&nbsp;&nbsp;onSquareClick: (sq) =&gt; { /* handle click */ }<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">const game = MCE.createGame('standard');
+MCE.renderBoard(document.getElementById('board'), game, {
+  size: 480,
+  onSquareClick: (sq) =&gt; { /* handle click */ }
+});</code></pre>
 
   <h2>Architecture</h2>
   <p>The engine is split into focused modules that extend the global <code>MCE</code> namespace:</p>
@@ -91,11 +88,9 @@ MCE.renderBoard(document.getElementById('board'), game, {<br>
 
   <h2>Variable Board Sizes</h2>
   <p>The engine supports arbitrary rectangular boards. Each game object has <code>rows</code> and <code>cols</code> properties. All coordinate functions accept an optional game context:</p>
-  <div class="docs-code">
-MCE.sq(row, col, game)&nbsp;&nbsp;// → index<br>
-MCE.rc(index, game)&nbsp;&nbsp;&nbsp;&nbsp;// → [row, col]<br>
-MCE.onBoard(row, col, game) // → boolean
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.sq(row, col, game)  // → index
+MCE.rc(index, game)    // → [row, col]
+MCE.onBoard(row, col, game) // → boolean</code></pre>
 
   <h2>Supported Variants (54)</h2>
   <table class="docs-table">
@@ -178,5 +173,8 @@ MCE.onBoard(row, col, game) // → boolean
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
 </footer>
 <script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
 </body>
 </html>

@@ -19,6 +19,7 @@
 <meta property="og:image:height" content="630">
 <link rel="stylesheet" href="../css/shared.css?v=0.7.0">
 <link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
 </head>
 <body>
 
@@ -49,20 +50,18 @@
 
   <h2>Minimal Plugin</h2>
   <p>The simplest possible variant — standard rules with one flag change:</p>
-  <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('noCastling', {<br>
-&nbsp;&nbsp;label: 'No Castling',<br>
-&nbsp;&nbsp;group: 'Classic',<br>
-&nbsp;&nbsp;rows: 8,<br>
-&nbsp;&nbsp;cols: 8,<br>
-&nbsp;&nbsp;fen: null,<br>
-&nbsp;&nbsp;noCastling: true,<br>
-&nbsp;&nbsp;title: 'No Castling',<br>
-&nbsp;&nbsp;description: 'Standard chess with castling disabled.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('noCastling', {
+  label: 'No Castling',
+  group: 'Classic',
+  rows: 8,
+  cols: 8,
+  fen: null,
+  noCastling: true,
+  title: 'No Castling',
+  description: 'Standard chess with castling disabled.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+});</code></pre>
   <p>Setting <code>fen: null</code> uses the standard starting position. The <code>noCastling: true</code> flag disables castling moves without any custom code.</p>
 
   <h2>Config Properties</h2>
@@ -105,385 +104,338 @@ MCE.registerVariant('noCastling', {<br>
   </table>
 
   <h3>Example: Flags only</h3>
-  <div class="docs-code">
-MCE.registerVariant('breakthrough', {<br>
-&nbsp;&nbsp;label: 'Breakthrough',<br>
-&nbsp;&nbsp;group: 'Alternate Rules',<br>
-&nbsp;&nbsp;rows: 7, cols: 7,<br>
-&nbsp;&nbsp;fen: 'ppppppp/ppppppp/7/7/7/PPPPPPP/PPPPPPP w - - 0 1',<br>
-&nbsp;&nbsp;noCastling: true,<br>
-&nbsp;&nbsp;noEnPassant: true,<br>
-&nbsp;&nbsp;noPromotion: true,<br>
-&nbsp;&nbsp;title: 'Breakthrough',<br>
-&nbsp;&nbsp;description: 'Race a pawn to the far rank to win.',<br>
-&nbsp;&nbsp;rule: 'Board: 7×7 · Win: Reach far rank',<br>
-&nbsp;&nbsp;winCondition: function(g) { /* ... */ },<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('breakthrough', {
+  label: 'Breakthrough',
+  group: 'Alternate Rules',
+  rows: 7, cols: 7,
+  fen: 'ppppppp/ppppppp/7/7/7/PPPPPPP/PPPPPPP w - - 0 1',
+  noCastling: true,
+  noEnPassant: true,
+  noPromotion: true,
+  title: 'Breakthrough',
+  description: 'Race a pawn to the far rank to win.',
+  rule: 'Board: 7×7 · Win: Reach far rank',
+  winCondition: function(g) { /* ... */ },
+});</code></pre>
 
   <h3>Example: Custom promotion rank</h3>
-  <div class="docs-code">
-MCE.registerVariant('makruk', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;promotionRank: function(side) { return side === MCE.WHITE ? 2 : 5; },<br>
-&nbsp;&nbsp;promotionPieces: ['m'], // promote to Met only<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('makruk', {
+  // ...config...
+  promotionRank: function(side) { return side === MCE.WHITE ? 2 : 5; },
+  promotionPieces: ['m'], // promote to Met only
+});</code></pre>
 
   <h3>Example: Berolina pawns</h3>
-  <div class="docs-code">
-MCE.registerVariant('berolinaChess', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;pawnMoveStyle: 'berolina', // pawns move diagonal, capture straight<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('berolinaChess', {
+  // ...config...
+  pawnMoveStyle: 'berolina', // pawns move diagonal, capture straight
+});</code></pre>
 
   <h3>Example: Divergent pieces</h3>
   <p>Map piece types to different move vs. capture patterns. <code>moveStyle</code>/<code>captureStyle</code> is <code>'slide'</code> or <code>'jump'</code>. Directions use the standard MCE direction arrays.</p>
-  <div class="docs-code">
-MCE.registerVariant('hoppelPoppel', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;divergentPieces: {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;n: { move: MCE.KNIGHT_OFFSETS, moveStyle: 'jump',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture: MCE.BISHOP_DIRS, captureStyle: 'slide' },<br>
-&nbsp;&nbsp;&nbsp;&nbsp;b: { move: MCE.BISHOP_DIRS, moveStyle: 'slide',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture: MCE.KNIGHT_OFFSETS, captureStyle: 'jump' },<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('hoppelPoppel', {
+  // ...config...
+  divergentPieces: {
+    n: { move: MCE.KNIGHT_OFFSETS, moveStyle: 'jump',
+         capture: MCE.BISHOP_DIRS, captureStyle: 'slide' },
+    b: { move: MCE.BISHOP_DIRS, moveStyle: 'slide',
+         capture: MCE.KNIGHT_OFFSETS, captureStyle: 'jump' },
+  },
+});</code></pre>
 
   <h3>Example: Wrap-around board</h3>
-  <div class="docs-code">
-MCE.registerVariant('cylinderChess', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;wrapFiles: true, // a-file connects to h-file<br>
-});<br>
-<br>
-MCE.registerVariant('toroidalChess', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;wrapFiles: true, // files wrap<br>
-&nbsp;&nbsp;wrapRanks: true, // ranks wrap too (torus)<br>
-&nbsp;&nbsp;noCastling: true,<br>
-&nbsp;&nbsp;noEnPassant: true,<br>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('cylinderChess', {
+  // ...config...
+  wrapFiles: true, // a-file connects to h-file
 });
-  </div>
+MCE.registerVariant('toroidalChess', {
+  // ...config...
+  wrapFiles: true, // files wrap
+  wrapRanks: true, // ranks wrap too (torus)
+  noCastling: true,
+  noEnPassant: true,
+});</code></pre>
 
   <h2>Hook Functions</h2>
   <p>Hooks let plugins inject custom logic at specific points in the game loop. All hooks are optional.</p>
 
   <h3>winCondition(g)</h3>
   <p>Called each turn to check for a variant-specific win. Return a status string (e.g. <code>'koth-w'</code>) to end the game, or <code>null</code> to continue.</p>
-  <div class="docs-code">
-MCE.registerVariant('kingOfTheHill', {<br>
-&nbsp;&nbsp;// ...config...<br>
-&nbsp;&nbsp;winCondition: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var center = [27, 28, 35, 36]; // d4, e4, d5, e5<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var i = 0; i &lt; center.length; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var p = g.board[center[i]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (p &amp;&amp; MCE.pieceType(p) === 'k') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var winner = MCE.pieceColor(p);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (winner !== g.turn) return 'koth-' + winner;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return null;<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('kingOfTheHill', {
+  // ...config...
+  winCondition: function(g) {
+    var center = [27, 28, 35, 36]; // d4, e4, d5, e5
+    for (var i = 0; i &lt; center.length; i++) {
+      var p = g.board[center[i]];
+      if (p && MCE.pieceType(p) === 'k') {
+        var winner = MCE.pieceColor(p);
+        if (winner !== g.turn) return 'koth-' + winner;
+      }
+    }
+    return null;
+  },
+});</code></pre>
 
   <h3>moveFilter(g, moves)</h3>
   <p>Filters the legal move array. Receives all legal moves, returns a subset. Used for forced captures, no-check constraints, etc.</p>
-  <div class="docs-code">
-// Antichess: captures are mandatory<br>
-moveFilter: function(g, moves) {<br>
-&nbsp;&nbsp;var captures = moves.filter(function(m) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return g.board[m.to] || m.flag === 'ep';<br>
-&nbsp;&nbsp;});<br>
-&nbsp;&nbsp;return captures.length > 0 ? captures : moves;<br>
-}
-  </div>
-  <div class="docs-code">
-// Racing Kings: no move may give or leave either side in check<br>
-moveFilter: function(g, moves) {<br>
-&nbsp;&nbsp;return moves.filter(function(m) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var undo = MCE.makeMove(g, m);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var legal = !MCE.inCheck(g, MCE.WHITE) &amp;&amp; !MCE.inCheck(g, MCE.BLACK);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.unmakeMove(g, undo);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return legal;<br>
-&nbsp;&nbsp;});<br>
-}
-  </div>
-  <div class="docs-code">
-// Makpong: king cannot move out of check (must block or capture)<br>
-moveFilter: function(g, moves) {<br>
-&nbsp;&nbsp;if (MCE.inCheck(g, g.turn)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves.filter(function(m) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return MCE.pieceType(g.board[m.from]) !== 'k';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;});<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return moves;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Antichess: captures are mandatory
+moveFilter: function(g, moves) {
+  var captures = moves.filter(function(m) {
+    return g.board[m.to] || m.flag === 'ep';
+  });
+  return captures.length > 0 ? captures : moves;
+}</code></pre>
+  <pre class="language-javascript"><code class="language-javascript">// Racing Kings: no move may give or leave either side in check
+moveFilter: function(g, moves) {
+  return moves.filter(function(m) {
+    var undo = MCE.makeMove(g, m);
+    var legal = !MCE.inCheck(g, MCE.WHITE) && !MCE.inCheck(g, MCE.BLACK);
+    MCE.unmakeMove(g, undo);
+    return legal;
+  });
+}</code></pre>
+  <pre class="language-javascript"><code class="language-javascript">// Makpong: king cannot move out of check (must block or capture)
+moveFilter: function(g, moves) {
+  if (MCE.inCheck(g, g.turn)) {
+    return moves.filter(function(m) {
+      return MCE.pieceType(g.board[m.from]) !== 'k';
+    });
+  }
+  return moves;
+}</code></pre>
 
   <h3>beforeMove(g, move, undo)</h3>
   <p>Overrides how a move is physically executed on the board. The default behaviour moves the piece from <code>move.from</code> to <code>move.to</code>. This hook replaces that entirely.</p>
-  <div class="docs-code">
-// Rifle Chess: capturing piece stays on its own square<br>
-beforeMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;if (g.board[move.to] &amp;&amp; move.flag !== 'ep') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.pieceData) g.pieceData[move.to] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = undo.piece;<br>
-&nbsp;&nbsp;} else {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = undo.piece;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.pieceData) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.pieceData[move.to] = undo.pieceData || null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.pieceData[move.from] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
-}
-  </div>
-  <div class="docs-code">
-// Atomic Chess: captures cause explosions<br>
-beforeMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;if (g.board[move.to] &amp;&amp; move.flag !== 'ep') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;undo.exploded = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var rc = MCE.rc(move.to, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var dr = -1; dr &lt;= 1; dr++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (var dc = -1; dc &lt;= 1; dc++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (dr === 0 &amp;&amp; dc === 0) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var r = rc[0] + dr, c = rc[1] + dc;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(r, c, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var sq = MCE.sq(r, c, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[sq] &amp;&amp; MCE.pieceType(g.board[sq]) !== 'p') {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;undo.exploded.push({ sq: sq, piece: g.board[sq] });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.board[sq] = null;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;} else {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = undo.piece;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = null;<br>
-&nbsp;&nbsp;}<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Rifle Chess: capturing piece stays on its own square
+beforeMove: function(g, move, undo) {
+  if (g.board[move.to] && move.flag !== 'ep') {
+    g.board[move.to] = null;
+    if (g.pieceData) g.pieceData[move.to] = null;
+    g.board[move.from] = undo.piece;
+  } else {
+    g.board[move.to] = undo.piece;
+    g.board[move.from] = null;
+    if (g.pieceData) {
+      g.pieceData[move.to] = undo.pieceData || null;
+      g.pieceData[move.from] = null;
+    }
+  }
+}</code></pre>
+  <pre class="language-javascript"><code class="language-javascript">// Atomic Chess: captures cause explosions
+beforeMove: function(g, move, undo) {
+  if (g.board[move.to] && move.flag !== 'ep') {
+    g.board[move.to] = null;
+    g.board[move.from] = null;
+    undo.exploded = [];
+    var rc = MCE.rc(move.to, g);
+    for (var dr = -1; dr &lt;= 1; dr++) {
+      for (var dc = -1; dc &lt;= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        var r = rc[0] + dr, c = rc[1] + dc;
+        if (!MCE.onBoard(r, c, g)) continue;
+        var sq = MCE.sq(r, c, g);
+        if (g.board[sq] && MCE.pieceType(g.board[sq]) !== 'p') {
+          undo.exploded.push({ sq: sq, piece: g.board[sq] });
+          g.board[sq] = null;
+        }
+      }
+    }
+  } else {
+    g.board[move.to] = undo.piece;
+    g.board[move.from] = null;
+  }
+}</code></pre>
 
   <h3>turnLogic(g, undo)</h3>
   <p>Overrides turn advancement. The default is: increment fullmove on Black's turn, then flip the turn. Use this for multi-move turns, duck placement phases, etc.</p>
-  <div class="docs-code">
-// Marseillais: two moves per turn, check ends turn early<br>
-turnLogic: function(g, undo) {<br>
-&nbsp;&nbsp;g.movesThisTurn++;<br>
-&nbsp;&nbsp;undo.movesThisTurn = g.movesThisTurn - 1;<br>
-&nbsp;&nbsp;var isFirstMove = g.fullmove === 1 &amp;&amp; g.turn === MCE.WHITE;<br>
-&nbsp;&nbsp;var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;<br>
-&nbsp;&nbsp;var givesCheck = MCE.inCheck(g, opp);<br>
-&nbsp;&nbsp;if (g.movesThisTurn >= 2 || isFirstMove || givesCheck) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.turn === MCE.BLACK) g.fullmove++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.advanceTurn(g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.movesThisTurn = 0;<br>
-&nbsp;&nbsp;}<br>
-}
-  </div>
-  <div class="docs-code">
-// Duck Chess: two-phase turn (move piece, then place duck)<br>
-turnLogic: function(g, undo) {<br>
-&nbsp;&nbsp;if (!g.duckPhase) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.duckPhase = true;<br>
-&nbsp;&nbsp;} else {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.duckPhase = false;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.turn === MCE.BLACK) g.fullmove++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;MCE.advanceTurn(g);<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;undo.duckPhase = !g.duckPhase;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Marseillais: two moves per turn, check ends turn early
+turnLogic: function(g, undo) {
+  g.movesThisTurn++;
+  undo.movesThisTurn = g.movesThisTurn - 1;
+  var isFirstMove = g.fullmove === 1 && g.turn === MCE.WHITE;
+  var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
+  var givesCheck = MCE.inCheck(g, opp);
+  if (g.movesThisTurn >= 2 || isFirstMove || givesCheck) {
+    if (g.turn === MCE.BLACK) g.fullmove++;
+    MCE.advanceTurn(g);
+    g.movesThisTurn = 0;
+  }
+}</code></pre>
+  <pre class="language-javascript"><code class="language-javascript">// Duck Chess: two-phase turn (move piece, then place duck)
+turnLogic: function(g, undo) {
+  if (!g.duckPhase) {
+    g.duckPhase = true;
+  } else {
+    g.duckPhase = false;
+    if (g.turn === MCE.BLACK) g.fullmove++;
+    MCE.advanceTurn(g);
+  }
+  undo.duckPhase = !g.duckPhase;
+}</code></pre>
 
   <h3>restoreState(g, undo)</h3>
   <p>Called during <code>unmakeMove</code> to restore variant-specific state. Anything stored on <code>undo</code> in <code>turnLogic</code> should be restored here.</p>
-  <div class="docs-code">
-restoreState: function(g, undo) {<br>
-&nbsp;&nbsp;if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;<br>
-&nbsp;&nbsp;if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">restoreState: function(g, undo) {
+  if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+  if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
+}</code></pre>
 
   <h3>init(g)</h3>
   <p>Called once when a game is created, after the FEN is loaded. Use for randomised positions or initialising variant-specific game state.</p>
-  <div class="docs-code">
-// Chess960: randomise the starting position<br>
-init: function(g) {<br>
-&nbsp;&nbsp;MCE.loadFEN(g, MCE.randomFEN960());<br>
-&nbsp;&nbsp;g.positionHistory = [MCE.positionKey(g)];<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Chess960: randomise the starting position
+init: function(g) {
+  MCE.loadFEN(g, MCE.randomFEN960());
+  g.positionHistory = [MCE.positionKey(g)];
+}</code></pre>
 
   <h3>visibility(g, side)</h3>
   <p>Returns a <code>Set</code> of visible square indices for Fog of War style variants. Squares not in the set are hidden from the player.</p>
-  <div class="docs-code">
-visibility: function(g, side) {<br>
-&nbsp;&nbsp;var visible = new Set();<br>
-&nbsp;&nbsp;for (var i = 0; i &lt; g.rows * g.cols; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var p = g.board[i];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (p &amp;&amp; MCE.pieceColor(p) === side) visible.add(i);<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;var tempG = Object.assign({}, g, { turn: side });<br>
-&nbsp;&nbsp;var moves = MCE.pseudoLegalMoves(tempG);<br>
-&nbsp;&nbsp;for (var j = 0; j &lt; moves.length; j++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;visible.add(moves[j].to);<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return visible;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">visibility: function(g, side) {
+  var visible = new Set();
+  for (var i = 0; i &lt; g.rows * g.cols; i++) {
+    var p = g.board[i];
+    if (p && MCE.pieceColor(p) === side) visible.add(i);
+  }
+  var tempG = Object.assign({}, g, { turn: side });
+  var moves = MCE.pseudoLegalMoves(tempG);
+  for (var j = 0; j &lt; moves.length; j++) {
+    visible.add(moves[j].to);
+  }
+  return visible;
+}</code></pre>
 
   <h3>afterMove(g, move, undo)</h3>
   <p>Called after the move is fully executed but before turn logic runs. Use for side effects like incrementing check counters or transforming pieces. Store original state in <code>undo</code> for reversal via <code>restoreState</code>.</p>
-  <div class="docs-code">
-// Einstein Chess: non-captures demote, captures promote<br>
-afterMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;var p = g.board[move.to];<br>
-&nbsp;&nbsp;if (!p || MCE.pieceType(p) === 'k') return;<br>
-&nbsp;&nbsp;var hierarchy = ['p', 'n', 'b', 'r', 'q'];<br>
-&nbsp;&nbsp;var idx = hierarchy.indexOf(MCE.pieceType(p));<br>
-&nbsp;&nbsp;var isCapture = move.flag === 'capture' || move.flag === 'ep';<br>
-&nbsp;&nbsp;var newIdx = isCapture ? Math.min(idx + 1, 4) : Math.max(idx - 1, 0);<br>
-&nbsp;&nbsp;if (newIdx !== idx) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;undo.originalPiece = p; // save for restoreState<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var newType = hierarchy[newIdx];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = MCE.pieceColor(p) === MCE.WHITE<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? newType.toUpperCase() : newType;<br>
-&nbsp;&nbsp;}<br>
-},<br>
-restoreState: function(g, undo) {<br>
-&nbsp;&nbsp;if (undo.originalPiece) g.board[undo.to] = undo.originalPiece;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Einstein Chess: non-captures demote, captures promote
+afterMove: function(g, move, undo) {
+  var p = g.board[move.to];
+  if (!p || MCE.pieceType(p) === 'k') return;
+  var hierarchy = ['p', 'n', 'b', 'r', 'q'];
+  var idx = hierarchy.indexOf(MCE.pieceType(p));
+  var isCapture = move.flag === 'capture' || move.flag === 'ep';
+  var newIdx = isCapture ? Math.min(idx + 1, 4) : Math.max(idx - 1, 0);
+  if (newIdx !== idx) {
+    undo.originalPiece = p; // save for restoreState
+    var newType = hierarchy[newIdx];
+    g.board[move.to] = MCE.pieceColor(p) === MCE.WHITE
+      ? newType.toUpperCase() : newType;
+  }
+},
+restoreState: function(g, undo) {
+  if (undo.originalPiece) g.board[undo.to] = undo.originalPiece;
+}</code></pre>
 
   <h3>statusText(g, helpers)</h3>
   <p>Returns a custom status bar message, or <code>null</code> for default. <code>helpers.nameFor(side)</code> returns the player name for a side.</p>
-  <div class="docs-code">
-statusText: function(g, helpers) {<br>
-&nbsp;&nbsp;if (g.movesThisTurn === 1) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return helpers.nameFor(g.turn) + ' — second move';<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return null;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">statusText: function(g, helpers) {
+  if (g.movesThisTurn === 1) {
+    return helpers.nameFor(g.turn) + ' — second move';
+  }
+  return null;
+}</code></pre>
 
   <h3>aiMoveCount(g)</h3>
   <p>Tells the AI how many sequential moves to make per turn. Default is 1.</p>
-  <div class="docs-code">
-aiMoveCount: function(g) {<br>
-&nbsp;&nbsp;return g.maxMovesPerTurn[g.turn] || 1;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">aiMoveCount: function(g) {
+  return g.maxMovesPerTurn[g.turn] || 1;
+}</code></pre>
 
   <h3>positionKey(g)</h3>
   <p>Custom position hashing for the transposition table. Required when pieces aren't distinguishable from FEN alone (e.g., all pieces are <code>'X'</code> with types in pieceData).</p>
-  <div class="docs-code">
-positionKey: function(g) {<br>
-&nbsp;&nbsp;var key = '';<br>
-&nbsp;&nbsp;for (var i = 0; i &lt; g.rows * g.cols; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var pd = g.pieceData[i];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;key += pd ? pd.key[0] + pd.owner[0] : '.';<br>
-&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;return key + ' ' + g.turn;<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">positionKey: function(g) {
+  var key = '';
+  for (var i = 0; i &lt; g.rows * g.cols; i++) {
+    var pd = g.pieceData[i];
+    key += pd ? pd.key[0] + pd.owner[0] : '.';
+  }
+  return key + ' ' + g.turn;
+}</code></pre>
   <p>If not provided but <code>ownershipMode === 'pieceData'</code>, MCE auto-generates a pieceData-aware hash. Only provide this hook if you need custom hashing beyond the default.</p>
 
   <h3>Using pendingAction in afterMove</h3>
   <p>Set <code>g._pendingAction</code> in <code>afterMove</code> to require a follow-up move before the turn ends:</p>
-  <div class="docs-code">
-afterMove: function(g, move, undo) {<br>
-&nbsp;&nbsp;var pd = g.pieceData &amp;&amp; g.pieceData[move.to];<br>
-&nbsp;&nbsp;if (pd &amp;&amp; pd.mustRetreat &amp;&amp; undo.captured) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g._pendingAction = {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: move.to,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filter: function(m) { return isAdjacent(m.to, move.to, g); },<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'Must retreat after capture'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;};<br>
-&nbsp;&nbsp;}<br>
-}
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">afterMove: function(g, move, undo) {
+  var pd = g.pieceData && g.pieceData[move.to];
+  if (pd && pd.mustRetreat && undo.captured) {
+    g._pendingAction = {
+      from: move.to,
+      filter: function(m) { return isAdjacent(m.to, move.to, g); },
+      label: 'Must retreat after capture'
+    };
+  }
+}</code></pre>
   <p>The engine automatically suppresses turn advancement, restricts legal moves to the follow-up, and restores state on undo. See <a href="api.html#multi-step-turns">Multi-Step Turns</a> in the API reference for full details.</p>
 
   <h2>Variant Inheritance</h2>
   <p>A plugin can extend another variant using the <code>extends</code> property. All config from the parent is inherited, and the child can override any property.</p>
-  <div class="docs-code">
-MCE.registerVariant('fiveCheck', {<br>
-&nbsp;&nbsp;extends: 'threeCheck',<br>
-&nbsp;&nbsp;label: 'Five-Check',<br>
-&nbsp;&nbsp;checkThreshold: 5,<br>
-&nbsp;&nbsp;title: 'Five-Check',<br>
-&nbsp;&nbsp;description: 'Like Three-Check but need five checks to win.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: 5 checks or checkmate',<br>
-&nbsp;&nbsp;winCondition: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.checkCount.w >= 5) return 'checkmate';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.checkCount.b >= 5) return 'checkmate';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return null;<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('fiveCheck', {
+  extends: 'threeCheck',
+  label: 'Five-Check',
+  checkThreshold: 5,
+  title: 'Five-Check',
+  description: 'Like Three-Check but need five checks to win.',
+  rule: 'Board: 8×8 · Win: 5 checks or checkmate',
+  winCondition: function(g) {
+    if (g.checkCount.w >= 5) return 'checkmate';
+    if (g.checkCount.b >= 5) return 'checkmate';
+    return null;
+  },
+});</code></pre>
 
   <h2>Custom Pieces</h2>
   <p>If your variant introduces a new piece type, register it with <code>MCE.registerPiece()</code>. This goes in the same plugin file.</p>
-  <div class="docs-code">
-// Maharaja piece (Queen + Knight compound) — used as 'm'<br>
-MCE.registerPiece('m', {<br>
-&nbsp;&nbsp;genMoves: function(g, from, side) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var moves = [];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var pos = MCE.rc(from, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Queen directions (sliding)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var d = 0; d &lt; dirs.length; d++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var nr = pos[0] + dirs[d][0], nc = pos[1] + dirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (MCE.onBoard(nr, nc, g)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var target = MCE.sq(nr, nc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var tp = g.board[target];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (tp) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (MCE.pieceColor(tp) !== side) moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: target, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr += dirs[d][0]; nc += dirs[d][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Knight jumps<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for (var j = 0; j &lt; jumps.length; j++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var jr = pos[0] + jumps[j][0], jc = pos[1] + jumps[j][1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!MCE.onBoard(jr, jc, g)) continue;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var jt = MCE.sq(jr, jc, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!g.board[jt] || MCE.pieceColor(g.board[jt]) !== side)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: from, to: jt, flag: null });<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return moves;<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;attacks: function(g, from, target) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Return true if 'from' attacks 'target'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var fp = MCE.rc(from, g), tp = MCE.rc(target, g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var dr = tp[0] - fp[0], dc = tp[1] - fp[1];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Knight attack<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if ((Math.abs(dr) === 2 &amp;&amp; Math.abs(dc) === 1) ||<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Math.abs(dr) === 1 &amp;&amp; Math.abs(dc) === 2)) return true;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;// Queen attack (sliding, check for blockers)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var stepR = dr === 0 ? 0 : dr / Math.abs(dr);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var stepC = dc === 0 ? 0 : dc / Math.abs(dc);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var cr = fp[0] + stepR, cc = fp[1] + stepC;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while (cr !== tp[0] || cc !== tp[1]) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[MCE.sq(cr, cc, g)]) return false;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cr += stepR; cc += stepC;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return true;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return false;<br>
-&nbsp;&nbsp;}<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">// Maharaja piece (Queen + Knight compound) — used as 'm'
+MCE.registerPiece('m', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var pos = MCE.rc(from, g);
+    // Queen directions (sliding)
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+    for (var d = 0; d &lt; dirs.length; d++) {
+      var nr = pos[0] + dirs[d][0], nc = pos[1] + dirs[d][1];
+      while (MCE.onBoard(nr, nc, g)) {
+        var target = MCE.sq(nr, nc, g);
+        var tp = g.board[target];
+        if (tp) {
+          if (MCE.pieceColor(tp) !== side) moves.push({ from: from, to: target, flag: null });
+          break;
+        }
+        moves.push({ from: from, to: target, flag: null });
+        nr += dirs[d][0]; nc += dirs[d][1];
+      }
+    }
+    // Knight jumps
+    var jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+    for (var j = 0; j &lt; jumps.length; j++) {
+      var jr = pos[0] + jumps[j][0], jc = pos[1] + jumps[j][1];
+      if (!MCE.onBoard(jr, jc, g)) continue;
+      var jt = MCE.sq(jr, jc, g);
+      if (!g.board[jt] || MCE.pieceColor(g.board[jt]) !== side)
+        moves.push({ from: from, to: jt, flag: null });
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    // Return true if 'from' attacks 'target'
+    var fp = MCE.rc(from, g), tp = MCE.rc(target, g);
+    var dr = tp[0] - fp[0], dc = tp[1] - fp[1];
+    // Knight attack
+    if ((Math.abs(dr) === 2 && Math.abs(dc) === 1) ||
+        (Math.abs(dr) === 1 && Math.abs(dc) === 2)) return true;
+    // Queen attack (sliding, check for blockers)
+    if (dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc)) {
+      var stepR = dr === 0 ? 0 : dr / Math.abs(dr);
+      var stepC = dc === 0 ? 0 : dc / Math.abs(dc);
+      var cr = fp[0] + stepR, cc = fp[1] + stepC;
+      while (cr !== tp[0] || cc !== tp[1]) {
+        if (g.board[MCE.sq(cr, cc, g)]) return false;
+        cr += stepR; cc += stepC;
+      }
+      return true;
+    }
+    return false;
+  }
+});</code></pre>
   <p>The <code>registerPiece</code> handler requires two functions:</p>
   <ul>
     <li><code>genMoves(g, from, side)</code> — return all pseudo-legal moves for the piece at <code>from</code></li>
@@ -494,92 +446,84 @@ MCE.registerPiece('m', {<br>
   <h2>Complete Examples</h2>
 
   <h3>Simplest: flag-only variant</h3>
-  <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('torpedo', {<br>
-&nbsp;&nbsp;label: 'Torpedo Chess',<br>
-&nbsp;&nbsp;group: 'Classic',<br>
-&nbsp;&nbsp;rows: 8, cols: 8, fen: null,<br>
-&nbsp;&nbsp;torpedo: true,<br>
-&nbsp;&nbsp;title: 'Torpedo Chess',<br>
-&nbsp;&nbsp;description: 'Pawns can double-push from any rank, not just the starting row.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('torpedo', {
+  label: 'Torpedo Chess',
+  group: 'Classic',
+  rows: 8, cols: 8, fen: null,
+  torpedo: true,
+  title: 'Torpedo Chess',
+  description: 'Pawns can double-push from any rank, not just the starting row.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+});</code></pre>
 
   <h3>Win condition variant</h3>
-  <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('threeCheck', {<br>
-&nbsp;&nbsp;label: 'Three-Check',<br>
-&nbsp;&nbsp;group: 'Tactical',<br>
-&nbsp;&nbsp;rows: 8, cols: 8, fen: null,<br>
-&nbsp;&nbsp;checkThreshold: 3,<br>
-&nbsp;&nbsp;title: 'Three-Check',<br>
-&nbsp;&nbsp;description: 'Deliver three checks to win immediately.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate or 3 checks',<br>
-&nbsp;&nbsp;winCondition: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.checkCount.w >= 3) return 'checkmate';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.checkCount.b >= 3) return 'checkmate';<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return null;<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('threeCheck', {
+  label: 'Three-Check',
+  group: 'Tactical',
+  rows: 8, cols: 8, fen: null,
+  checkThreshold: 3,
+  title: 'Three-Check',
+  description: 'Deliver three checks to win immediately.',
+  rule: 'Board: 8×8 · Win: Checkmate or 3 checks',
+  winCondition: function(g) {
+    if (g.checkCount.w >= 3) return 'checkmate';
+    if (g.checkCount.b >= 3) return 'checkmate';
+    return null;
+  },
+});</code></pre>
 
   <h3>Multi-move turn variant</h3>
-  <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('monsterChess', {<br>
-&nbsp;&nbsp;label: 'Monster Chess',<br>
-&nbsp;&nbsp;group: 'Alternate Rules',<br>
-&nbsp;&nbsp;rows: 8, cols: 8,<br>
-&nbsp;&nbsp;fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',<br>
-&nbsp;&nbsp;title: 'Monster Chess',<br>
-&nbsp;&nbsp;description: 'White gets two moves per turn; Black gets one.',<br>
-&nbsp;&nbsp;rule: 'Board: 8×8 · Win: Checkmate',<br>
-&nbsp;&nbsp;init: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.maxMovesPerTurn = { w: 2, b: 1 };<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.lastMovedSq = -1;<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;turnLogic: function(g, undo) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;g.movesThisTurn++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;undo.movesThisTurn = g.movesThisTurn - 1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;undo.lastMovedSq = g.lastMovedSq;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var max = g.maxMovesPerTurn[g.turn] || 1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (g.movesThisTurn >= max || MCE.inCheck(g, opp)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.turn === MCE.BLACK) g.fullmove++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MCE.advanceTurn(g);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.movesThisTurn = 0;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.lastMovedSq = -1;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;} else {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.lastMovedSq = undo.to;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;restoreState: function(g, undo) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;aiMoveCount: function(g) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;return g.maxMovesPerTurn[g.turn] || 1;<br>
-&nbsp;&nbsp;},<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('monsterChess', {
+  label: 'Monster Chess',
+  group: 'Alternate Rules',
+  rows: 8, cols: 8,
+  fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',
+  title: 'Monster Chess',
+  description: 'White gets two moves per turn; Black gets one.',
+  rule: 'Board: 8×8 · Win: Checkmate',
+  init: function(g) {
+    g.maxMovesPerTurn = { w: 2, b: 1 };
+    g.lastMovedSq = -1;
+  },
+  turnLogic: function(g, undo) {
+    g.movesThisTurn++;
+    undo.movesThisTurn = g.movesThisTurn - 1;
+    undo.lastMovedSq = g.lastMovedSq;
+    var max = g.maxMovesPerTurn[g.turn] || 1;
+    var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
+    if (g.movesThisTurn >= max || MCE.inCheck(g, opp)) {
+      if (g.turn === MCE.BLACK) g.fullmove++;
+      MCE.advanceTurn(g);
+      g.movesThisTurn = 0;
+      g.lastMovedSq = -1;
+    } else {
+      g.lastMovedSq = undo.to;
+    }
+  },
+  restoreState: function(g, undo) {
+    if (undo.movesThisTurn !== undefined) g.movesThisTurn = undo.movesThisTurn;
+    if (undo.lastMovedSq !== undefined) g.lastMovedSq = undo.lastMovedSq;
+  },
+  aiMoveCount: function(g) {
+    return g.maxMovesPerTurn[g.turn] || 1;
+  },
+});</code></pre>
 
   <h3>Large board with custom pieces</h3>
-  <div class="docs-code">
-'use strict';<br>
-MCE.registerVariant('capablanca', {<br>
-&nbsp;&nbsp;label: 'Capablanca',<br>
-&nbsp;&nbsp;group: 'Large Boards',<br>
-&nbsp;&nbsp;rows: 8, cols: 10,<br>
-&nbsp;&nbsp;fen: 'rnabqkbcnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNABQKBCNR w KQkq - 0 1',<br>
-&nbsp;&nbsp;promotionPieces: ['q', 'r', 'b', 'n', 'a', 'c'],<br>
-&nbsp;&nbsp;title: 'Capablanca Chess',<br>
-&nbsp;&nbsp;description: 'Adds Archbishop (a) and Chancellor (c) on a 10-wide board.',<br>
-&nbsp;&nbsp;rule: 'Board: 10×8 · Win: Checkmate',<br>
-});
-  </div>
+  <pre class="language-javascript"><code class="language-javascript">'use strict';
+MCE.registerVariant('capablanca', {
+  label: 'Capablanca',
+  group: 'Large Boards',
+  rows: 8, cols: 10,
+  fen: 'rnabqkbcnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNABQKBCNR w KQkq - 0 1',
+  promotionPieces: ['q', 'r', 'b', 'n', 'a', 'c'],
+  title: 'Capablanca Chess',
+  description: 'Adds Archbishop (a) and Chancellor (c) on a 10-wide board.',
+  rule: 'Board: 10×8 · Win: Checkmate',
+});</code></pre>
 
   <h2>File Naming &amp; Loading</h2>
   <p>Name your file using kebab-case matching the variant: <code>js/variants/king-of-the-hill.js</code>. Then add it to both:</p>
@@ -612,5 +556,8 @@ MCE.registerVariant('capablanca', {<br>
   <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
 </footer>
 <script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
 </body>
 </html>
