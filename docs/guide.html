@@ -40,8 +40,18 @@
 <div class="docs-layout">
 <nav class="docs-toc" id="docs-toc"></nav>
 <div class="docs-body">
-  <h1>Building a Variant: Orda Chess</h1>
-  <p class="docs-lede">This guide walks through creating a complete variant plugin from scratch. We will build Orda Chess step by step, using every major plugin concept: custom pieces, divergent movement, attack functions, asymmetric FEN, and variant registration.</p>
+  <h1>Variant Guides</h1>
+  <p class="docs-lede">Three guides covering every hook and utility in the engine. Each builds a real variant from scratch.</p>
+
+  <table class="docs-table">
+    <tr><th>Guide</th><th>Concepts covered</th></tr>
+    <tr><td><strong>Orda Chess</strong> (below)</td><td>registerPiece, custom movement, attack functions, divergentPieces, asymmetric FEN</td></tr>
+    <tr><td><a href="guide-crazyhouse.html">Crazyhouse</a></td><td>Action moves, moveFilter, afterMove, mutateBoard, restoreState, evaluate, statusText, init</td></tr>
+    <tr><td><a href="guide-poison.html">Poison Chess</a></td><td>Effects system (addEffect, hasEffect, tickEffects), moveFilter, afterMove, mutateBoard, evaluate</td></tr>
+  </table>
+
+  <h2>Building Orda Chess</h2>
+  <p>This guide builds Orda Chess step by step, using custom pieces, divergent movement, attack functions, asymmetric FEN, and variant registration.</p>
 
   <section id="prerequisites">
     <h2>Prerequisites</h2>

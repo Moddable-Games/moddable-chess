@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Crazyhouse — Moddable Chess</title>
+<link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="Building Crazyhouse — Moddable Chess">
+<meta property="og:description" content="Step-by-step guide to building Crazyhouse using action moves, moveFilter, afterMove, and restoreState.">
+<meta property="og:url" content="https://chess.moddable.games/docs/guide-crazyhouse.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Building Crazyhouse — Moddable Chess">
+<meta name="twitter:description" content="Step-by-step guide to building Crazyhouse using action moves, moveFilter, afterMove, and restoreState.">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.15">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.6.15">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="stylesheet" href="../css/shared.css?v=0.6.15">
+<link rel="stylesheet" href="../css/docs.css?v=0.6.15">
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../" class="site-nav__brand">
+    <img src="../assets/cube.svg" class="site-nav__cube" alt="">
+    <span class="site-nav__wordmark">Moddable Chess</span>
+  </a>
+  <div class="site-nav__links">
+    <a href="../play/">Play</a>
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Variants</a>
+    <a href="guide.html" class="active">Guide</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+<nav class="docs-toc" id="docs-toc"></nav>
+<div class="docs-body">
+  <h1>Building Crazyhouse</h1>
+  <p class="docs-lede">This guide builds Crazyhouse from scratch, demonstrating action moves, moveFilter, afterMove, mutateBoard, restoreState, evaluate, and statusText. These are the Tier 3 hooks that enable ability-based and state-tracking variants.</p>
+  <p><a href="guide.html">Back to all guides</a></p>
+
+  <section id="overview">
+    <h2>What We Are Building</h2>
+    <p>Crazyhouse is the most popular chess variant online. When you capture a piece, it goes into your "hand." On your turn, instead of moving a piece on the board, you can "drop" a piece from your hand onto any empty square. This creates an ever-growing arsenal and deep tactical play.</p>
+    <p>Key engine features used:</p>
+    <ul>
+      <li><code>init</code> — set up hand state on game creation</li>
+      <li><code>moveFilter</code> — generate drop moves alongside normal moves</li>
+      <li><code>afterMove</code> — place drops via mutateBoard; capture pieces into hand</li>
+      <li><code>restoreState</code> — restore hand when AI undoes moves during search</li>
+      <li><code>evaluate</code> — value pieces in hand for AI scoring</li>
+      <li><code>statusText</code> — show hand contents to the player</li>
+    </ul>
+  </section>
+
+  <section id="step1">
+    <h2>Step 1: Create the Plugin File</h2>
+    <p>Create <code>js/variants/crazyhouse.js</code> with the skeleton:</p>
+    <div class="docs-code">
+'use strict';<br>
+MCE.registerVariant('crazyhouse', {<br>
+&nbsp;&nbsp;label: 'Crazyhouse',<br>
+&nbsp;&nbsp;group: 'Alternate Rules',<br>
+&nbsp;&nbsp;rows: 8, cols: 8,<br>
+&nbsp;&nbsp;fen: null,<br>
+&nbsp;&nbsp;title: 'Crazyhouse',<br>
+&nbsp;&nbsp;description: 'Captured pieces switch sides and can be dropped back onto the board.',<br>
+&nbsp;&nbsp;rule: 'Board: 8x8 - Win: Checkmate',<br>
+&nbsp;&nbsp;init: function(g) { },<br>
+&nbsp;&nbsp;moveFilter: function(g, moves) { return moves; },<br>
+&nbsp;&nbsp;afterMove: function(g, move, undo) { },<br>
+&nbsp;&nbsp;restoreState: function(g, undo) { },<br>
+&nbsp;&nbsp;evaluate: function(g, defaultEval) { return defaultEval(g); },<br>
+&nbsp;&nbsp;statusText: function(g, helpers) { return null; },<br>
+});
+    </div>
+    <p>Add the script tag to <code>play/index.html</code> before <code>game-controller.js</code>.</p>
+  </section>
+
+  <section id="step2">
+    <h2>Step 2: Initialize Hand State</h2>
+    <p>The <code>init</code> hook runs once when the game is created. We use it to add a hand for each side:</p>
+    <div class="docs-code">
+init: function(g) {<br>
+&nbsp;&nbsp;g.hand = { w: [], b: [] };<br>
+}
+    </div>
+    <p>The hand is an array of piece type characters (e.g. <code>['p', 'n', 'b']</code>). These are always lowercase — the engine determines colour from whose hand it is.</p>
+  </section>
+
+  <section id="step3">
+    <h2>Step 3: Generate Drop Moves</h2>
+    <p>The <code>moveFilter</code> hook receives all legal moves and can add or remove from the list. We append drop moves for each unique piece type in the player's hand:</p>
+    <div class="docs-code">
+moveFilter: function(g, moves) {<br>
+&nbsp;&nbsp;var side = g.turn;<br>
+&nbsp;&nbsp;var hand = g.hand[side];<br>
+&nbsp;&nbsp;if (!hand || hand.length === 0) return moves;<br>
+<br>
+&nbsp;&nbsp;var total = g.rows * g.cols;<br>
+&nbsp;&nbsp;var uniquePieces = {};<br>
+&nbsp;&nbsp;for (var h = 0; h &lt; hand.length; h++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uniquePieces[hand[h]] = true;<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;var pieceTypes = Object.keys(uniquePieces);<br>
+&nbsp;&nbsp;for (var p = 0; p &lt; pieceTypes.length; p++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var pt = pieceTypes[p];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for (var sq = 0; sq &lt; total; sq++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (g.board[sq]) continue;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (pt === 'p') {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var rc = MCE.rc(sq, g);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (rc[0] === 0 || rc[0] === g.rows - 1) continue;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;moves.push({ from: sq, to: sq, flag: 'action',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action: 'drop', dropPiece: pt });<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;return moves;<br>
+}
+    </div>
+    <p>Key points:</p>
+    <ul>
+      <li><code>flag: 'action'</code> tells the engine to skip normal board mutation — the piece does not move physically</li>
+      <li><code>from: sq, to: sq</code> — drops target the same square (the piece appears there)</li>
+      <li>Pawns cannot be dropped on rank 0 or rank 7 (promotion ranks)</li>
+      <li>We deduplicate piece types — if you have 3 pawns in hand, you only generate pawn drops once per empty square</li>
+    </ul>
+  </section>
+
+  <section id="step4">
+    <h2>Step 4: Handle Drops and Captures</h2>
+    <p>The <code>afterMove</code> hook fires after the piece has moved (or in our case, after the action move no-op). We handle two cases:</p>
+    <div class="docs-code">
+afterMove: function(g, move, undo) {<br>
+&nbsp;&nbsp;var moverSide = undo.turn;<br>
+<br>
+&nbsp;&nbsp;if (move.flag === 'action' && move.action === 'drop') {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Place piece from hand onto the board<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var dropChar = move.dropPiece;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var placed = (moverSide === MCE.WHITE)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? dropChar.toUpperCase() : dropChar;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;MCE.mutateBoard(g, undo, [{ sq: move.to, piece: placed }]);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Remove from hand (save for undo)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;undo._handBefore = g.hand[moverSide].slice();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var idx = g.hand[moverSide].indexOf(dropChar);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (idx !== -1) g.hand[moverSide].splice(idx, 1);<br>
+<br>
+&nbsp;&nbsp;} else if (undo.captured || move.flag === 'ep') {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Capture: add piece type to hand<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var capturedPiece = undo.captured;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (move.flag === 'ep') capturedPiece = undo.epCaptured;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (capturedPiece) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;undo._handBefore = g.hand[moverSide].slice();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g.hand[moverSide].push(MCE.pieceType(capturedPiece));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
+    </div>
+    <p><code>MCE.mutateBoard(g, undo, [...])</code> places the piece AND automatically tracks the change for undo — no manual restoration needed for board changes. We only need to manually track the hand state since it is not part of the board array.</p>
+  </section>
+
+  <section id="step5">
+    <h2>Step 5: Restore Hand State</h2>
+    <p>The <code>restoreState</code> hook fires during <code>unmakeMove</code>. The AI calls make/unmake millions of times during search, so this must be correct:</p>
+    <div class="docs-code">
+restoreState: function(g, undo) {<br>
+&nbsp;&nbsp;if (undo._handBefore !== undefined) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g.hand[undo.turn] = undo._handBefore;<br>
+&nbsp;&nbsp;}<br>
+}
+    </div>
+    <p>We saved a snapshot of the hand array before modifying it. Restoration is a simple reassignment. The board changes made via <code>mutateBoard</code> are restored automatically — we do not need to handle those here.</p>
+  </section>
+
+  <section id="step6">
+    <h2>Step 6: Custom Evaluation</h2>
+    <p>The AI needs to know that pieces in hand have value. We score them at 70% of their board value:</p>
+    <div class="docs-code">
+evaluate: function(g, defaultEval) {<br>
+&nbsp;&nbsp;var material = defaultEval(g);<br>
+&nbsp;&nbsp;var score = material;<br>
+&nbsp;&nbsp;var pieceValues = { p: 70, n: 210, b: 220, r: 350, q: 630 };<br>
+&nbsp;&nbsp;var side = g.turn;<br>
+&nbsp;&nbsp;var opp = (side === MCE.WHITE) ? MCE.BLACK : MCE.WHITE;<br>
+<br>
+&nbsp;&nbsp;var myHand = g.hand[side] || [];<br>
+&nbsp;&nbsp;var oppHand = g.hand[opp] || [];<br>
+<br>
+&nbsp;&nbsp;for (var i = 0; i &lt; myHand.length; i++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;score += (pieceValues[myHand[i]] || 0);<br>
+&nbsp;&nbsp;for (var j = 0; j &lt; oppHand.length; j++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;score -= (pieceValues[oppHand[j]] || 0);<br>
+<br>
+&nbsp;&nbsp;return score;<br>
+}
+    </div>
+    <p>The <code>defaultEval</code> parameter gives material + piece-square table scoring for on-board pieces. We add hand value on top.</p>
+  </section>
+
+  <section id="step7">
+    <h2>Step 7: Status Text</h2>
+    <p>Show the current player's hand contents:</p>
+    <div class="docs-code">
+statusText: function(g, helpers) {<br>
+&nbsp;&nbsp;var hand = g.hand[g.turn] || [];<br>
+&nbsp;&nbsp;if (hand.length === 0) return null;<br>
+&nbsp;&nbsp;return helpers.nameFor(g.turn) + ' hand: ' + hand.slice().sort().join(', ');<br>
+}
+    </div>
+    <p>Returning <code>null</code> falls through to the default status text ("White to move", etc.).</p>
+  </section>
+
+  <section id="summary">
+    <h2>Summary</h2>
+    <p>Hooks used and their purpose:</p>
+    <table class="docs-table">
+      <thead><tr><th>Hook</th><th>Purpose in Crazyhouse</th></tr></thead>
+      <tbody>
+        <tr><td><code>init</code></td><td>Create <code>g.hand</code> state for both sides</td></tr>
+        <tr><td><code>moveFilter</code></td><td>Generate drop action moves for pieces in hand</td></tr>
+        <tr><td><code>afterMove</code></td><td>Place drops via mutateBoard; add captures to hand</td></tr>
+        <tr><td><code>restoreState</code></td><td>Restore hand array during AI search undo</td></tr>
+        <tr><td><code>evaluate</code></td><td>Score hand pieces at 70% board value</td></tr>
+        <tr><td><code>statusText</code></td><td>Display hand contents to the player</td></tr>
+      </tbody>
+    </table>
+    <p>The complete file is approximately 110 lines. Action moves and mutateBoard handle all the complexity of piece drops with automatic undo support.</p>
+    <p><a href="guide.html">Back to all guides</a> | <a href="guide-poison.html">Next: Poison Chess (Effects System)</a></p>
+  </section>
+</div>
+</div>
+
+<footer class="site-footer">
+  <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.6.15</p>
+</footer>
+<script src="../js/docs-toc.js?v=0.6.15"></script>
+</body>
+</html>
