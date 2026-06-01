@@ -153,9 +153,11 @@ function renderBoard(container, game, opts) {
   }
 
   // Build current piece positions map
+  const excludeSq = opts.excludePiece !== undefined ? opts.excludePiece : -1;
   const currentPositions = new Map();
   const total = rows * cols;
   for (let i = 0; i < total; i++) {
+    if (i === excludeSq) continue;
     const p = game.board[i];
     if (!p) continue;
     if (fogMask && !fogMask.has(i)) continue;
