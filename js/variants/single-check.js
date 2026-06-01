@@ -9,6 +9,30 @@ MCE.registerVariant('singleCheck', {
   title: 'Single-Check',
   description: 'Deliver just one check to win instantly. Ultra-aggressive variant where every move is a potential game-ender. King safety is everything.',
   rule: 'Board: 8×8 · Win: One check',
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    var oppKingSq = -1;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (p && MCE.pieceType(p) === 'k' && MCE.pieceColor(p) !== g.turn) {
+        oppKingSq = i;
+        break;
+      }
+    }
+    var kingPressure = 0;
+    if (oppKingSq >= 0) {
+      var krc = MCE.rc(oppKingSq, g);
+      for (var j = 0; j < g.board.length; j++) {
+        var piece = g.board[j];
+        if (!piece || MCE.pieceColor(piece) !== g.turn) continue;
+        var prc = MCE.rc(j, g);
+        var dist = Math.abs(prc[0] - krc[0]) + Math.abs(prc[1] - krc[1]);
+        if (dist <= 2) kingPressure += 100;
+        else if (dist <= 4) kingPressure += 30;
+      }
+    }
+    return material + kingPressure;
+  },
   winCondition: function(g) {
     if (g.checkCount.w >= 1) return 'checkmate';
     if (g.checkCount.b >= 1) return 'checkmate';

@@ -9,6 +9,32 @@ MCE.registerVariant('atomic', {
   title: 'Atomic Chess',
   description: 'Captures cause explosions that destroy all non-pawn pieces on adjacent squares, including the capturer. If a king is caught in the blast, that side loses.',
   rule: 'Board: 8×8 · Win: Explode opponent\'s king',
+  evaluate: function(g, defaultEval) {
+    var whiteKingSq = -1, blackKingSq = -1;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (p && MCE.pieceType(p) === 'k') {
+        if (MCE.pieceColor(p) === MCE.WHITE) whiteKingSq = i;
+        else blackKingSq = i;
+      }
+    }
+    if (whiteKingSq === -1) return g.turn === MCE.BLACK ? 100000 : -100000;
+    if (blackKingSq === -1) return g.turn === MCE.WHITE ? 100000 : -100000;
+    var material = defaultEval(g);
+    var score = material;
+    var targetKingSq = (g.turn === MCE.WHITE) ? blackKingSq : whiteKingSq;
+    var tkRc = MCE.rc(targetKingSq, g);
+    for (var j = 0; j < g.board.length; j++) {
+      var piece = g.board[j];
+      if (!piece || MCE.pieceColor(piece) !== g.turn) continue;
+      if (MCE.pieceType(piece) === 'k') continue;
+      var rc = MCE.rc(j, g);
+      var dist = Math.abs(rc[0] - tkRc[0]) + Math.abs(rc[1] - tkRc[1]);
+      if (dist <= 2) score += 200;
+      else if (dist <= 4) score += 80;
+    }
+    return score;
+  },
   beforeMove: function(g, move, undo) {
     if (g.board[move.to] && move.flag !== 'ep') {
       g.board[move.to] = undo.piece;

@@ -19,6 +19,21 @@ MCE.registerVariant('racingKings', {
     }
     return null;
   },
+  evaluate: function(g) {
+    var myKingRank = 7, oppKingRank = 7;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (p && MCE.pieceType(p) === 'k') {
+        var rank = MCE.rc(i, g)[0];
+        if (MCE.pieceColor(p) === g.turn) myKingRank = rank;
+        else oppKingRank = rank;
+      }
+    }
+    var score = (oppKingRank - myKingRank) * 300;
+    if (myKingRank === 0) score = 100000;
+    if (oppKingRank === 0) score = -100000;
+    return score;
+  },
   moveFilter: function(g, moves) {
     return moves.filter(function(m) {
       var undo = MCE.makeMove(g, m);

@@ -45,7 +45,7 @@ function ttStore(key, depth, score, flag, bestMove) {
   tt[idx] = { key, depth, score, flag, bestMove, gen: ttGeneration };
 }
 
-function evaluate(g) {
+function defaultEvaluate(g) {
   let score = 0;
   const total = g.rows * g.cols;
   for (let i = 0; i < total; i++) {
@@ -55,6 +55,12 @@ function evaluate(g) {
     score += pieceColor(p) === WHITE ? val : -val;
   }
   return g.turn === WHITE ? score : -score;
+}
+
+function evaluate(g) {
+  const vc = MCE.getVariantConfig(g.variant);
+  if (vc && vc.evaluate) return vc.evaluate(g, defaultEvaluate);
+  return defaultEvaluate(g);
 }
 
 function getAIMoves(g) {

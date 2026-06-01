@@ -16,6 +16,19 @@ MCE.registerVariant('giveaway', {
     });
     return captures.length > 0 ? captures : moves;
   },
+  evaluate: function(g) {
+    var score = 0;
+    var myCount = 0, oppCount = 0;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceColor(p) === g.turn) myCount++;
+      else oppCount++;
+    }
+    score = (oppCount - myCount) * 200;
+    if (myCount === 0) score = 100000;
+    return score;
+  },
   winCondition: function(g) {
     var hasPiece = false;
     for (var i = 0; i < g.board.length; i++) {

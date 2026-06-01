@@ -8,6 +8,28 @@ MCE.registerVariant('horde', {
   title: 'Horde Chess',
   description: 'Massively asymmetric — White has 36 pawns filling ranks 1-4, Black has a normal army. Black wins by checkmate or eliminating all White pieces.',
   rule: 'Board: 8×8 · Win: Checkmate (Black) or eliminate horde (Black)',
+  evaluate: function(g, defaultEval) {
+    var whitePawns = 0, blackMaterial = 0;
+    var VALS = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceColor(p) === MCE.WHITE) {
+        whitePawns++;
+        var rank = MCE.rc(i, g)[0];
+        if (g.turn === MCE.WHITE) {
+          whitePawns += (7 - rank) * 0.1;
+        }
+      } else {
+        blackMaterial += VALS[MCE.pieceType(p)] || 100;
+      }
+    }
+    if (g.turn === MCE.WHITE) {
+      return whitePawns * 30 - blackMaterial * 0.3;
+    } else {
+      return blackMaterial * 0.3 - whitePawns * 30;
+    }
+  },
   winCondition: function(g) {
     var whiteHasPieces = g.board.some(function(p) {
       return p && MCE.pieceColor(p) === MCE.WHITE;
