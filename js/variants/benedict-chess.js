@@ -48,6 +48,22 @@ MCE.registerVariant('benedictChess', {
       }
     }
   },
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    var myCount = 0, oppCount = 0;
+    var oppHasKing = false;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceColor(p) === g.turn) myCount++;
+      else {
+        oppCount++;
+        if (MCE.pieceType(p) === 'k') oppHasKing = true;
+      }
+    }
+    if (!oppHasKing) return 100000;
+    return material + (myCount - oppCount) * 50;
+  },
   winCondition: function(g) {
     var whiteKing = false;
     var blackKing = false;

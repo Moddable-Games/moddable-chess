@@ -9,6 +9,17 @@ MCE.registerVariant('omnicide', {
   title: 'Omnicide Chess',
   description: 'The goal is to lose all your pieces. Unlike Antichess, captures are NOT forced — you choose freely. The king is just another piece (no check).',
   rule: 'Board: 8×8 · Win: Lose all pieces',
+  evaluate: function(g) {
+    var myCount = 0, oppCount = 0;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceColor(p) === g.turn) myCount++;
+      else oppCount++;
+    }
+    if (myCount === 0) return 100000;
+    return (oppCount - myCount) * 200;
+  },
   winCondition: function(g) {
     var hasPiece = false;
     for (var i = 0; i < g.board.length; i++) {

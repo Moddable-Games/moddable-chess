@@ -9,6 +9,16 @@ MCE.registerVariant('shatar', {
   title: 'Shatar (Mongolian Chess)',
   description: 'Mongolian chess where check does not exist. You win by leaving the opponent with a bare king — their last remaining piece. Standard moves otherwise.',
   rule: 'Board: 8×8 · Win: Bare king',
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    var oppCount = 0;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (p && MCE.pieceColor(p) !== g.turn) oppCount++;
+    }
+    if (oppCount === 1) return 100000;
+    return material + (16 - oppCount) * 60;
+  },
   winCondition: function(g) {
     var wCount = 0, bCount = 0;
     for (var i = 0; i < g.board.length; i++) {

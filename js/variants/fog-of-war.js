@@ -24,6 +24,21 @@ MCE.registerVariant('fogOfWar', {
     }
     return visible;
   },
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    var myActivity = 0, oppActivity = 0;
+    var total = g.rows * g.cols;
+    for (var i = 0; i < total; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceColor(p) === g.turn) {
+        var rc = MCE.rc(i, g);
+        var centerDist = Math.abs(rc[0] - 3.5) + Math.abs(rc[1] - 3.5);
+        myActivity += (7 - centerDist) * 10;
+      }
+    }
+    return material + myActivity;
+  },
   winCondition: function(g) {
     var whiteKing = false, blackKing = false;
     for (var i = 0; i < g.board.length; i++) {

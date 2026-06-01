@@ -20,6 +20,19 @@ MCE.registerVariant('darkChess', {
     }
     return visible;
   },
+  evaluate: function(g, defaultEval) {
+    var material = defaultEval(g);
+    var myActivity = 0;
+    var total = g.rows * g.cols;
+    for (var i = 0; i < total; i++) {
+      var p = g.board[i];
+      if (!p || MCE.pieceColor(p) !== g.turn) continue;
+      var rc = MCE.rc(i, g);
+      var centerDist = Math.abs(rc[0] - 3.5) + Math.abs(rc[1] - 3.5);
+      myActivity += (7 - centerDist) * 10;
+    }
+    return material + myActivity;
+  },
   winCondition: function(g) {
     var whiteKing = false;
     var blackKing = false;
