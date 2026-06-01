@@ -53,6 +53,11 @@ function renderBoard(container, game, opts) {
   const animCaptureBurst = opts.animCaptureBurst || false;
 
   container.innerHTML = '';
+
+  if (opts.surroundRenderer) {
+    try { opts.surroundRenderer(container, game, { width: size, height, tileSize, rows, cols, flipped }); } catch (e) { /* don't crash */ }
+  }
+
   const svg = svgEl('svg', { width: size, height: height, viewBox: `0 0 ${size} ${height}` });
 
   // Draw squares
@@ -114,6 +119,19 @@ function renderBoard(container, game, opts) {
         cx, cy, r: tileSize * 0.15, fill: theme.dot,
       }));
     }
+  }
+
+  // Draw effect overlays
+  if (opts.effectOverlay && game.effects && game.effects.length > 0) {
+    try {
+      for (const effect of game.effects) {
+        const [er, ec] = MCE.rc(effect.sq, game);
+        const edr = flipped ? rows - 1 - er : er;
+        const edc = flipped ? cols - 1 - ec : ec;
+        const el = opts.effectOverlay(svg, effect, edc * tileSize, edr * tileSize, tileSize, game);
+        if (el) svg.appendChild(el);
+      }
+    } catch (e) { /* don't crash */ }
   }
 
   // Draw fog overlay
