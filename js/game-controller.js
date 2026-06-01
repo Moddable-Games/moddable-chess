@@ -488,6 +488,9 @@ function render() {
 
   if (game.duckPhase) {
     opts.legalMoves = [];
+  } else if (game._pendingAction) {
+    opts.legalMoves = getMovesForVariant();
+    opts.selected = game._pendingAction.from;
   } else if (!aiThinking || game.turn !== aiColor) {
     const allMoves = getMovesForVariant();
     opts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
@@ -651,6 +654,15 @@ function handleClick(sq) {
     return;
   }
 
+  if (game._pendingAction) {
+    const allMoves = getMovesForVariant();
+    const candidates = allMoves.filter(m => m.to === sq);
+    if (candidates.length > 0) {
+      executeMove(candidates[0]);
+    }
+    return;
+  }
+
   const piece = game.board[sq];
   const allMoves = getMovesForVariant();
 
@@ -685,6 +697,13 @@ function executeMove(move) {
   renderControls();
   renderCaptured();
   render();
+
+  if (game._pendingAction) {
+    if (gameMode === 'solo' && game.turn === aiColor) {
+      scheduleAIMove();
+    }
+    return;
+  }
 
   if (gameMode === 'solo' && !isGameOver()) {
     if (currentVariant === 'duckChess' && game.duckPhase) {
@@ -803,6 +822,18 @@ function scheduleAIMove() {
 function doAIMove() {
   if (isGameOver()) { aiThinking = false; render(); return; }
 
+  if (game._pendingAction) {
+    const moves = getMovesForVariant();
+    if (moves.length > 0) {
+      const pick = moves[Math.floor(Math.random() * moves.length)];
+      handleAIResult(pick);
+    } else {
+      aiThinking = false;
+      render();
+    }
+    return;
+  }
+
   const vcAI = MCE.getVariantConfig(currentVariant);
   if (vcAI && vcAI.aiMoveCount) {
     const count = vcAI.aiMoveCount(game);
@@ -842,6 +873,11 @@ function handleAIResult(move) {
   undoStack.push(undo);
   lastMove = { from: move.from, to: move.to };
   addMoveToList(move, side);
+
+  if (game._pendingAction) {
+    setTimeout(doAIMove, 100);
+    return;
+  }
 
   if (currentVariant === 'duckChess' && game.duckPhase) {
     if (aiWorker && aiWorkerReady) {

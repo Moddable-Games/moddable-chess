@@ -30,18 +30,20 @@ moddable-chess/
 │   ├── style.css           ← Play page styles
 │   └── docs.css            ← Documentation styles
 ├── js/
-│   ├── chess-engine.js     ← Core: board state, FEN, coordinate helpers
-│   ├── chess-moves.js      ← Move generation: pseudo-legal + legal moves
-│   ├── chess-play.js       ← Make/unmake moves, turn logic dispatch
-│   ├── chess-variants.js   ← Variant status + custom piece registration
-│   ├── board-renderer.js   ← SVG board renderer (variable sizes)
-│   ├── game-controller.js  ← Play page: wires engine to renderer
-│   ├── home.js             ← Homepage: variant grid from JSON
-│   └── variants/           ← Plugin files (one per variant)
-│       ├── index.js        ← Auto-loader
+│   ├── chess-engine.js         ← Core: board state, FEN, coordinate helpers
+│   ├── chess-moves.js          ← Move generation: pseudo-legal + legal moves
+│   ├── chess-play.js           ← Make/unmake moves, turn logic dispatch
+│   ├── chess-variants.js       ← Variant status + custom piece registration
+│   ├── board-renderer.js       ← SVG board renderer (tilePainter, pieceProvider, afterRender)
+│   ├── game-controller-core.js ← Reusable MCE.createGameController() for consumers
+│   ├── replay.js               ← MCE.createReplay() for move-by-move playback
+│   ├── game-controller.js      ← Play page: wires engine to renderer
+│   ├── home.js                 ← Homepage: variant grid from JSON
+│   └── variants/               ← Plugin files (one per variant)
+│       ├── index.js            ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 70 total
+│       └── ...                 ← 70 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -151,6 +153,15 @@ Open `http://localhost:8000/`
 ---
 
 ### Changelog
+
+#### 2026-06-01 (v0.7.0)
+- Add custom positionKey hook for pieceData-based games (#75)
+- Add multi-step turns via pendingAction pattern (#74, #78)
+- Add board renderer extension points: tilePainter, pieceProvider, afterRender (#76, #79-81)
+- Extract reusable MCE.createGameController() module (#77, #82)
+- Add MCE.createReplay() for move-by-move playback (#83)
+- All DC decoupling blockers resolved (dungeon-chess#40 Phases 2-6 unblocked)
+- Bump to v0.7.0
 
 #### 2026-06-01
 - Add Tier 3 engine subsystems: effects system, action moves, capture interception, board mutations (#59-#63)

@@ -65,11 +65,20 @@ function renderBoard(container, game, opts) {
       const sqIdx = MCE.sq(dr, dc, game);
 
       const theme = getTheme();
-      const rect = svgEl('rect', {
-        x, y, width: tileSize, height: tileSize,
-        fill: isLight ? theme.light : theme.dark,
-      });
-      svg.appendChild(rect);
+      let tileHandled = false;
+      if (opts.tilePainter) {
+        try {
+          const custom = opts.tilePainter(svg, sqIdx, dr, dc, tileSize, isLight, game);
+          if (custom) { custom.setAttribute('x', x); custom.setAttribute('y', y); svg.appendChild(custom); tileHandled = true; }
+        } catch (e) { /* fall through to default */ }
+      }
+      if (!tileHandled) {
+        const rect = svgEl('rect', {
+          x, y, width: tileSize, height: tileSize,
+          fill: isLight ? theme.light : theme.dark,
+        });
+        svg.appendChild(rect);
+      }
 
       if (lastMove && (sqIdx === lastMove.from || sqIdx === lastMove.to)) {
         svg.appendChild(svgEl('rect', {
@@ -157,38 +166,44 @@ function renderBoard(container, game, opts) {
 
   // Draw pieces
   for (const [sqIdx, pos] of currentPositions) {
-    const pieceSize = tileSize * 0.9;
-    const use = svgEl('use', {
-      href: '#piece-' + pos.piece,
-      width: pieceSize,
-      height: pieceSize,
-    });
+    let pieceEl = null;
+    if (opts.pieceProvider) {
+      try { pieceEl = opts.pieceProvider(game, sqIdx, tileSize); } catch (e) { /* fall through */ }
+    }
+    if (!pieceEl) {
+      const pieceSize = tileSize * 0.9;
+      pieceEl = svgEl('use', {
+        href: '#piece-' + pos.piece,
+        width: pieceSize,
+        height: pieceSize,
+      });
+    }
 
     if (animate && sqIdx === animateToSq && animateFromX !== null) {
       if (animStyle === 'arc') {
-        use.setAttribute('x', pos.x);
-        use.setAttribute('y', pos.y);
-        use.setAttribute('transform', 'translate(0, 0)');
-        svg.appendChild(use);
-        animateArc(svg, use, animateFromX, animateFromY, pos.x, pos.y, tileSize, animDuration, animArcHeight, pos.piece);
+        pieceEl.setAttribute('x', pos.x);
+        pieceEl.setAttribute('y', pos.y);
+        pieceEl.setAttribute('transform', 'translate(0, 0)');
+        svg.appendChild(pieceEl);
+        animateArc(svg, pieceEl, animateFromX, animateFromY, pos.x, pos.y, tileSize, animDuration, animArcHeight, pos.piece);
       } else {
         const dx = animateFromX - pos.x;
         const dy = animateFromY - pos.y;
-        use.setAttribute('x', pos.x);
-        use.setAttribute('y', pos.y);
-        use.setAttribute('transform', `translate(${dx}, ${dy})`);
-        use.style.transition = `transform ${animDuration}ms ${animEasing}`;
-        svg.appendChild(use);
+        pieceEl.setAttribute('x', pos.x);
+        pieceEl.setAttribute('y', pos.y);
+        pieceEl.setAttribute('transform', `translate(${dx}, ${dy})`);
+        pieceEl.style.transition = `transform ${animDuration}ms ${animEasing}`;
+        svg.appendChild(pieceEl);
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            use.setAttribute('transform', 'translate(0, 0)');
+            pieceEl.setAttribute('transform', 'translate(0, 0)');
           });
         });
       }
     } else {
-      use.setAttribute('x', pos.x);
-      use.setAttribute('y', pos.y);
-      svg.appendChild(use);
+      pieceEl.setAttribute('x', pos.x);
+      pieceEl.setAttribute('y', pos.y);
+      svg.appendChild(pieceEl);
     }
   }
 
@@ -243,6 +258,10 @@ function renderBoard(container, game, opts) {
       }
     });
     svg.appendChild(overlay);
+  }
+
+  if (opts.afterRender) {
+    try { opts.afterRender(svg, game, tileSize, opts); } catch (e) { /* don't crash the board */ }
   }
 
   container.appendChild(svg);
