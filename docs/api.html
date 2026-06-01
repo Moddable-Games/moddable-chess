@@ -193,7 +193,7 @@ const t = MCE.getTheme();<br>
   </div>
 
   <h3>MCE.THEMES</h3>
-  <p>Object containing all available theme definitions. Keys: <code>classic</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>.</p>
+  <p>Object containing all available theme definitions. Keys: <code>classic</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>, <code>transparent</code>.</p>
   <table class="docs-table">
     <tr><th>Theme</th><th>Light sq</th><th>Dark sq</th><th>Style</th></tr>
     <tr><td><code>classic</code></td><td>#f0d9b5</td><td>#b58863</td><td>Standard tan/brown (default)</td></tr>
@@ -202,6 +202,7 @@ const t = MCE.getTheme();<br>
     <tr><td><code>marble</code></td><td>#f2f0ec</td><td>#b8b5af</td><td>Grey/white stone</td></tr>
     <tr><td><code>neon</code></td><td>#1a1a2e</td><td>#0f0f1a</td><td>Dark with bright move indicators</td></tr>
     <tr><td><code>minimal</code></td><td>#fafafa</td><td>#e8e8e8</td><td>Near-white, very subtle contrast</td></tr>
+    <tr><td><code>transparent</code></td><td>rgba(255,255,255,0.12)</td><td>rgba(255,255,255,0.22)</td><td>See-through for embedding on any background</td></tr>
   </table>
 
   <h3>Custom themes</h3>
@@ -218,6 +219,120 @@ MCE.THEMES.forest = {<br>
 };<br>
 MCE.setTheme('forest');
   </div>
+
+  <h2>AI System</h2>
+
+  <h3>MCE.aiPickMove(game, depth, opts)</h3>
+  <p>Returns the best move found by the AI. Uses iterative deepening with alpha-beta pruning, quiescence search, transposition table, and move ordering.</p>
+  <div class="docs-code">
+// Use difficulty preset (recommended):<br>
+var move = MCE.aiPickMove(game, null, { difficulty: 'hard' });<br>
+<br>
+// Or specify time budget directly:<br>
+var move = MCE.aiPickMove(game, null, { timeMs: 2000 });
+  </div>
+
+  <h3>MCE.AI_DIFFICULTIES</h3>
+  <p>Available difficulty presets:</p>
+  <table class="docs-table">
+    <tr><th>Key</th><th>Time</th><th>Behaviour</th></tr>
+    <tr><td><code>beginner</code></td><td>200ms</td><td>30% random blunders</td></tr>
+    <tr><td><code>easy</code></td><td>400ms</td><td>15% blunders, picks from top 5 moves</td></tr>
+    <tr><td><code>medium</code></td><td>800ms</td><td>Picks from top 3 moves</td></tr>
+    <tr><td><code>hard</code></td><td>1.5s</td><td>Always picks best move</td></tr>
+    <tr><td><code>expert</code></td><td>3s</td><td>Always picks best move, deepest search</td></tr>
+  </table>
+
+  <h3>Variant evaluators</h3>
+  <p>Variants can provide custom position evaluation via the <code>evaluate</code> hook:</p>
+  <div class="docs-code">
+MCE.registerVariant('myVariant', {<br>
+&nbsp;&nbsp;evaluate: function(g, defaultEval) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;var material = defaultEval(g);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Add custom scoring logic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return material + customBonus;<br>
+&nbsp;&nbsp;}<br>
+});
+  </div>
+  <p>The AI automatically uses the variant's evaluator if defined. The <code>defaultEval</code> parameter provides material + piece-square table scoring as a baseline.</p>
+
+  <h2>Effects System</h2>
+
+  <p>Temporary status effects on board squares. Effects auto-decrement each turn and are fully undo-aware for AI search.</p>
+
+  <h3>MCE.addEffect(game, undo, effect)</h3>
+  <p>Adds an effect to the game. Call from <code>afterMove</code> or <code>beforeMove</code> hooks.</p>
+  <div class="docs-code">
+MCE.addEffect(g, undo, {<br>
+&nbsp;&nbsp;sq: targetSquare,<br>
+&nbsp;&nbsp;type: 'poison',<br>
+&nbsp;&nbsp;duration: 3,&nbsp;&nbsp;&nbsp;&nbsp;// turns until expiry (null = permanent)<br>
+&nbsp;&nbsp;owner: g.turn<br>
+});
+  </div>
+
+  <h3>MCE.hasEffect(game, sq, type)</h3>
+  <p>Returns <code>true</code> if the square has an active effect of the given type.</p>
+
+  <h3>MCE.getEffects(game, sq)</h3>
+  <p>Returns array of all effects on a square.</p>
+
+  <h3>MCE.removeEffect(game, undo, sq, type)</h3>
+  <p>Removes an effect by square and type.</p>
+
+  <h3>MCE.tickEffects(game, undo)</h3>
+  <p>Decrements all effect durations by 1 and removes expired effects. Called automatically after each turn (unless variant has custom <code>turnLogic</code>).</p>
+
+  <h2>Board Mutations</h2>
+
+  <h3>MCE.mutateBoard(game, undo, mutations)</h3>
+  <p>Batch-modifies board squares with automatic undo tracking. Use in <code>afterMove</code> or <code>beforeMove</code> hooks instead of manually tracking changes.</p>
+  <div class="docs-code">
+// In afterMove: transform a piece and clear a square<br>
+MCE.mutateBoard(g, undo, [<br>
+&nbsp;&nbsp;{ sq: 27, piece: 'Q' },&nbsp;&nbsp;// place white queen on d5<br>
+&nbsp;&nbsp;{ sq: 35, piece: null }&nbsp;&nbsp;// clear e4<br>
+]);<br>
+// Automatically restored on unmakeMove — no restoreState needed
+  </div>
+
+  <h2>Action Moves</h2>
+
+  <p>Moves that consume a turn without physical board movement. Generate them in <code>moveFilter</code> and handle them in <code>afterMove</code>.</p>
+  <div class="docs-code">
+// In moveFilter — generate action moves:<br>
+moves.push({<br>
+&nbsp;&nbsp;from: pieceSq,<br>
+&nbsp;&nbsp;to: targetSq,<br>
+&nbsp;&nbsp;flag: 'action',<br>
+&nbsp;&nbsp;action: 'hex'<br>
+});<br>
+<br>
+// In afterMove — apply the action's effect:<br>
+if (move.flag === 'action' && move.action === 'hex') {<br>
+&nbsp;&nbsp;MCE.addEffect(g, undo, { sq: move.to, type: 'hex', duration: 2 });<br>
+}
+  </div>
+  <p>Action moves skip all standard board mutation (no piece movement, en passant, castling, or promotion). The AI evaluates them alongside normal moves in the search tree.</p>
+
+  <h2>Capture Interception</h2>
+
+  <p>The <code>beforeMove</code> hook can return a signal to modify capture behaviour:</p>
+  <div class="docs-code">
+beforeMove: function(g, move, undo) {<br>
+&nbsp;&nbsp;if (MCE.hasEffect(g, move.to, 'shield')) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Move attacker but don't remove target<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.to] = g.board[move.from];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;g.board[move.from] = null;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;MCE.removeEffect(g, undo, move.to, 'shield');<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return { cancelCapture: true };<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;// Normal move<br>
+&nbsp;&nbsp;g.board[move.to] = g.board[move.from];<br>
+&nbsp;&nbsp;g.board[move.from] = null;<br>
+}
+  </div>
+  <p>Return values: <code>{ cancelCapture: true }</code> or <code>{ redirectCapture: squareIndex }</code>. Existing variants that return nothing are unaffected.</p>
 
   <h2>Plugin Registration</h2>
 
@@ -237,13 +352,16 @@ MCE.registerVariant('myVariant', {<br>
 &nbsp;&nbsp;noCheck: false,<br>
 &nbsp;&nbsp;torpedo: false,<br>
 &nbsp;&nbsp;// Hook functions (all optional):<br>
-&nbsp;&nbsp;winCondition: function(g) { return null; },<br>
+&nbsp;&nbsp;init: function(g) { },<br>
 &nbsp;&nbsp;moveFilter: function(g, moves) { return moves; },<br>
 &nbsp;&nbsp;beforeMove: function(g, move, undo) { },<br>
+&nbsp;&nbsp;afterMove: function(g, move, undo) { },<br>
 &nbsp;&nbsp;turnLogic: function(g, undo) { },<br>
 &nbsp;&nbsp;restoreState: function(g, undo) { },<br>
-&nbsp;&nbsp;init: function(g) { },<br>
+&nbsp;&nbsp;winCondition: function(g) { return null; },<br>
+&nbsp;&nbsp;evaluate: function(g, defaultEval) { return defaultEval(g); },<br>
 &nbsp;&nbsp;visibility: function(g, side) { return new Set(); },<br>
+&nbsp;&nbsp;statusText: function(g, helpers) { return null; },<br>
 });
   </div>
   <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>
@@ -322,7 +440,8 @@ const fen = MCE.randomFEN960();<br>
   <p>These only apply when <code>embed=1</code> is set:</p>
   <table class="docs-table">
     <tr><th>Parameter</th><th>Values</th><th>Effect</th></tr>
-    <tr><td><code>theme</code></td><td><code>light</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code></td><td><code>light</code> switches UI colour scheme. Others set the board colour theme</td></tr>
+    <tr><td><code>theme</code></td><td><code>light</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>, <code>transparent</code></td><td><code>light</code> switches UI colour scheme. Others set the board colour theme</td></tr>
+    <tr><td><code>difficulty</code></td><td><code>beginner</code>, <code>easy</code>, <code>medium</code>, <code>hard</code>, <code>expert</code></td><td>AI difficulty level (default: medium)</td></tr>
     <tr><td><code>bg</code></td><td>CSS colour</td><td>Override background colour (e.g. <code>%23f0f0f0</code> for #f0f0f0)</td></tr>
     <tr><td><code>accent</code></td><td>CSS colour</td><td>Override accent colour for selection highlights and borders</td></tr>
     <tr><td><code>radius</code></td><td>CSS value</td><td>Border radius on the board container (e.g. <code>12px</code>)</td></tr>
@@ -351,6 +470,22 @@ const fen = MCE.randomFEN960();<br>
   <div class="docs-code">
 &lt;iframe src="https://chess.moddable.games/play/?embed=1&amp;mode=pass&amp;p1=Magnus&amp;p2=Hikaru"<br>
 &nbsp;&nbsp;width="800" height="600" frameborder="0"&gt;&lt;/iframe&gt;
+  </div>
+
+  <h3>postMessage API</h3>
+  <p>Control embedded iframes without reloading. Send messages to the iframe's <code>contentWindow</code>:</p>
+  <div class="docs-code">
+// Switch variant (resets board):<br>
+iframe.contentWindow.postMessage({ type: 'chess:setVariant', variant: 'atomic' }, '*');<br>
+<br>
+// Switch theme (preserves game state):<br>
+iframe.contentWindow.postMessage({ type: 'chess:setTheme', theme: 'cosmic' }, '*');<br>
+<br>
+// Change background colour:<br>
+iframe.contentWindow.postMessage({ type: 'chess:setBg', bg: '#1a1a2e' }, '*');<br>
+<br>
+// Reset current variant to starting position:<br>
+iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');
   </div>
 
   <p>Cosmic dark board theme with Capablanca variant:</p>

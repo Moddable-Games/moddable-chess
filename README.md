@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 64 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 68 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -41,7 +41,7 @@ moddable-chess/
 │       ├── index.js        ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 64 total
+│       └── ...             ← 68 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -151,6 +151,17 @@ Open `http://localhost:8000/`
 ---
 
 ### Changelog
+
+#### 2026-06-01
+- Add Tier 3 engine subsystems: effects system, action moves, capture interception, board mutations (#59-#63)
+- Add 4 new Tier 3 variants (68 total): Crazyhouse, Recruitment Chess, Teleportation Chess, Poison Chess
+- Add AI difficulty levels (beginner through expert) with time-based iterative deepening
+- Add search optimisations: move ordering, quiescence search, transposition table, Web Worker
+- Add variant-aware AI evaluation for 21 variants (custom evaluators per plugin)
+- Add piece-square tables to default evaluator (positional knowledge for all variants)
+- Fix AI move generation to use variantLegalMoves for all moveFilter variants
+- Refactor Einstein, Benedict, Andernach to use mutateBoard() helper
+- Bump to v0.6.14
 
 #### 2026-05-31
 - Add postMessage embed API: `chess:setVariant`, `chess:setTheme`, `chess:setBg`, `chess:newGame` (#65)
