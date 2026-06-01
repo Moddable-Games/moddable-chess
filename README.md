@@ -1,6 +1,6 @@
 # Moddable Chess
 
-Modular chess engine with 68 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
+Modular chess engine with 70 playable variants on boards from 4×8 to 12×8. Zero dependencies, pure JavaScript, no build step.
 
 ---
 
@@ -41,7 +41,7 @@ moddable-chess/
 │       ├── index.js        ← Auto-loader
 │       ├── standard.js
 │       ├── atomic.js
-│       └── ...             ← 68 total
+│       └── ...             ← 70 total
 └── assets/
     └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
 ```
@@ -161,7 +161,11 @@ Open `http://localhost:8000/`
 - Add piece-square tables to default evaluator (positional knowledge for all variants)
 - Fix AI move generation to use variantLegalMoves for all moveFilter variants
 - Refactor Einstein, Benedict, Andernach to use mutateBoard() helper
-- Bump to v0.6.14
+- Add Medusa Chess and Immunization Chess (70 total)
+- Add opening book system for 8 variants (instant response in known positions)
+- Add 3 developer guides (Orda, Crazyhouse, Poison) covering all hooks
+- Restructure guide page as hub with decision table
+- Bump to v0.6.16
 
 #### 2026-05-31
 - Add postMessage embed API: `chess:setVariant`, `chess:setTheme`, `chess:setBg`, `chess:newGame` (#65)

@@ -406,5 +406,17 @@
     "name": "Poison Chess",
     "board": "8×8",
     "desc": "Capture squares become toxic for 3 turns — landing on poison destroys pieces."
+  },
+  {
+    "key": "medusaChess",
+    "name": "Medusa Chess",
+    "board": "8×8",
+    "desc": "Queen petrifies all enemy pieces she attacks for 2 turns — they cannot move."
+  },
+  {
+    "key": "immunizationChess",
+    "name": "Immunization Chess",
+    "board": "8×8",
+    "desc": "Pieces adjacent to a capture become immune to capture for 2 turns."
   }
 ]
