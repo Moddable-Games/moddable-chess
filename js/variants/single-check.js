@@ -1,5 +1,13 @@
 'use strict';
 MCE.registerVariant('singleCheck', {
+  openingBook: {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e4", "g1f3", "d2d4"],
+    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e6", "c7c6", "d7d6", "g8f6"],
+    "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq -": ["d7d5", "e7e6", "c7c6"],
+    "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": ["d2d3", "g1f3", "b1c3"],
+    "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": ["d2d3", "g1f3", "b1c3"],
+    "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": ["d2d3", "b1c3", "e4e5"],
+  },
   label: 'Single-Check',
   group: 'Tactical',
   rows: 8,

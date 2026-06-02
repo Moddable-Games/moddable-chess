@@ -1,5 +1,13 @@
 'use strict';
 MCE.registerVariant('antichess', {
+  openingBook: {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e3", "b2b4", "g2g4"],
+    "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq -": ["b7b5", "b7b6", "d7d5"],
+    "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq -": ["e7e5", "d7d5", "c7c5"],
+    "rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPP1P/RNBQKBNR b KQkq -": ["e7e5", "d7d5", "h7h5"],
+    "rnbqkbnr/p1pppppp/1p6/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq -": ["f1b5", "d1g4"],
+    "rnbqkbnr/ppp1pppp/8/3p4/8/4P3/PPPP1PPP/RNBQKBNR w KQkq -": ["f1b5", "d1h5"],
+  },
   label: 'Antichess',
   group: 'Alternate Rules',
   rows: 8,

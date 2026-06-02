@@ -1,5 +1,12 @@
 'use strict';
 MCE.registerVariant('giveaway', {
+  openingBook: {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e3", "b2b4", "d2d4", "g2g4"],
+    "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq -": ["b7b5", "b7b6", "d7d5", "e7e5"],
+    "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq -": ["e7e5", "d7d5", "c7c5"],
+    "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq -": ["e7e5", "c7c5", "d7d5"],
+    "rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPP1P/RNBQKBNR b KQkq -": ["e7e5", "d7d5"],
+  },
   label: 'Giveaway',
   group: 'Alternate Rules',
   rows: 8,

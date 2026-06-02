@@ -196,6 +196,17 @@ MCE.registerVariant('crazyhouse', {
     <p>Returning <code>null</code> falls through to the default status text ("White to move", etc.).</p>
   </section>
 
+  <section id="step8">
+    <h2>Step 8: Opening Book</h2>
+    <p>Give the AI known good openings so it plays instantly for the first few moves instead of searching. Add an <code>openingBook</code> object to your variant config:</p>
+    <pre class="language-javascript"><code class="language-javascript">openingBook: {
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],
+  "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e5", "d7d5", "g8f6"],
+}</code></pre>
+    <p>Keys are position keys (first 4 FEN fields). Values are arrays of candidate moves in coordinate notation — the AI picks one randomly for variety. Multiple entries let you cover a few moves deep from the starting position.</p>
+    <p>This is optional — the AI plays fine without it — but book moves eliminate the thinking delay in well-known positions and give the AI more human-like opening play.</p>
+  </section>
+
   <section id="summary">
     <h2>Summary</h2>
     <p>Hooks used and their purpose:</p>
@@ -208,6 +219,7 @@ MCE.registerVariant('crazyhouse', {
         <tr><td><code>restoreState</code></td><td>Restore hand array during AI search undo</td></tr>
         <tr><td><code>evaluate</code></td><td>Score hand pieces at 70% board value</td></tr>
         <tr><td><code>statusText</code></td><td>Display hand contents to the player</td></tr>
+        <tr><td><code>openingBook</code></td><td>Pre-programmed moves for known positions</td></tr>
       </tbody>
     </table>
     <p>The complete file is approximately 110 lines. Action moves and mutateBoard handle all the complexity of piece drops with automatic undo support.</p>

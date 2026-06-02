@@ -8,11 +8,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Moddable Chess">
 <meta property="og:title" content="Guides — Moddable Chess">
-<meta property="og:description" content="Three step-by-step guides covering every hook in the engine. Custom pieces, action moves, and the effects system.">
+<meta property="og:description" content="Four step-by-step guides covering every hook in the engine. Custom pieces, action moves, effects, and building a full game on MCE.">
 <meta property="og:url" content="https://chess.moddable.games/docs/guide.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Guides — Moddable Chess">
-<meta name="twitter:description" content="Three step-by-step guides covering every hook in the engine. Custom pieces, action moves, and the effects system.">
+<meta name="twitter:description" content="Four step-by-step guides covering every hook in the engine. Custom pieces, action moves, effects, and building a full game on MCE.">
 <meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.0">
 <meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.0">
 <meta property="og:image:width" content="1200">
@@ -41,17 +41,17 @@
 <nav class="docs-toc" id="docs-toc"></nav>
 <div class="docs-body">
   <h1>Developer Guides</h1>
-  <p class="docs-lede">Three step-by-step guides that together cover every hook, utility, and pattern in the engine. Each builds a real variant from an empty file to a working plugin.</p>
+  <p class="docs-lede">Four step-by-step guides that together cover every hook, utility, and pattern in the engine. The first three each build a variant from an empty file to a working plugin. The fourth builds a complete standalone game on the engine.</p>
 
-  <section id="why-three">
-    <h2>Why Three Guides?</h2>
+  <section id="why-four">
+    <h2>Why Four Guides?</h2>
     <p>The engine has three layers of extension points, and no single variant uses them all:</p>
     <ul>
       <li><strong>Custom pieces</strong> — new movement patterns, attack functions, piece registration</li>
       <li><strong>Game hooks</strong> — action moves, turn logic, move filtering, board mutations</li>
       <li><strong>Effects system</strong> — timed status effects, square-based state, automatic expiry</li>
     </ul>
-    <p>Each guide targets one layer so you can learn exactly what you need without wading through concepts that do not apply to your variant.</p>
+    <p>Guides 1–3 each target one layer in isolation, building a variant plugin from scratch. Guide 4 uses all three layers together and adds the consumer APIs — game controller, terrain, custom rendering, and unit templates — to build a complete standalone game on the engine.</p>
   </section>
 
   <section id="orda">
@@ -96,6 +96,24 @@
     <p><a href="guide-poison.html">Start the Poison Chess guide</a></p>
   </section>
 
+  <section id="dungeon-chess">
+    <h2>Guide 4: Dungeon Chess — MCE as a Game Subsystem</h2>
+    <p>Build a complete standalone game on MCE — 4-player tactical combat with 22 custom unit types, terrain, effects, capture interception, multi-step turns, and fully custom rendering. Covers:</p>
+    <ul>
+      <li><code>MCE.buildUnitHandler()</code> — declarative move specs with the unit template system</li>
+      <li><code>ownershipMode: 'pieceData'</code> — unlimited unit types via a single piece character</li>
+      <li><code>terrainSkip</code> — global terrain predicates for move generation</li>
+      <li><code>beforeMove</code> — capture interception (cancel/redirect captures)</li>
+      <li><code>afterMove</code> + <code>MCE.mutateBoard()</code> — board mutations with undo</li>
+      <li><code>turnLogic</code> + <code>pendingAction</code> — multi-step turns</li>
+      <li><code>positionKey</code> — custom hash for pieceData-based games</li>
+      <li><code>MCE.createGameController()</code> — full interaction loop with AI, undo, animation</li>
+      <li><code>tilePainter</code> / <code>pieceProvider</code> / <code>afterRender</code> / <code>surroundRenderer</code> — custom rendering pipeline</li>
+      <li><code>onSquareClick</code> / <code>onAnimateMove</code> — controller interaction callbacks</li>
+    </ul>
+    <p><a href="guide-dungeon-chess.html">Start the Dungeon Chess guide</a></p>
+  </section>
+
   <section id="which">
     <h2>Which Guide Do I Need?</h2>
     <table class="docs-table">
@@ -106,6 +124,9 @@
       <tr><td>Override how captures work</td><td><a href="guide-crazyhouse.html">Crazyhouse</a> + <a href="api.html#capture-interception">API: Capture Interception</a></td></tr>
       <tr><td>Control turn advancement (multi-move, phases)</td><td><a href="guide-crazyhouse.html">Crazyhouse</a> (turnLogic concept) + <a href="api.html">API Reference</a></td></tr>
       <tr><td>Add fog of war or visibility restrictions</td><td><a href="api.html">API Reference</a> (visibility hook)</td></tr>
+      <tr><td>Use MCE as an embedded engine in a larger game</td><td><a href="guide-dungeon-chess.html">Dungeon Chess</a></td></tr>
+      <tr><td>Custom rendering (terrain, sprites, effects)</td><td><a href="guide-dungeon-chess.html">Dungeon Chess</a></td></tr>
+      <tr><td>Terrain and board geometry</td><td><a href="guide-dungeon-chess.html">Dungeon Chess</a></td></tr>
     </table>
   </section>
 

@@ -98,6 +98,13 @@ MCE.registerPiece('h', {
 });
 
 MCE.registerVariant('ordaChess', {
+  openingBook: {
+    "lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ -": ["e2e4", "d2d4", "g1f3", "c2c4"],
+    "lhaykahl/8/pppppppp/8/4P3/PPPP1PPP/8/RNBQKBNR b KQ -": ["e6e5", "d6d5", "c6c5"],
+    "lhaykahl/8/pppppppp/8/3P4/PPP1PPPP/8/RNBQKBNR b KQ -": ["d6d5", "e6e5", "f6f5"],
+    "lhaykahl/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNBQKBNR w KQ -": ["g1f3", "d2d4", "f1c4"],
+    "lhaykahl/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNBQKBNR w KQ -": ["c2c4", "e2e4", "g1f3"],
+  },
   label: 'Orda Chess',
   group: 'Asymmetric',
   rows: 8,

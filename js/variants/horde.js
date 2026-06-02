@@ -1,5 +1,12 @@
 'use strict';
 MCE.registerVariant('horde', {
+  openingBook: {
+    "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq -": ["f5f6", "c5c6", "e4e5", "d4d5"],
+    "rnbqkbnr/pppppppp/5P2/1PP2P2/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP b kq -": ["g7f6", "e7e6", "d7d6"],
+    "rnbqkbnr/pppppppp/2P5/1P3PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP b kq -": ["b7c6", "d7d6", "e7e5"],
+    "rnbqkbnr/pppppppp/8/1PP2PP1/PPPP1PPP/PPPPPPPP/PPPPPPPP/PPPPPPPP b kq -": ["d7d5", "e7e5", "g8f6"],
+    "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPP1PPPP/PPPPPPPP/PPPPPPPP b kq -": ["d7d5", "e7e5", "c7c6"],
+  },
   label: 'Horde Chess',
   group: 'Alternate Rules',
   rows: 8,

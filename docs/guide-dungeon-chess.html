@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Dungeon Chess — Moddable Chess</title>
+<link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="Building Dungeon Chess — Moddable Chess">
+<meta property="og:description" content="Step-by-step guide to building a full game on MCE: custom pieces, terrain, effects, capture interception, multi-step turns, and custom rendering.">
+<meta property="og:url" content="https://chess.moddable.games/docs/guide-dungeon-chess.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Building Dungeon Chess — Moddable Chess">
+<meta name="twitter:description" content="Step-by-step guide to building a full game on MCE: custom pieces, terrain, effects, capture interception, multi-step turns, and custom rendering.">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.0">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="stylesheet" href="../css/shared.css?v=0.7.0">
+<link rel="stylesheet" href="../css/docs.css?v=0.7.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.0">
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../" class="site-nav__brand">
+    <img src="../assets/cube.svg" class="site-nav__cube" alt="">
+    <span class="site-nav__wordmark">Moddable Chess</span>
+  </a>
+  <div class="site-nav__links">
+    <a href="../play/">Play</a>
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Variants</a>
+    <a href="guide.html" class="active">Guide</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+<nav class="docs-toc" id="docs-toc"></nav>
+<div class="docs-body">
+  <h1>Building Dungeon Chess</h1>
+  <p class="docs-lede">This guide builds a complete game on top of MCE — not just a variant, but a standalone application with custom pieces, terrain, effects, capture interception, multi-step turns, and its own renderer. Dungeon Chess demonstrates using MCE as an embeddable game subsystem.</p>
+  <p><a href="guide.html">Back to all guides</a></p>
+
+  <section id="overview">
+    <h2>What We Are Building</h2>
+    <p>Dungeon Chess is a 4-player tactical battle on dungeon maps with water terrain, asymmetric factions (22 unique unit types), and special abilities. MCE provides all game logic, AI, and rendering — Dungeon Chess is a pure consumer that registers one variant and configures the engine.</p>
+    <p>Key engine features used:</p>
+    <ul>
+      <li><code>registerPiece</code> + <code>buildUnitHandler</code> — define 22 unit types with the unit template system</li>
+      <li><code>registerVariant</code> — register terrain predicates, all game hooks</li>
+      <li><code>terrainSkip</code> — water/void awareness for move generation</li>
+      <li><code>moveFilter</code> — inject action moves (hex casting)</li>
+      <li><code>beforeMove</code> — capture interception (troll thick-skin)</li>
+      <li><code>afterMove</code> — board mutations (demonics explosion)</li>
+      <li><code>turnLogic</code> — multi-step turns (salamander retreat)</li>
+      <li><code>positionKey</code> — custom hash for pieceData-based games</li>
+      <li><code>createGameController</code> — full interaction loop with callbacks</li>
+      <li><code>tilePainter</code> / <code>pieceProvider</code> / <code>afterRender</code> — custom board rendering</li>
+    </ul>
+  </section>
+
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <p>Dungeon Chess loads MCE as a library and communicates through a single bridge module:</p>
+    <pre class="language-javascript"><code class="language-javascript">dungeon-chess/
+├── lib/mce/           ← MCE library files (vendored)
+│   ├── js/chess-engine.js
+│   ├── js/chess-moves.js
+│   ├── js/chess-play.js
+│   ├── js/chess-variants.js
+│   ├── js/chess-units.js
+│   ├── js/chess-ai.js
+│   ├── js/board-renderer.js
+│   └── js/game-controller-core.js
+├── js/
+│   ├── mce-bridge.js  ← All MCE integration (variant + unit registration)
+│   ├── battle-draw.js ← Game controller setup, UI wiring
+│   └── ...            ← DC-specific UI, screens, state
+└── index.html</code></pre>
+    <p>The bridge module is the only file that touches the <code>MCE</code> namespace. Everything else is pure game UI.</p>
+  </section>
+
+  <section id="step1">
+    <h2>Step 1: Create the Game with Terrain</h2>
+    <p>Dungeon Chess uses <code>MCE.createGame()</code> with an object config to set up a large board with terrain and multi-player support:</p>
+    <pre class="language-javascript"><code class="language-javascript">var game = MCE.createGame({
+  rows: 10,
+  cols: 10,
+  terrain: buildTerrainArray(mapData),
+  players: ['w', 'b', 'r', 'g'],
+  variant: 'dungeon-chess',
+  ownershipMode: 'pieceData'
+});</code></pre>
+    <p>Key config properties:</p>
+    <ul>
+      <li><code>terrain</code> — flat array matching the board. Values like <code>'w'</code> (water) or <code>null</code> (void/wall) affect move generation</li>
+      <li><code>players</code> — array of turn-order colour keys for multi-player games</li>
+      <li><code>ownershipMode: 'pieceData'</code> — piece ownership is determined by <code>g.pieceData[sq].owner</code> rather than character case</li>
+    </ul>
+    <p>The terrain array is built from map section data — 26 modular dungeon tiles that combine into different board layouts.</p>
+  </section>
+
+  <section id="step2">
+    <h2>Step 2: Register Units with the Template System</h2>
+    <p>Instead of writing <code>genMoves</code>/<code>attacks</code> by hand for every unit, use <code>MCE.buildUnitHandler()</code> with declarative move specs:</p>
+    <pre class="language-javascript"><code class="language-javascript">// Simple: a unit that moves like a rook but can't cross water
+unitHandlers.dragon = MCE.buildUnitHandler({
+  move: 'rook:waterBlock'
+});
+
+// Divergent: moves like a king, attacks at range like a bishop
+unitHandlers.archer = MCE.buildUnitHandler({
+  move: 'king:waterBlock',
+  attack: 'gapped:bishop:waterBlock'
+});
+
+// Knight-style jumps that respect water
+unitHandlers.knight = MCE.buildUnitHandler({
+  move: 'knight:waterBlock'
+});
+
+// Cannon: needs a screen piece to capture over
+unitHandlers.cannon = MCE.buildUnitHandler({
+  move: 'rook:waterBlock',
+  cannon: { dirs: 'rook' }
+});</code></pre>
+    <p>String specs are composed with colons: <code>'style:dirs:modifier'</code>. Available tokens:</p>
+    <table class="docs-table">
+      <tr><th>Token</th><th>Meaning</th></tr>
+      <tr><td><code>rook</code>, <code>bishop</code>, <code>queen</code>, <code>knight</code>, <code>king</code></td><td>Direction sets</td></tr>
+      <tr><td><code>jump</code></td><td>Single-square jumps (like king) in the given directions</td></tr>
+      <tr><td><code>gapped</code></td><td>Slide that must skip exactly one empty square before landing</td></tr>
+      <tr><td><code>waterBlock</code></td><td>Movement blocked by water terrain</td></tr>
+    </table>
+    <p>For units with complex logic (e.g. the Orc's flexible 2-square move), provide a function instead:</p>
+    <pre class="language-javascript"><code class="language-javascript">unitHandlers.orc = {
+  genMoves(g, sq, side) {
+    var moves = [];
+    var [r, c] = MCE.rc(sq, g);
+    // Custom: up to 2 steps in any direction, can change direction
+    generateFlexibleMoves(g, sq, r, c, side, 2, moves);
+    return moves;
+  },
+  attacks(g, from, target) {
+    var [fr, fc] = MCE.rc(from, g);
+    var [tr, tc] = MCE.rc(target, g);
+    return Math.abs(tr - fr) <= 1 && Math.abs(tc - fc) <= 1;
+  }
+};</code></pre>
+  </section>
+
+  <section id="step3">
+    <h2>Step 3: Register the Shared Piece Handler</h2>
+    <p>All 22 unit types share a single MCE piece character (<code>'x'</code>). The registered handler dispatches to the correct unit based on <code>pieceData</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerPiece('x', {
+  genMoves(g, sq, side) {
+    var pd = g.pieceData[sq];
+    if (!pd) return [];
+    // Hexed units can't move
+    if (MCE.hasEffect(g, sq, 'hex')) return [];
+    var handler = unitHandlers[pd.key];
+    if (!handler) return [];
+    return handler.genMoves(g, sq, side);
+  },
+  attacks(g, from, target) {
+    var pd = g.pieceData[from];
+    if (!pd) return false;
+    if (MCE.hasEffect(g, from, 'hex')) return false;
+    var handler = unitHandlers[pd.key];
+    return handler ? handler.attacks(g, from, target) : false;
+  }
+});</code></pre>
+    <p>This pattern lets you have unlimited unit types without registering a separate piece character for each. The <code>pieceData</code> array (synced automatically by make/unmake) holds the unit identity:</p>
+    <pre class="language-javascript"><code class="language-javascript">// Place a unit on the board:
+game.board[sq] = 'X';    // or 'x' — case doesn't matter with ownershipMode
+game.pieceData[sq] = { key: 'dragon', owner: 'w', cost: 8, isKing: false };</code></pre>
+  </section>
+
+  <section id="step4">
+    <h2>Step 4: Register the Variant with Terrain Predicates</h2>
+    <p>The variant registration ties all hooks together and declares terrain behaviour:</p>
+    <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('dungeon-chess', {
+  label: 'Dungeon Chess',
+  terrainSkip: function(t) { return t === 'w' || t === 2; },
+  moveFilter: dcMoveFilter,
+  beforeMove: dcBeforeMove,
+  afterMove: dcAfterMove,
+  turnLogic: dcTurnLogic,
+  evaluate: dcEvaluate,
+  restoreState: dcRestoreState,
+  positionKey: dcPositionKey,
+});</code></pre>
+    <p><code>terrainSkip</code> tells the engine which terrain values should block movement globally for this variant. Every call to <code>genSlides</code>, <code>genJumps</code>, <code>genCannon</code>, and <code>genGappedSlides</code> respects this predicate automatically — no per-call configuration needed.</p>
+    <p>Individual unit handlers can override with <code>waterBlock: true</code> in their move spec for finer control (e.g. a Wraith that phases through water).</p>
+  </section>
+
+  <section id="step5">
+    <h2>Step 5: Action Moves — Hex Casting</h2>
+    <p>The Shaman can cast a hex on any enemy unit instead of moving. This uses the action move pattern:</p>
+    <pre class="language-javascript"><code class="language-javascript">function dcMoveFilter(g, moves) {
+  var total = g.rows * g.cols;
+  for (var i = 0; i &lt; total; i++) {
+    if (!g.board[i] || !g.pieceData[i]) continue;
+    var pd = g.pieceData[i];
+    if (pd.key !== 'shaman' || pd.owner !== g.turn || pd.hexUsed) continue;
+    // Add hex action for every enemy unit
+    for (var j = 0; j &lt; total; j++) {
+      if (!g.board[j] || !g.pieceData[j]) continue;
+      var tpd = g.pieceData[j];
+      if (tpd.owner === g.turn || tpd.isKing) continue;
+      moves.push({ from: i, to: j, flag: 'action' });
+    }
+  }
+  return moves;
+}</code></pre>
+    <p>In <code>beforeMove</code>, detect the action and apply the effect:</p>
+    <pre class="language-javascript"><code class="language-javascript">function dcBeforeMove(g, move, undo) {
+  if (move.flag === 'action') {
+    var pd = g.pieceData[move.from];
+    if (pd && pd.key === 'shaman') {
+      undo._hexShamanSq = move.from;
+      pd.hexUsed = true;
+      MCE.addEffect(g, undo, { sq: move.to, type: 'hex', duration: 2 });
+    }
+    return;
+  }
+  // ... other beforeMove logic
+}</code></pre>
+    <p>The hex effect prevents the target from moving (checked in <code>genMoves</code>) and expires after 2 turns via <code>MCE.tickEffects()</code>.</p>
+  </section>
+
+  <section id="step6">
+    <h2>Step 6: Capture Interception — Troll Thick-Skin</h2>
+    <p>When a troll is captured, it doesn't die — it gets wounded and pushes the attacker back. The <code>beforeMove</code> hook intercepts the capture:</p>
+    <pre class="language-javascript"><code class="language-javascript">// In beforeMove, after the action check:
+var targetPd = g.pieceData[move.to];
+if (targetPd && targetPd.key === 'troll' && !targetPd.wounded) {
+  targetPd.wounded = true;
+  // Calculate push direction (attacker moves back)
+  var [fr, fc] = MCE.rc(move.from, g);
+  var [tr, tc] = MCE.rc(move.to, g);
+  var dr = tr - fr > 0 ? 1 : tr - fr &lt; 0 ? -1 : 0;
+  var dc = tc - fc > 0 ? 1 : tc - fc &lt; 0 ? -1 : 0;
+  var pushR = tr + dr, pushC = tc + dc;
+  if (MCE.onBoard(pushR, pushC, g)) {
+    var landSq = MCE.sq(pushR, pushC, g);
+    if (!g.board[landSq]) {
+      MCE.mutateBoard(g, undo, [{ sq: landSq, piece: 'X' }]);
+      g.pieceData[landSq] = targetPd;
+      g.board[move.to] = g.board[move.from];
+      g.pieceData[move.to] = g.pieceData[move.from];
+      g.board[move.from] = null;
+      g.pieceData[move.from] = null;
+    }
+  }
+  return { cancelCapture: true };
+}</code></pre>
+    <p>Returning <code>{ cancelCapture: true }</code> tells the engine to skip its normal capture logic. The troll survives (wounded), and the attacker is repositioned manually via <code>mutateBoard</code>.</p>
+  </section>
+
+  <section id="step7">
+    <h2>Step 7: Board Mutations — Demonics Explosion</h2>
+    <p>When a Demonics unit is captured, it explodes and destroys all adjacent enemy pieces:</p>
+    <pre class="language-javascript"><code class="language-javascript">function dcAfterMove(g, move, undo) {
+  if (!undo.captured) return;
+  var victimPd = undo.pieceDataTo;
+  if (!victimPd || victimPd.key !== 'demonics') return;
+
+  var [cr, cc] = MCE.rc(move.to, g);
+  for (var d = 0; d &lt; MCE.QUEEN_DIRS.length; d++) {
+    var dir = MCE.QUEEN_DIRS[d];
+    var nr = cr + dir[0], nc = cc + dir[1];
+    if (!MCE.onBoard(nr, nc, g)) continue;
+    var adjSq = MCE.sq(nr, nc, g);
+    var adjPd = g.pieceData[adjSq];
+    if (adjPd && adjPd.owner !== victimPd.owner) {
+      MCE.mutateBoard(g, undo, [{ sq: adjSq, piece: null }]);
+      g.pieceData[adjSq] = null;
+    }
+  }
+}</code></pre>
+    <p><code>MCE.mutateBoard</code> handles undo tracking automatically — the destroyed pieces reappear when the AI calls <code>unmakeMove</code>. But <code>pieceData</code> changes need manual restoration in <code>restoreState</code>.</p>
+  </section>
+
+  <section id="step8">
+    <h2>Step 8: Multi-Step Turns — Salamander Retreat</h2>
+    <p>After a Salamander captures, it must retreat to an adjacent empty square. This uses the <code>pendingAction</code> pattern inside <code>turnLogic</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">function dcTurnLogic(g, undo) {
+  if (undo.captured) {
+    var pd = g.pieceData[undo.to];
+    if (pd && pd.key === 'salamander') {
+      var retreatTargets = findAdjacentEmpty(g, undo.to);
+      if (retreatTargets.length > 0) {
+        g._pendingAction = {
+          from: undo.to,
+          filter: function(m) {
+            return retreatTargets.indexOf(m.to) >= 0;
+          }
+        };
+        return; // Don't advance turn yet
+      }
+    }
+  }
+  // Normal turn end
+  if (g.effects && g.effects.length > 0) MCE.tickEffects(g, undo);
+  MCE.advanceTurn(g);
+}</code></pre>
+    <p>When <code>g._pendingAction</code> is set, the engine restricts legal moves to only those matching the filter. The game controller shows the valid retreat squares. After the follow-up move, <code>turnLogic</code> is called again — this time without a pending action, so the turn advances normally.</p>
+  </section>
+
+  <section id="step9">
+    <h2>Step 9: Custom Position Key</h2>
+    <p>Standard MCE position keys are based on the board character array. Since Dungeon Chess uses a single character (<code>'X'</code>) for all units, the default key can't distinguish a Dragon from a Pawn. Provide a custom <code>positionKey</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">function dcPositionKey(g) {
+  var key = '';
+  var total = g.rows * g.cols;
+  for (var i = 0; i &lt; total; i++) {
+    var pd = g.pieceData[i];
+    if (pd) key += pd.key.substring(0, 3) + pd.owner[0];
+    else key += '.';
+  }
+  return key + ' ' + g.turn;
+}</code></pre>
+    <p>This prevents transposition table collisions — the AI won't confuse positions where different unit types occupy the same squares.</p>
+  </section>
+
+  <section id="step10">
+    <h2>Step 10: Custom Rendering</h2>
+    <p>Dungeon Chess uses all three renderer extension points to draw a themed dungeon board:</p>
+
+    <h3>tilePainter — Terrain Tiles</h3>
+    <pre class="language-javascript"><code class="language-javascript">function dungeonTilePainter(svg, sq, r, c, tileSize, isLight, game) {
+  var terrain = game.terrain && game.terrain[sq];
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+  var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('width', tileSize);
+  rect.setAttribute('height', tileSize);
+
+  if (terrain === null) {
+    rect.setAttribute('fill', '#1a1a1a');  // Void/wall
+  } else if (terrain === 'w' || terrain === 2) {
+    rect.setAttribute('fill', '#1a4a6b');  // Water
+  } else {
+    rect.setAttribute('fill', isLight ? '#4a3d2e' : '#3d3225');  // Stone floor
+  }
+  g.appendChild(rect);
+  return g;
+}</code></pre>
+    <p>The <code>tilePainter</code> returns a <code>&lt;g&gt;</code> element. MCE automatically applies <code>transform="translate(x,y)"</code> to position it — you don't need to set x/y coordinates yourself.</p>
+
+    <h3>pieceProvider — Faction-Coloured Units</h3>
+    <pre class="language-javascript"><code class="language-javascript">function dungeonPieceProvider(game, sq, tileSize) {
+  var pd = game.pieceData && game.pieceData[sq];
+  if (!pd) return null;
+
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', '#sprite-' + pd.key);
+  use.setAttribute('width', tileSize * 0.85);
+  use.setAttribute('height', tileSize * 0.85);
+  use.setAttribute('fill', factionColor(pd.owner));
+  g.appendChild(use);
+  return g;
+}</code></pre>
+    <p>Custom pieces work seamlessly with MCE's animation system — both slide and arc modes position the returned element correctly during transitions.</p>
+
+    <h3>afterRender — Effect Overlays</h3>
+    <pre class="language-javascript"><code class="language-javascript">function dungeonAfterRender(svg, game, tileSize, opts) {
+  if (!game.effects) return;
+  for (var i = 0; i &lt; game.effects.length; i++) {
+    var e = game.effects[i];
+    if (e.type !== 'hex') continue;
+    var rc = MCE.rc(e.sq, game);
+    var r = opts.flipped ? game.rows - 1 - rc[0] : rc[0];
+    var c = opts.flipped ? game.cols - 1 - rc[1] : rc[1];
+    var ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring.setAttribute('cx', c * tileSize + tileSize / 2);
+    ring.setAttribute('cy', r * tileSize + tileSize / 2);
+    ring.setAttribute('r', tileSize * 0.4);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', 'rgba(180,0,255,0.6)');
+    ring.setAttribute('stroke-width', '3');
+    svg.appendChild(ring);
+  }
+}</code></pre>
+  </section>
+
+  <section id="step11">
+    <h2>Step 11: Wire Up the Game Controller</h2>
+    <p>Finally, <code>MCE.createGameController()</code> handles the full interaction loop — click handling, AI scheduling, undo/redo, and rendering:</p>
+    <pre class="language-javascript"><code class="language-javascript">var ctrl = MCE.createGameController(boardEl, game, {
+  players: { w: 'human', b: 'ai', r: 'ai', g: 'ai' },
+  aiDifficulty: 'medium',
+  workerPath: 'lib/mce/js/ai-worker.js',
+  renderOpts: {
+    size: 560,
+    animate: true,
+    animStyle: 'arc',
+    animDuration: 300,
+    animCaptureBurst: true,
+    tilePainter: dungeonTilePainter,
+    pieceProvider: dungeonPieceProvider,
+    afterRender: dungeonAfterRender,
+    suppressHighlights: false,
+  },
+  onMove: function(move, undo, captured) {
+    updateMoveLog(move);
+    playSound(captured ? 'capture' : 'move');
+  },
+  onSquareClick: function(sq, game, api) {
+    // Intercept clicks for hex targeting UI
+    if (hexTargetMode) {
+      castHex(sq, api);
+      return true;  // Prevent default handling
+    }
+    return false;
+  },
+  onAnimateMove: function(move, game, execute) {
+    // Custom animation timing
+    showMovePreview(move);
+    setTimeout(execute, 100);
+  },
+  onGameEnd: function(result) {
+    showVictoryScreen(result);
+  },
+  onTurnChange: function(turn) {
+    highlightActivePlayer(turn);
+  },
+  onPendingAction: function(action, moves) {
+    showRetreatUI(action, moves);
+  },
+});</code></pre>
+    <p>The controller returns methods for external control:</p>
+    <pre class="language-javascript"><code class="language-javascript">undoBtn.onclick = function() { ctrl.undo(); };
+ctrl.setDifficulty('hard');
+ctrl.setFlipped(true);
+ctrl.render();  // Force re-render after external state change</code></pre>
+  </section>
+
+  <section id="step12">
+    <h2>Step 12: Surround Renderer</h2>
+    <p>For atmosphere beyond the board edges (dungeon walls, torchlight), use <code>surroundRenderer</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">renderOpts: {
+  surroundRenderer: function(container, game, info) {
+    // info = { width, height, tileSize, rows, cols, flipped }
+    var canvas = document.createElement('canvas');
+    canvas.width = info.width + 120;  // Extra space for walls
+    canvas.height = info.height + 120;
+    canvas.style.position = 'absolute';
+    canvas.style.left = '-60px';
+    canvas.style.top = '-60px';
+    container.style.position = 'relative';
+    drawDungeonWalls(canvas.getContext('2d'), info);
+    container.appendChild(canvas);
+  }
+}</code></pre>
+    <p>The <code>surroundRenderer</code> is called before the SVG board is created, so canvas elements or background divs render behind the board.</p>
+  </section>
+
+  <section id="summary">
+    <h2>Summary</h2>
+    <p>Hooks and APIs used:</p>
+    <table class="docs-table">
+      <thead><tr><th>API / Hook</th><th>Purpose in Dungeon Chess</th></tr></thead>
+      <tbody>
+        <tr><td><code>registerPiece</code></td><td>Single dispatcher for 22 unit types via pieceData</td></tr>
+        <tr><td><code>buildUnitHandler</code></td><td>Declarative move specs for simple units</td></tr>
+        <tr><td><code>terrainSkip</code></td><td>Water/void blocks movement globally</td></tr>
+        <tr><td><code>moveFilter</code></td><td>Inject hex action moves for Shaman</td></tr>
+        <tr><td><code>beforeMove</code></td><td>Troll thick-skin capture interception</td></tr>
+        <tr><td><code>afterMove</code></td><td>Demonics explosion via mutateBoard</td></tr>
+        <tr><td><code>turnLogic</code></td><td>Salamander forced retreat (pendingAction)</td></tr>
+        <tr><td><code>positionKey</code></td><td>Hash pieceData keys for AI accuracy</td></tr>
+        <tr><td><code>createGameController</code></td><td>Full interaction loop with AI, undo, animation</td></tr>
+        <tr><td><code>tilePainter</code></td><td>Terrain-aware dungeon floor tiles</td></tr>
+        <tr><td><code>pieceProvider</code></td><td>Faction-coloured SVG sprites</td></tr>
+        <tr><td><code>afterRender</code></td><td>Hex effect overlays</td></tr>
+        <tr><td><code>surroundRenderer</code></td><td>Dungeon wall atmosphere</td></tr>
+        <tr><td><code>onSquareClick</code></td><td>Intercept clicks for hex targeting UI</td></tr>
+        <tr><td><code>onAnimateMove</code></td><td>Custom animation timing</td></tr>
+      </tbody>
+    </table>
+    <p>The complete bridge module is approximately 570 lines. MCE provides 100% of game logic, AI, rendering, animation, and undo — Dungeon Chess adds only unit definitions, variant hooks, and UI.</p>
+    <p><a href="guide.html">Back to all guides</a> | <a href="api.html">API Reference</a></p>
+  </section>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.0</p>
+</footer>
+<script src="../js/docs-toc.js?v=0.7.0"></script>
+<script src="../js/prism.js?v=0.7.0"></script>
+<script src="../js/prism-javascript.js?v=0.7.0"></script>
+<script src="../js/prism-copy.js?v=0.7.0"></script>
+</body>
+</html>

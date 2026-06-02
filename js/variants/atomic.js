@@ -1,5 +1,13 @@
 'use strict';
 MCE.registerVariant('atomic', {
+  openingBook: {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["g1f3", "e2e4", "d2d4"],
+    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e6", "d7d5", "g8f6"],
+    "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq -": ["f7f6", "d7d5", "e7e6"],
+    "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -": ["d2d4", "g1f3", "d2d3"],
+    "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3": ["e7e6", "d7d5", "f7f6"],
+    "rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3": ["d7d5", "g8f6", "f7f6"],
+  },
   label: 'Atomic',
   group: 'Tactical',
   rows: 8,

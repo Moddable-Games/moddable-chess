@@ -1,5 +1,10 @@
 'use strict';
 MCE.registerVariant('grand', {
+  openingBook: {
+    "r8r/1nbqkcbn1/pppppppppp/10/10/10/10/PPPPPPPPPP/1NBQKCBN1/R8R w - -": ["e3e4", "d3d4", "f2f3", "c2c3"],
+    "r8r/1nbqkcbn1/pppppppppp/10/10/10/4P5/PPPP1PPPPP/1NBQKCBN1/R8R b - -": ["e8e7", "d8d7", "f9f8"],
+    "r8r/1nbqkcbn1/pppppppppp/10/10/10/3P6/PPP1PPPPPP/1NBQKCBN1/R8R b - -": ["d8d7", "e8e7", "g9f8"],
+  },
   label: 'Grand Chess',
   group: 'Large Boards',
   rows: 10,

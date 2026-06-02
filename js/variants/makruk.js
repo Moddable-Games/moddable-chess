@@ -1,4 +1,12 @@
 'use strict';
+var makrukOpeningBook = {
+  "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSMKSNR w - -": ["e3e4", "d3d4", "f3f4", "c3c4"],
+  "rnsmksnr/8/pppppppp/8/4P3/PPPP1PPP/8/RNSMKSNR b - -": ["e6e5", "d6d5", "f6f5"],
+  "rnsmksnr/8/pppppppp/8/3P4/PPP1PPPP/8/RNSMKSNR b - -": ["d6d5", "e6e5", "c6c5"],
+  "rnsmksnr/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNSMKSNR w - -": ["d3d4", "f3f4", "b1c3"],
+  "rnsmksnr/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNSMKSNR w - -": ["e3e4", "c3c4", "b1c3"],
+};
+
 MCE.registerPiece('m', {
   genMoves: function(g, from, side) {
     var moves = [];
@@ -23,6 +31,7 @@ MCE.registerPiece('m', {
 });
 
 MCE.registerVariant('makruk', {
+  openingBook: makrukOpeningBook,
   label: 'Makruk',
   group: 'Alternate Rules',
   rows: 8,

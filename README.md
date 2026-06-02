@@ -160,6 +160,10 @@ Open `http://localhost:8000/`
 - Add excludePiece option to hide pieces during animation
 - Add game controller extensions: customRender, onSquareClick hook, interaction API
 - Add unit template system for config-driven piece registration
+- Migrate opening books into variant plugins (openingBook config property)
+- Add opening books for 18 new variants (26 total, up from 8)
+- New docs: Dungeon Chess integration guide, expanded API reference (controller callbacks, unit templates, terrain predicates)
+- Homepage: add "Build with MCE" consumer section with DC showcase
 - Add effect lifecycle hooks, controller callbacks, renderer extensions
 - Add generic terrain predicate system (replaces hardcoded water checks)
 - Add genJumps waterBlock boolean parameter

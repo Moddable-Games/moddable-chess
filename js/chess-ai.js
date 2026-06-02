@@ -16,15 +16,23 @@ function loadOpeningBook(basePath) {
   }
 }
 
+
 function probeBook(g) {
-  if (!openingBook) return null;
   var variant = g.variant || 'standard';
+  var key = MCE.positionKey(g);
+  var vc = MCE.getVariantConfig(variant);
+  if (vc && vc.openingBook) {
+    var entries = vc.openingBook[key];
+    if (entries && entries.length > 0) {
+      return parseBookMove(g, entries[Math.floor(Math.random() * entries.length)]);
+    }
+  }
+  if (!openingBook) return null;
   var book = openingBook[variant];
   if (!book) return null;
-  var key = MCE.positionKey(g);
-  var entries = book[key];
-  if (!entries || entries.length === 0) return null;
-  var pick = entries[Math.floor(Math.random() * entries.length)];
+  var entries2 = book[key];
+  if (!entries2 || entries2.length === 0) return null;
+  var pick = entries2[Math.floor(Math.random() * entries2.length)];
   return parseBookMove(g, pick);
 }
 

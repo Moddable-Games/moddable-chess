@@ -168,6 +168,12 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board</code></pre>
   tilePainter: null,     // custom tile rendering function
   pieceProvider: null,   // custom piece rendering function
   afterRender: null,     // post-render callback for overlays
+  surroundRenderer: null,// render around the board (before SVG creation)
+  effectOverlay: null,   // per-effect overlay renderer
+  legalMoveRenderer: null,// custom legal move indicator renderer
+  suppressHighlights: false, // skip built-in selection/lastMove highlights
+  excludePiece: -1,      // single square index to hide piece (animation)
+  excludePieces: null,   // array of square indices to hide (multi-animation)
 });</code></pre>
 
   <h3>Animation styles</h3>
@@ -292,17 +298,20 @@ var move = MCE.aiPickMove(game, null, { timeMs: 2000 });</code></pre>
     <tr><td><code>expert</code></td><td>3s</td><td>Always picks best move, deepest search</td></tr>
   </table>
 
-  <h3>MCE.loadOpeningBook(basePath)</h3>
-  <p>Loads the opening book from <code>basePath + 'data/openings.json'</code>. Called automatically on page load. The AI probes the book before searching — if the current position has a book entry, it plays instantly.</p>
-  <pre class="language-javascript"><code class="language-javascript">// Book format (data/openings.json):
-{
-  "standard": {
+  <h3>Opening books</h3>
+  <p>The AI probes for book moves before searching. If the current position has a book entry, it plays instantly. Books are stored as the <code>openingBook</code> property in variant configs:</p>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('myVariant', {
+  openingBook: {
     "rnbqkbnr/.../RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],
     "...position key...": ["move1", "move2"]
   },
-  "atomic": { ... }
-}</code></pre>
-  <p>Moves are in coordinate notation (<code>e2e4</code>, <code>g1f3</code>, <code>e7e8q</code> for promotion). Multiple moves per position enables variety — one is chosen randomly.</p>
+  // ...
+});</code></pre>
+  <p>Keys are position keys (first 4 FEN fields: board, turn, castling, en passant). Values are arrays of moves in coordinate notation (<code>e2e4</code>, <code>g1f3</code>, <code>e7e8q</code> for promotion). Multiple moves per position enables variety — one is chosen randomly.</p>
+  <p>26 variants ship with built-in opening books. The AI checks <code>variantConfig.openingBook</code> first, then falls back to <code>data/openings.json</code> (legacy).</p>
+
+  <h3>MCE.loadOpeningBook(basePath)</h3>
+  <p>Loads the legacy JSON book from <code>basePath + 'data/openings.json'</code>. Called automatically on page load. This is a fallback — prefer adding <code>openingBook</code> directly to your variant config.</p>
 
   <h3>Variant evaluators</h3>
   <p>Variants can provide custom position evaluation via the <code>evaluate</code> hook:</p>
@@ -471,6 +480,46 @@ if (move.flag === 'action' && move.action === 'hex') {
     <tr><td><code>ctrl.destroy()</code></td><td>Cleanup: terminates AI worker, removes listeners</td></tr>
   </table>
 
+  <h3>Controller callbacks</h3>
+  <table class="docs-table">
+    <tr><th>Option</th><th>Signature</th><th>Description</th></tr>
+    <tr><td><code>onMove</code></td><td><code>(move, undo, captured)</code></td><td>Called after every executed move (human or AI). Use for sound, logging, UI updates.</td></tr>
+    <tr><td><code>onGameEnd</code></td><td><code>(result)</code></td><td>Called when the game ends (checkmate, stalemate, or custom win condition).</td></tr>
+    <tr><td><code>onTurnChange</code></td><td><code>(turn, turnIndex)</code></td><td>Called when the active player changes. <code>turn</code> is the colour key, <code>turnIndex</code> the index into the players array.</td></tr>
+    <tr><td><code>onSelect</code></td><td><code>(sq, piece, legalMoves)</code></td><td>Called when a piece is selected. Receives the square index, piece character, and array of legal moves from that square.</td></tr>
+    <tr><td><code>onPendingAction</code></td><td><code>(action, legalMoves)</code></td><td>Called when a multi-step turn starts. Show retreat/follow-up UI.</td></tr>
+    <tr><td><code>onPendingActionEnd</code></td><td><code>()</code></td><td>Called when the pending action completes (follow-up move made).</td></tr>
+    <tr><td><code>onRender</code></td><td><code>(game, renderOpts)</code></td><td>Called after every board render. Use for syncing external UI with board state.</td></tr>
+    <tr><td><code>onAnimateMove</code></td><td><code>(move, game, execute)</code></td><td>Intercepts move execution. Call <code>execute()</code> when ready — lets you add pre-animation delays or effects.</td></tr>
+    <tr><td><code>onCaptureEffect</code></td><td><code>(sq, capturedPiece)</code></td><td>Called when a capture occurs. Use for particle effects, screen shake, sounds.</td></tr>
+    <tr><td><code>onSquareClick</code></td><td><code>(sq, game, api) → boolean</code></td><td>Intercepts square clicks before default handling. Return <code>true</code> to prevent the default select/move behaviour. The <code>api</code> object exposes <code>{ selected, executeMove, getLegalMoves, render }</code>.</td></tr>
+    <tr><td><code>onPromotionNeeded</code></td><td><code>(candidates, side, callback)</code></td><td>Custom promotion UI. Call <code>callback(pieceChar)</code> with the chosen piece.</td></tr>
+    <tr><td><code>customRender</code></td><td><code>(game, state)</code></td><td>Replaces the default render entirely. <code>state</code> includes <code>{ selected, lastMove, flipped, aiThinking, gameOver, getLegalMoves }</code>.</td></tr>
+  </table>
+
+  <h4>onSquareClick example — hex targeting UI</h4>
+  <pre class="language-javascript"><code class="language-javascript">var ctrl = MCE.createGameController(boardEl, game, {
+  onSquareClick: function(sq, game, api) {
+    if (hexTargetMode) {
+      api.executeMove({ from: shamanSq, to: sq, flag: 'action' });
+      hexTargetMode = false;
+      return true; // prevent default
+    }
+    return false; // let default handling proceed
+  }
+});</code></pre>
+
+  <h4>onAnimateMove example — pre-move preview</h4>
+  <pre class="language-javascript"><code class="language-javascript">var ctrl = MCE.createGameController(boardEl, game, {
+  onAnimateMove: function(move, game, execute) {
+    showArrow(move.from, move.to);
+    setTimeout(function() {
+      hideArrow();
+      execute(); // now actually make the move
+    }, 200);
+  }
+});</code></pre>
+
   <h3>Player configuration</h3>
   <p>The <code>players</code> object maps colour keys to <code>'human'</code> or <code>'ai'</code>. For multi-player games:</p>
   <pre class="language-javascript"><code class="language-javascript">players: { w: 'human', b: 'ai', r: 'ai', g: 'ai' }</code></pre>
@@ -531,6 +580,7 @@ prevBtn.onclick = function() { replay.stepBack(); renderReplay(); };</code></pre
   visibility: function(g, side) { return new Set(); },
   statusText: function(g, helpers) { return null; },
   positionKey: function(g) { return customHash(g); },
+  openingBook: { "posKey": ["e2e4", "d2d4"] },
 });</code></pre>
   <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>
 
@@ -556,6 +606,113 @@ console.log(vc.beforeMove); // [Function] (explosion logic)</code></pre>
   }
 });</code></pre>
   <p>Use the registered character in FEN strings (uppercase = white, lowercase = black).</p>
+
+  <h2>Unit Template System</h2>
+  <p>For games with many custom unit types (like Dungeon Chess's 22 units), the template system lets you define movement declaratively instead of writing <code>genMoves</code>/<code>attacks</code> by hand.</p>
+
+  <h3>MCE.buildUnitHandler(config)</h3>
+  <p>Returns a <code>{ genMoves, attacks }</code> handler object from a declarative config. Use it with <code>registerPiece</code> or as a dispatch target.</p>
+  <pre class="language-javascript"><code class="language-javascript">// Simple: slides like a rook, blocked by water
+var dragon = MCE.buildUnitHandler({ move: 'rook:waterBlock' });
+
+// Divergent: moves like a king, attacks like a bishop (gapped)
+var archer = MCE.buildUnitHandler({
+  move: 'king:waterBlock',
+  attack: 'gapped:bishop:waterBlock'
+});
+
+// Knight jumps
+var cavalry = MCE.buildUnitHandler({ move: 'knight:waterBlock' });
+
+// Cannon: slides to move, needs a screen piece to capture over
+var cannon = MCE.buildUnitHandler({
+  move: 'rook:waterBlock',
+  cannon: { dirs: 'rook' }
+});</code></pre>
+
+  <h4>Move spec string format</h4>
+  <p>String specs are composed with colons: <code>'style:dirs:modifier'</code>. Order does not matter.</p>
+  <table class="docs-table">
+    <tr><th>Token</th><th>Type</th><th>Meaning</th></tr>
+    <tr><td><code>rook</code></td><td>Directions</td><td>Orthogonal (N/S/E/W)</td></tr>
+    <tr><td><code>bishop</code></td><td>Directions</td><td>Diagonal (NE/NW/SE/SW)</td></tr>
+    <tr><td><code>queen</code></td><td>Directions</td><td>All 8 directions</td></tr>
+    <tr><td><code>knight</code></td><td>Directions + style</td><td>L-shaped jumps (also sets style to <code>jump</code>)</td></tr>
+    <tr><td><code>king</code></td><td>Directions + style</td><td>Single-step in all 8 (queen dirs, jump style)</td></tr>
+    <tr><td><code>jump</code></td><td>Style</td><td>Single-square jumps (no sliding)</td></tr>
+    <tr><td><code>gapped</code></td><td>Style</td><td>Slide that must skip exactly one empty square before landing</td></tr>
+    <tr><td><code>waterBlock</code></td><td>Modifier</td><td>Movement blocked by water terrain (<code>terrainSkip</code> predicate)</td></tr>
+  </table>
+
+  <h4>Config object properties</h4>
+  <table class="docs-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>move</code></td><td>string | string[] | function</td><td>Movement spec (non-capturing moves). Array for multiple movement styles.</td></tr>
+    <tr><td><code>attack</code></td><td>string | string[] | function</td><td>Attack spec (capture-only moves). If omitted, <code>move</code> is used for captures too.</td></tr>
+    <tr><td><code>cannon</code></td><td>{ dirs: string }</td><td>Cannon-style capture (needs a screen piece to jump over).</td></tr>
+    <tr><td><code>genMoves</code></td><td>function(g, sq, side)</td><td>Escape hatch: full custom move generation (overrides <code>move</code>/<code>attack</code>).</td></tr>
+    <tr><td><code>attacks</code></td><td>function(g, from, target)</td><td>Escape hatch: full custom attack detection.</td></tr>
+  </table>
+
+  <h4>Using with registerPiece</h4>
+  <pre class="language-javascript"><code class="language-javascript">// Direct: one handler per piece character
+MCE.registerPiece('d', MCE.buildUnitHandler({ move: 'rook:waterBlock' }));
+
+// Dispatch: many unit types via a single character + pieceData
+var unitHandlers = {
+  dragon: MCE.buildUnitHandler({ move: 'rook:waterBlock' }),
+  archer: MCE.buildUnitHandler({ move: 'king', attack: 'gapped:bishop' }),
+  knight: MCE.buildUnitHandler({ move: 'knight:waterBlock' }),
+};
+MCE.registerPiece('x', {
+  genMoves: function(g, sq, side) {
+    var pd = g.pieceData[sq];
+    return pd && unitHandlers[pd.key] ? unitHandlers[pd.key].genMoves(g, sq, side) : [];
+  },
+  attacks: function(g, from, target) {
+    var pd = g.pieceData[from];
+    return pd && unitHandlers[pd.key] ? unitHandlers[pd.key].attacks(g, from, target) : false;
+  }
+});</code></pre>
+
+  <h3>MCE.registerUnit(key, config)</h3>
+  <p>Registers a unit in the global unit registry by key. Retrieval via <code>getUnit()</code>. Useful for shared unit definitions across multiple variants.</p>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerUnit('dragon', { move: 'rook:waterBlock' });
+MCE.registerUnit('archer', { move: 'king', attack: 'gapped:bishop' });</code></pre>
+
+  <h3>MCE.getUnit(key)</h3>
+  <p>Returns the registered config object for a unit, or <code>null</code> if not found.</p>
+  <pre class="language-javascript"><code class="language-javascript">var dragonConfig = MCE.getUnit('dragon');
+var handler = MCE.buildUnitHandler(dragonConfig);</code></pre>
+
+  <h3>MCE.getUnitRegistry()</h3>
+  <p>Returns the full unit registry object. Keys are unit names, values are config objects.</p>
+
+  <h2>Terrain Predicates</h2>
+  <p>Terrain predicates control how terrain values affect move generation globally for a variant.</p>
+
+  <h3>terrainSkip (variant config)</h3>
+  <p>A function registered in <code>registerVariant()</code> that returns <code>true</code> for terrain values that block movement. All slide/jump/cannon generators respect it automatically.</p>
+  <pre class="language-javascript"><code class="language-javascript">MCE.registerVariant('dungeon-chess', {
+  terrainSkip: function(t) { return t === 'w' || t === 2; },
+  // ...
+});</code></pre>
+
+  <h3>waterBlock (move spec modifier)</h3>
+  <p>Per-unit terrain blocking. When <code>waterBlock</code> is in a move spec string, movement stops at squares where the variant's <code>terrainSkip</code> predicate returns true.</p>
+  <pre class="language-javascript"><code class="language-javascript">// This unit IS blocked by water:
+var soldier = MCE.buildUnitHandler({ move: 'rook:waterBlock' });
+
+// This unit is NOT blocked (e.g. a flying unit):
+var wraith = MCE.buildUnitHandler({ move: 'queen' });</code></pre>
+  <p>This lets you have units that respect terrain alongside units that ignore it — all using the same global terrain array.</p>
+
+  <h3>terrainBlock (move spec modifier)</h3>
+  <p>A custom terrain blocking predicate, more specific than <code>waterBlock</code>. Takes a terrain value, returns <code>true</code> to block.</p>
+  <pre class="language-javascript"><code class="language-javascript">// Block only lava, not water
+var fireVulnerable = MCE.buildUnitHandler({
+  move: { dirs: 'queen', terrainBlock: function(t) { return t === 'lava'; } }
+});</code></pre>
 
   <h2>Utilities</h2>
 

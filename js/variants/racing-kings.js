@@ -1,5 +1,11 @@
 'use strict';
 MCE.registerVariant('racingKings', {
+  openingBook: {
+    "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - -": ["h2g3", "g2f3", "h2h3"],
+    "8/8/8/8/8/6K1/krbnNBR1/qrbnNBRQ b - -": ["a2b3", "b2c3", "a2a3"],
+    "8/8/8/8/8/5K2/krbnNBR1/qrbnNBRQ b - -": ["a2b3", "b2c3"],
+    "8/8/8/8/8/1k6/1rbnNBRK/qrbnNBRQ w - -": ["h2g3", "g2f3"],
+  },
   label: 'Racing Kings',
   group: 'Alternate Rules',
   rows: 8,
