@@ -154,6 +154,17 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-02
+- Add renderBoard hooks: excludePieces array, suppressHighlights, legalMoveRenderer
+- Add tilePainter transform positioning (supports `<g>` elements)
+- Add excludePiece option to hide pieces during animation
+- Add game controller extensions: customRender, onSquareClick hook, interaction API
+- Add unit template system for config-driven piece registration
+- Add effect lifecycle hooks, controller callbacks, renderer extensions
+- Add generic terrain predicate system (replaces hardcoded water checks)
+- Add genJumps waterBlock boolean parameter
+- Fix handleAIResult to schedule next AI move in multi-player games
+
 #### 2026-06-01 (v0.7.0)
 - Add custom positionKey hook for pieceData-based games (#75)
 - Add multi-step turns via pendingAction pattern (#74, #78)
