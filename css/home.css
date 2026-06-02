@@ -367,6 +367,11 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 40px;
 }
 
+a.mc-consumer-card {
+  text-decoration: none;
+  color: inherit;
+}
+
 .mc-consumer-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(111,181,255,0.15);

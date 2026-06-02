@@ -145,7 +145,7 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board</code></pre>
   <h3>MCE.algebraicToSq(str, game)</h3>
   <p>Converts algebraic notation to an index.</p>
 
-  <h2>Rendering</h2>
+  <h2 id="rendering">Rendering</h2>
 
   <h3>MCE.renderBoard(container, game, opts)</h3>
   <p>Renders an SVG chess board into a DOM element.</p>
@@ -432,7 +432,7 @@ if (move.flag === 'action' && move.action === 'hex') {
     <tr><td><code>label</code></td><td>string</td><td>Optional UI label describing the required action</td></tr>
   </table>
 
-  <h2>Game Controller</h2>
+  <h2 id="game-controller">Game Controller</h2>
 
   <h3>MCE.createGameController(container, game, opts)</h3>
   <p>Mounts a full game interaction loop (select → move → animate → AI → repeat) on a DOM container. Consumer games use this instead of reimplementing click handling, AI scheduling, and undo logic.</p>
@@ -607,7 +607,7 @@ console.log(vc.beforeMove); // [Function] (explosion logic)</code></pre>
 });</code></pre>
   <p>Use the registered character in FEN strings (uppercase = white, lowercase = black).</p>
 
-  <h2>Unit Template System</h2>
+  <h2 id="unit-template-system">Unit Template System</h2>
   <p>For games with many custom unit types (like Dungeon Chess's 22 units), the template system lets you define movement declaratively instead of writing <code>genMoves</code>/<code>attacks</code> by hand.</p>
 
   <h3>MCE.buildUnitHandler(config)</h3>
@@ -688,7 +688,7 @@ var handler = MCE.buildUnitHandler(dragonConfig);</code></pre>
   <h3>MCE.getUnitRegistry()</h3>
   <p>Returns the full unit registry object. Keys are unit names, values are config objects.</p>
 
-  <h2>Terrain Predicates</h2>
+  <h2 id="terrain-predicates">Terrain Predicates</h2>
   <p>Terrain predicates control how terrain values affect move generation globally for a variant.</p>
 
   <h3>terrainSkip (variant config)</h3>
