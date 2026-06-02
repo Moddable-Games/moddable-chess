@@ -186,7 +186,7 @@ if (embedMode) {
   if (radius) document.getElementById('board-container').style.borderRadius = radius;
 }
 
-const basePath = document.querySelector('script[src*="game-controller"]').src.replace(/js\/game-controller\.js.*/, '');
+const basePath = document.querySelector('script[src*="game-controller.js"]').src.replace(/js\/game-controller\.js.*/, '');
 MCE.loadOpeningBook(basePath);
 
 let aiWorker = null;
