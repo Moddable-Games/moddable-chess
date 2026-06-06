@@ -432,6 +432,11 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
+  if (!embedMode) {
+    const url = new URL(location);
+    url.searchParams.set('variant', variant);
+    history.replaceState(null, '', url);
+  }
   const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   if (g) openGroup = g.label;
   game = MCE.createGame(variant);
