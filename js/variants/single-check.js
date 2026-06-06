@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('singleCheck', {
+  group: 'Tactical',
   openingBook: {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e4", "g1f3", "d2d4"],
     "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e6", "c7c6", "d7d6", "g8f6"],

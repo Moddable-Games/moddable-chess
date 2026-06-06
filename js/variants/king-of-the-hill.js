@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('kingOfTheHill', {
+  group: 'Tactical',
   openingBook: {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e4", "d2d4"],
     "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e5", "d7d5"],

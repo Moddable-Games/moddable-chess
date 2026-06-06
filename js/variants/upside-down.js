@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('upsideDown', {
+  group: 'Classic',
   label: 'Upside-Down',
   group: 'Classic',
   rows: 8,

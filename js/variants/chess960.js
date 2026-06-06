@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('chess960', {
+  group: 'Classic',
   label: 'Fischer Random (960)',
   group: 'Classic',
   rows: 8,

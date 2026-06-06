@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('amazonChess', {
+  group: 'Classic',
   label: 'Amazon Chess',
   group: 'Classic',
   rows: 8,

@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('threeCheck', {
+  group: 'Tactical',
   openingBook: {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["e2e4", "d2d4", "g1f3"],
     "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e5", "c7c5", "e7e6"],

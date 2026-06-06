@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('chigorin', {
+  group: 'Classic',
   label: 'Chigorin',
   group: 'Classic',
   rows: 8,

@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('breakthrough', {
+  group: 'Alternate Rules',
   openingBook: {
     "ppppppp/ppppppp/7/7/7/PPPPPPP/PPPPPPP w - -": ["d1d2", "c1c2", "e1e2", "b1b2"],
     "ppppppp/ppppppp/7/7/3P3/PPP1PPP/PPPPPPP b - -": ["d7d6", "c7c6", "e7e6"],

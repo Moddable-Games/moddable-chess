@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('capablanca', {
+  group: 'Large Boards',
   openingBook: {
     "rnabqkbcnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNABQKBCNR w KQkq -": ["e2e4", "d2d4", "g1f3", "c2c4", "i1h3"],
     "rnabqkbcnr/pppppppppp/10/10/4P5/10/PPPP1PPPPP/RNABQKBCNR b KQkq e3": ["e7e5", "d7d5", "c7c5", "g8f6"],

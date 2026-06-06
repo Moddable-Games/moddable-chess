@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('atomic', {
+  group: 'Tactical',
   openingBook: {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -": ["g1f3", "e2e4", "d2d4"],
     "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3": ["e7e6", "d7d5", "g8f6"],

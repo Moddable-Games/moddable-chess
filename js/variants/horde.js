@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('horde', {
+  group: 'Alternate Rules',
   openingBook: {
     "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq -": ["f5f6", "c5c6", "e4e5", "d4d5"],
     "rnbqkbnr/pppppppp/5P2/1PP2P2/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP b kq -": ["g7f6", "e7e6", "d7d6"],

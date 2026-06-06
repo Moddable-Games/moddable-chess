@@ -8,121 +8,37 @@ const movesEl = document.getElementById('moves');
 const pickerEl = document.getElementById('variant-picker');
 const descEl = document.getElementById('description');
 
-const DESCRIPTIONS = {
-  standard: { title: 'Standard Chess', text: 'Classic FIDE chess. Checkmate the opponent\'s king to win.', rule: 'Board: 8×8 · Win: Checkmate' },
-  kingOfTheHill: { title: 'King of the Hill', text: 'Standard rules, plus an instant win if your king reaches any of the four centre squares (d4, d5, e4, e5).', rule: 'Board: 8×8 · Win: Checkmate or king reaches centre' },
-  threeCheck: { title: 'Three-Check', text: 'Standard rules, but delivering three checks to your opponent wins immediately — no need for checkmate.', rule: 'Board: 8×8 · Win: Checkmate or 3 checks' },
-  antichess: { title: 'Antichess', text: 'Captures are mandatory. The goal is to lose all your pieces. No check, no castling — the king is just another piece.', rule: 'Board: 8×8 · Win: Lose all pieces or get stalemated' },
-  racingKings: { title: 'Racing Kings', text: 'No checks allowed at any point. Both sides race their king to rank 8. First to arrive wins.', rule: 'Board: 8×8 · Win: King reaches rank 8' },
-  chess960: { title: 'Fischer Random (Chess960)', text: 'Standard rules but the back rank is randomised from 960 possible positions. Bishops on opposite colours, king between rooks.', rule: 'Board: 8×8 · Win: Checkmate' },
-  rifle: { title: 'Rifle Chess', text: 'When you capture a piece, your piece stays on its original square — it "shoots" the target from a distance.', rule: 'Board: 8×8 · Win: Checkmate' },
-  atomic: { title: 'Atomic Chess', text: 'Captures cause explosions that destroy all non-pawn pieces on adjacent squares, including the capturer. If a king is caught in the blast, that side loses.', rule: 'Board: 8×8 · Win: Explode opponent\'s king' },
-  marseillais: { title: 'Marseillais Chess', text: 'Each player makes two moves per turn (except White\'s first turn). If your first move gives check, your turn ends immediately.', rule: 'Board: 8×8 · Win: Checkmate' },
-  duckChess: { title: 'Duck Chess', text: 'After each move, place the duck (yellow blocker) on any empty square. The duck blocks all movement. Win by capturing the opponent\'s king — no check warnings.', rule: 'Board: 8×8 · Win: Capture king' },
-  fogOfWar: { title: 'Fog of War', text: 'You can only see squares your pieces can legally move to. Hidden squares are darkened. No check warnings — you must capture the king to win.', rule: 'Board: 8×8 · Win: Capture king' },
-  capablanca: { title: 'Capablanca Chess', text: 'Invented by world champion José Capablanca. Adds two new pieces: the Archbishop (bishop + knight) and Chancellor (rook + knight) on a wider board.', rule: 'Board: 10×8 · Win: Checkmate' },
-  grand: { title: 'Grand Chess', text: 'Same new pieces as Capablanca on a larger board. Pawns start on rank 3. No castling. Promotion only to previously captured pieces.', rule: 'Board: 10×10 · Win: Checkmate' },
-  courier: { title: 'Courier Chess', text: 'Medieval German variant from the 1200s. Uses a 12-column board with extra bishops and Sage pieces (move one step in any direction, non-royal).', rule: 'Board: 12×8 · Win: Checkmate' },
-  noCastling: { title: 'No Castling', text: 'Standard chess with castling disabled. Endorsed by Vladimir Kramnik and played in elite tournaments. Forces creative king safety solutions.', rule: 'Board: 8×8 · Win: Checkmate' },
-  torpedo: { title: 'Torpedo Chess', text: 'Pawns can always move two squares forward, not just from their starting rank. Makes pawns far more dynamic and endgames completely different.', rule: 'Board: 8×8 · Win: Checkmate' },
-  horde: { title: 'Horde Chess', text: 'Massively asymmetric — White has 36 pawns filling ranks 1-4, Black has a normal army. Black wins by checkmate or eliminating all White pieces. White wins by checkmating Black.', rule: 'Board: 8×8 · Win: Checkmate (Black) or eliminate horde (Black)' },
-  extinction: { title: 'Extinction Chess', text: 'You lose when any one piece type is completely eliminated from your army. Protecting your last bishop matters more than protecting your king.', rule: 'Board: 8×8 · Win: Eliminate a piece type' },
-  breakthrough: { title: 'Breakthrough', text: 'Only pawns on a 7×7 board. First to reach the far rank wins. No promotion — just push through. Simple to learn, deep to master. Used in AI competitions.', rule: 'Board: 7×7 · Win: Reach far rank' },
-  maharaja: { title: 'Maharaja & Sepoys', text: 'Extreme asymmetry — White has only a Maharaja (Queen + Knight compound piece) against Black\'s full army. The Maharaja must checkmate Black\'s king alone.', rule: 'Board: 8×8 · Win: Checkmate' },
-  knightmate: { title: 'Knightmate', text: 'The roles of king and knight are swapped. The knight is the royal piece that must be checkmated, while the king moves like a knight and is expendable.', rule: 'Board: 8×8 · Win: Checkmate knight' },
-  monsterChess: { title: 'Monster Chess', text: 'White has only a king and rooks but gets two moves per turn. Black has a full army with one move per turn. Giving check ends your turn early.', rule: 'Board: 8×8 · Win: Checkmate' },
-  progressive: { title: 'Progressive Chess', text: 'White makes 1 move, then Black makes 2, White makes 3, Black makes 4, and so on — escalating each turn. Giving check ends your turn immediately.', rule: 'Board: 8×8 · Win: Checkmate' },
-  chigorin: { title: 'Chigorin Chess', text: 'White has knights instead of bishops, Black has the standard army. Named after Mikhail Chigorin. White\'s knights provide a tactical edge but lack long-range diagonal control.', rule: 'Board: 8×8 · Win: Checkmate' },
-  almostChess: { title: 'Almost Chess', text: 'Identical to standard chess except one queen is replaced by a Chancellor (Rook + Knight compound). Subtle but significant strategic shift.', rule: 'Board: 8×8 · Win: Checkmate' },
-  amazonChess: { title: 'Amazon Chess', text: 'Both sides have an Amazon (Queen + Knight compound) instead of a regular Queen. The most powerful piece in fairy chess on a standard board.', rule: 'Board: 8×8 · Win: Checkmate' },
-  endgameChess: { title: 'Endgame Chess', text: 'Start with only pawns and kings — no back-rank pieces. Pure endgame technique from move one. Great for endgame practice.', rule: 'Board: 8×8 · Win: Checkmate' },
-  peasantsRevolt: { title: "Peasants' Revolt", text: 'Asymmetric: White has a king and 8 pawns against Black\'s king and 2 knights. Can the peasant army overwhelm the cavalry?', rule: 'Board: 8×8 · Win: Checkmate' },
-  pawnsOnly: { title: 'Pawns Only', text: 'Only pawns and kings on the board. First player to promote a pawn (or checkmate) wins. Simple to learn, surprisingly deep.', rule: 'Board: 8×8 · Win: Checkmate or promotion' },
-  upsideDown: { title: 'Upside-Down Chess', text: 'Pieces start on the opponent\'s back rank — white pieces on rank 8, black on rank 1. Pawns march "backward" toward promotion. Chaotic opening.', rule: 'Board: 8×8 · Win: Checkmate' },
-  singleCheck: { title: 'Single-Check', text: 'Deliver just one check to win instantly. Ultra-aggressive variant where every move is a potential game-ender. King safety is everything.', rule: 'Board: 8×8 · Win: One check' },
-  fiveCheck: { title: 'Five-Check', text: 'Like Three-Check but you need five checks to win. More strategic than Single-Check, more aggressive than standard.', rule: 'Board: 8×8 · Win: 5 checks or checkmate' },
-  giveaway: { title: 'Giveaway Chess', text: 'Captures are mandatory. Lose all your pieces to win. Unlike Antichess, being stalemated means you LOSE (not win). FICS rules.', rule: 'Board: 8×8 · Win: Lose all pieces' },
-  suicideChess: { title: 'Suicide Chess', text: 'Captures are mandatory. Lose all your pieces to win. Stalemate is a draw (not a win for either side). The gentlest losing-chess variant.', rule: 'Board: 8×8 · Win: Lose all pieces' },
-  stalemateWins: { title: 'Stalemate Wins', text: 'Standard chess rules but stalemate is a WIN for the stalemating side (not a draw). Completely changes endgame theory.', rule: 'Board: 8×8 · Win: Checkmate or stalemate' },
-  codrus: { title: 'Codrus', text: 'Named after the Athenian king who sacrificed himself. Lose your king to win. No check concept — you must arrange for your own king to be captured.', rule: 'Board: 8×8 · Win: Lose your king' },
-  makpong: { title: 'Makpong', text: 'Thai chess variant where the king cannot move out of check — must block or capture the attacker. If neither is possible, checkmate. Based on Makruk.', rule: 'Board: 8×8 · Win: Checkmate' },
-  losAlamos: { title: 'Los Alamos Chess', text: 'The first chess variant ever played by a computer (1956). 6×6 board with no bishops, no castling, no double pawn step. Pure tactics.', rule: 'Board: 6×6 · Win: Checkmate' },
-  minichess: { title: 'Minichess (5×5)', text: 'Gardner\'s Minichess — full piece types crammed onto a tiny 5×5 board. Fast, tactical, and surprisingly rich for its size.', rule: 'Board: 5×5 · Win: Checkmate' },
-};
+function getDescription(key) {
+  const vc = MCE.getVariantConfig(key);
+  if (!vc || !vc.title) return null;
+  return { title: vc.title, text: vc.description || '', rule: vc.rule || '' };
+}
 
-const VARIANT_GROUPS = [
-  { label: 'Classic', variants: [
-    ['standard', 'Standard'],
-    ['almostChess', 'Almost Chess'],
-    ['amazonChess', 'Amazon Chess'],
-    ['chess960', 'Fischer Random'],
-    ['chigorin', 'Chigorin'],
-    ['noCastling', 'No Castling'],
-    ['torpedo', 'Torpedo'],
-    ['upsideDown', 'Upside-Down'],
-  ]},
-  { label: 'Tactical', variants: [
-    ['atomic', 'Atomic'],
-    ['extinction', 'Extinction'],
-    ['fiveCheck', 'Five-Check'],
-    ['kingOfTheHill', 'King of the Hill'],
-    ['rifle', 'Rifle'],
-    ['singleCheck', 'Single-Check'],
-    ['threeCheck', 'Three-Check'],
-  ]},
-  { label: 'Alternate Rules', variants: [
-    ['antichess', 'Antichess'],
-    ['breakthrough', 'Breakthrough (7×7)'],
-    ['codrus', 'Codrus'],
-    ['duckChess', 'Duck Chess'],
-    ['fogOfWar', 'Fog of War'],
-    ['giveaway', 'Giveaway'],
-    ['horde', 'Horde'],
-    ['knightmate', 'Knightmate'],
-    ['maharaja', 'Maharaja & Sepoys'],
-    ['makpong', 'Makpong'],
-    ['marseillais', 'Marseillais'],
-    ['monsterChess', 'Monster Chess'],
-    ['progressive', 'Progressive'],
-    ['racingKings', 'Racing Kings'],
-    ['stalemateWins', 'Stalemate Wins'],
-    ['suicideChess', 'Suicide Chess'],
-  ]},
-  { label: 'Asymmetric', variants: [
-    ['endgameChess', 'Endgame Chess'],
-    ['pawnsOnly', 'Pawns Only'],
-    ['peasantsRevolt', "Peasants' Revolt"],
-  ]},
-  { label: 'Small Boards', variants: [
-    ['losAlamos', 'Los Alamos (6×6)'],
-    ['minichess', 'Minichess (5×5)'],
-  ]},
-  { label: 'Large Boards', variants: [
-    ['capablanca', 'Capablanca (10×8)'],
-    ['courier', 'Courier (12×8)'],
-    ['grand', 'Grand Chess (10×10)'],
-  ]},
-];
+const GROUP_ORDER = ['Classic', 'Tactical', 'Alternate Rules', 'Asymmetric', 'Small Boards', 'Large Boards'];
 
 function getVariantGroups() {
-  const groups = VARIANT_GROUPS.map(g => ({ label: g.label, variants: [...g.variants] }));
-  const knownKeys = new Set(groups.flatMap(g => g.variants.map(([k]) => k)));
+  const groupMap = {};
   for (const [key, vc] of Object.entries(MCE.variantRegistry)) {
-    if (knownKeys.has(key)) continue;
     const groupLabel = vc.group || 'Plugins';
-    let target = groups.find(g => g.label === groupLabel);
-    if (!target) { target = { label: groupLabel, variants: [] }; groups.push(target); }
-    target.variants.push([key, vc.label || key]);
-    if (vc.title && vc.description) {
-      DESCRIPTIONS[key] = { title: vc.title, text: vc.description, rule: vc.rule || '' };
-    }
+    if (!groupMap[groupLabel]) groupMap[groupLabel] = [];
+    groupMap[groupLabel].push([key, vc.label || key]);
+  }
+  const groups = [];
+  for (const label of GROUP_ORDER) {
+    if (groupMap[label]) { groups.push({ label, variants: groupMap[label] }); delete groupMap[label]; }
+  }
+  for (const [label, variants] of Object.entries(groupMap)) {
+    groups.push({ label, variants });
   }
   for (const g of groups) {
-    const first = g.variants[0];
-    const isStandard = first && first[0] === 'standard';
-    const start = isStandard ? 1 : 0;
-    const tail = g.variants.slice(start).sort((a, b) => a[1].localeCompare(b[1]));
-    g.variants = isStandard ? [first, ...tail] : tail;
+    const stdIdx = g.variants.findIndex(([k]) => k === 'standard');
+    if (stdIdx >= 0) {
+      const std = g.variants.splice(stdIdx, 1)[0];
+      g.variants.sort((a, b) => a[1].localeCompare(b[1]));
+      g.variants.unshift(std);
+    } else {
+      g.variants.sort((a, b) => a[1].localeCompare(b[1]));
+    }
   }
   return groups;
 }
@@ -332,7 +248,7 @@ function renderPicker() {
 }
 
 function renderDescription() {
-  const d = DESCRIPTIONS[currentVariant];
+  const d = getDescription(currentVariant);
   if (!d) { descEl.innerHTML = ''; return; }
   descEl.innerHTML = `<h3>${d.title}</h3><p>${d.text}</p><div class="desc-rule">${d.rule}</div>`;
 }
@@ -1083,7 +999,7 @@ function setupEmbedBridge() {
     switch (e.data.type) {
       case 'chess:setVariant': {
         const v = e.data.variant;
-        if (v && (DESCRIPTIONS[v] || (MCE.variantRegistry && MCE.variantRegistry[v]))) {
+        if (v && MCE.getVariantConfig(v)) {
           startGame(v);
         }
         break;

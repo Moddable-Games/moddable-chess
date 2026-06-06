@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('racingKings', {
+  group: 'Alternate Rules',
   openingBook: {
     "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - -": ["h2g3", "g2f3", "h2h3"],
     "8/8/8/8/8/6K1/krbnNBR1/qrbnNBRQ b - -": ["a2b3", "b2c3", "a2a3"],

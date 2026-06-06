@@ -1,5 +1,6 @@
 'use strict';
 MCE.registerVariant('knightmate', {
+  group: 'Alternate Rules',
   openingBook: {
     "rkbqnbkr/pppppppp/8/8/8/8/PPPPPPPP/RKBQNBKR w KQkq -": ["e2e4", "d2d4", "c2c4", "g2g3"],
     "rkbqnbkr/pppppppp/8/8/4P3/8/PPPP1PPP/RKBQNBKR b KQkq e3": ["e7e5", "d7d5", "c7c5"],
