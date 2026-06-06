@@ -156,6 +156,10 @@ Open `http://localhost:8000/`
 
 #### 2026-06-06 (v0.7.1)
 - Fix basePath selector: match game-controller.js not game-controller-core.js (broke live play page)
+- Fix variant URL param validation: check registry instead of hardcoded subset (fixes embed for 32 variants)
+- Remove hardcoded DESCRIPTIONS and VARIANT_GROUPS; all variant metadata now derived from plugin registry
+- Add URL update on variant switch (refresh/share preserves selection)
+- Update docs hub variant table from 54 to 70
 - Improve transparent theme contrast: use grey-based rgba instead of white-based
 - Bump cache-busting strings to v0.7.1
 
