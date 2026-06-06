@@ -250,7 +250,7 @@ fetch(basePath + 'assets/pieces.svg')
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
     if (!embedMode) renderPicker();
-    const initVariant = paramVariant && DESCRIPTIONS[paramVariant] ? paramVariant : 'standard';
+    const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
     startGame(initVariant);
   });
 
