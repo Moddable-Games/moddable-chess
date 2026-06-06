@@ -154,6 +154,11 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-06 (v0.7.1)
+- Fix basePath selector: match game-controller.js not game-controller-core.js (broke live play page)
+- Improve transparent theme contrast: use grey-based rgba instead of white-based
+- Bump cache-busting strings to v0.7.1
+
 #### 2026-06-02
 - Add renderBoard hooks: excludePieces array, suppressHighlights, legalMoveRenderer
 - Add tilePainter transform positioning (supports `<g>` elements)

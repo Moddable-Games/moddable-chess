@@ -92,7 +92,7 @@ MCE.renderBoard(document.getElementById('board'), game, {
 MCE.rc(index, game)    // → [row, col]
 MCE.onBoard(row, col, game) // → boolean</code></pre>
 
-  <h2>Supported Variants (54)</h2>
+  <h2>Supported Variants (70)</h2>
   <table class="docs-table">
     <tr><th>Key</th><th>Board</th><th>Win Condition</th></tr>
     <tr><td><code>standard</code></td><td>8×8</td><td>Checkmate</td></tr>
@@ -149,6 +149,22 @@ MCE.onBoard(row, col, game) // → boolean</code></pre>
     <tr><td><code>halfChess</code></td><td>4×8</td><td>Checkmate</td></tr>
     <tr><td><code>dianaChess</code></td><td>6×6</td><td>Checkmate</td></tr>
     <tr><td><code>pettyChess</code></td><td>5×6</td><td>Checkmate</td></tr>
+    <tr><td><code>berolinaChess</code></td><td>8×8</td><td>Checkmate (pawns move diagonally)</td></tr>
+    <tr><td><code>cylinderChess</code></td><td>8×8</td><td>Checkmate (files wrap a↔h)</td></tr>
+    <tr><td><code>toroidalChess</code></td><td>8×8</td><td>Checkmate (board wraps both axes)</td></tr>
+    <tr><td><code>leganChess</code></td><td>8×8</td><td>Checkmate (Berolina pawns, swapped royals)</td></tr>
+    <tr><td><code>hoppelPoppel</code></td><td>8×8</td><td>Checkmate (knights/bishops swap captures)</td></tr>
+    <tr><td><code>makruk</code></td><td>8×8</td><td>Checkmate (Thai chess)</td></tr>
+    <tr><td><code>ordaChess</code></td><td>8×8</td><td>Checkmate (asymmetric Mongol army)</td></tr>
+    <tr><td><code>einsteinChess</code></td><td>8×8</td><td>Checkmate (moves demote, captures promote)</td></tr>
+    <tr><td><code>displacementChess</code></td><td>8×8</td><td>Checkmate (swap with adjacent friendlies)</td></tr>
+    <tr><td><code>shatar</code></td><td>8×8</td><td>Bare king (Mongolian chess)</td></tr>
+    <tr><td><code>crazyhouse</code></td><td>8×8</td><td>Checkmate (drop captured pieces)</td></tr>
+    <tr><td><code>recruitmentChess</code></td><td>8×8</td><td>Checkmate (captured pieces join your army)</td></tr>
+    <tr><td><code>teleportChess</code></td><td>8×8</td><td>Checkmate (teleport to empty squares)</td></tr>
+    <tr><td><code>poisonChess</code></td><td>8×8</td><td>Checkmate (capture squares become toxic)</td></tr>
+    <tr><td><code>medusaChess</code></td><td>8×8</td><td>Checkmate (pieces petrify on sight)</td></tr>
+    <tr><td><code>immunizationChess</code></td><td>8×8</td><td>Checkmate (pieces gain capture immunity)</td></tr>
   </table>
 
   <h2>Sister Projects</h2>
