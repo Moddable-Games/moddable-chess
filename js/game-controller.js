@@ -3,6 +3,7 @@
 
 const container = document.getElementById('board-container');
 const controlsEl = document.getElementById('board-controls');
+const toolbarEl = document.getElementById('board-toolbar');
 const statusEl = document.getElementById('status');
 const movesEl = document.getElementById('moves');
 const pickerEl = document.getElementById('variant-picker');
@@ -46,9 +47,23 @@ function getVariantGroups() {
 const params = new URLSearchParams(location.search);
 const paramVariant = params.get('variant');
 const embedMode = params.get('embed') === '1';
+let fullscreenMode = params.get('mode') === 'fullscreen';
 const paramP1 = params.get('p1') || 'White';
 const paramP2 = params.get('p2') || 'Black';
 const paramMode = params.get('mode');
+const paramTheme = params.get('theme');
+const paramPieces = params.get('pieces');
+
+if (paramTheme && MCE.THEMES && MCE.THEMES[paramTheme]) {
+  MCE.setTheme(paramTheme);
+}
+if (paramPieces && MCE.PIECE_STYLES && MCE.PIECE_STYLES[paramPieces]) {
+  MCE.setPieceStyle(paramPieces);
+}
+
+if (fullscreenMode) {
+  applyFullscreenMode();
+}
 
 if (embedMode) {
   document.querySelectorAll('.site-nav, #sidebar').forEach(el => el.style.display = 'none');
@@ -104,6 +119,11 @@ if (embedMode) {
 
 const basePath = document.querySelector('script[src*="game-controller.js"]').src.replace(/js\/game-controller\.js.*/, '');
 MCE.loadOpeningBook(basePath);
+
+const ANIM_STYLES = { slide: 'Slide', arc: 'Arc', bounce: 'Bounce', warp: 'Warp' };
+const ANIM_SPEEDS = { slow: { label: 'Slow', ms: 400 }, normal: { label: 'Normal', ms: 200 }, fast: { label: 'Fast', ms: 100 }, instant: { label: 'Instant', ms: 0 } };
+let animStyle = params.get('animStyle') || 'slide';
+let animSpeed = params.get('animSpeed') || 'normal';
 
 let aiWorker = null;
 let aiWorkerReady = false;
@@ -165,7 +185,7 @@ fetch(basePath + 'assets/pieces.svg')
     const div = document.createElement('div');
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
-    if (!embedMode) renderPicker();
+    if (!embedMode && !fullscreenMode) renderPicker();
     const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
     startGame(initVariant);
   });
@@ -256,9 +276,12 @@ function renderDescription() {
 function renderControls() {
   controlsEl.innerHTML = '';
 
+  const leftGroup = document.createElement('div');
+  leftGroup.className = 'ctrl-group';
+
   const flipBtn = document.createElement('button');
   flipBtn.className = 'ctrl-btn';
-  flipBtn.textContent = 'Flip Board';
+  flipBtn.textContent = 'Flip';
   flipBtn.addEventListener('click', () => {
     flipped = !flipped;
     render();
@@ -266,7 +289,7 @@ function renderControls() {
 
   const undoBtn = document.createElement('button');
   undoBtn.className = 'ctrl-btn';
-  undoBtn.textContent = 'Undo Move';
+  undoBtn.textContent = 'Undo';
   undoBtn.disabled = undoStack.length === 0;
   undoBtn.addEventListener('click', () => {
     if (undoStack.length === 0 || aiThinking) return;
@@ -300,14 +323,24 @@ function renderControls() {
     startGame(currentVariant);
   });
 
-  controlsEl.appendChild(flipBtn);
-  controlsEl.appendChild(undoBtn);
-  controlsEl.appendChild(newBtn);
+  leftGroup.appendChild(flipBtn);
+  leftGroup.appendChild(undoBtn);
+  leftGroup.appendChild(newBtn);
+  controlsEl.appendChild(leftGroup);
 
   if (gameMode === 'solo') {
+    const rightGroup = document.createElement('div');
+    rightGroup.className = 'ctrl-group';
+
     const diffSelect = document.createElement('select');
     diffSelect.className = 'ctrl-select';
-    const diffLabels = { beginner: 'Beginner', easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert' };
+    const diffLabels = {
+      beginner: 'Novice (~600)',
+      easy: 'Club (~1000)',
+      medium: 'Intermediate (~1200)',
+      hard: 'Advanced (~1400)',
+      expert: 'Expert (~1600)'
+    };
     Object.entries(diffLabels).forEach(([key, label]) => {
       const opt = document.createElement('option');
       opt.value = key;
@@ -318,11 +351,19 @@ function renderControls() {
     diffSelect.addEventListener('change', () => {
       aiDifficulty = diffSelect.value;
     });
-    controlsEl.appendChild(diffSelect);
+    rightGroup.appendChild(diffSelect);
+    controlsEl.appendChild(rightGroup);
   }
+}
+
+function renderToolbar() {
+  toolbarEl.innerHTML = '';
+
+  const leftGroup = document.createElement('div');
+  leftGroup.className = 'toolbar-group';
 
   const themeSelect = document.createElement('select');
-  themeSelect.className = 'ctrl-select';
+  themeSelect.className = 'toolbar-select';
   const currentThemeObj = MCE.getTheme();
   Object.entries(MCE.THEMES).forEach(([key, t]) => {
     const opt = document.createElement('option');
@@ -333,9 +374,80 @@ function renderControls() {
   });
   themeSelect.addEventListener('change', () => {
     MCE.setTheme(themeSelect.value);
+    const url = new URL(location);
+    url.searchParams.set('theme', themeSelect.value);
+    history.replaceState(null, '', url);
     render();
   });
-  controlsEl.appendChild(themeSelect);
+  leftGroup.appendChild(themeSelect);
+
+  const pieceSelect = document.createElement('select');
+  pieceSelect.className = 'toolbar-select';
+  const currentPS = MCE.getPieceStyle();
+  Object.entries(MCE.PIECE_STYLES).forEach(([key, ps]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = ps.label;
+    if (key === currentPS) opt.selected = true;
+    pieceSelect.appendChild(opt);
+  });
+  pieceSelect.addEventListener('change', () => {
+    MCE.setPieceStyle(pieceSelect.value);
+    const url = new URL(location);
+    url.searchParams.set('pieces', pieceSelect.value);
+    history.replaceState(null, '', url);
+    render();
+  });
+  leftGroup.appendChild(pieceSelect);
+
+  const styleSelect = document.createElement('select');
+  styleSelect.className = 'toolbar-select';
+  Object.entries(ANIM_STYLES).forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = label;
+    if (key === animStyle) opt.selected = true;
+    styleSelect.appendChild(opt);
+  });
+  styleSelect.addEventListener('change', () => {
+    animStyle = styleSelect.value;
+    const url = new URL(location);
+    url.searchParams.set('animStyle', animStyle);
+    history.replaceState(null, '', url);
+  });
+  leftGroup.appendChild(styleSelect);
+
+  const speedSelect = document.createElement('select');
+  speedSelect.className = 'toolbar-select';
+  Object.entries(ANIM_SPEEDS).forEach(([key, s]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = s.label;
+    if (key === animSpeed) opt.selected = true;
+    speedSelect.appendChild(opt);
+  });
+  speedSelect.addEventListener('change', () => {
+    animSpeed = speedSelect.value;
+    const url = new URL(location);
+    url.searchParams.set('animSpeed', animSpeed);
+    history.replaceState(null, '', url);
+  });
+  leftGroup.appendChild(speedSelect);
+
+  toolbarEl.appendChild(leftGroup);
+
+  const fsBtn = document.createElement('button');
+  fsBtn.className = 'toolbar-btn';
+  fsBtn.textContent = 'Fullscreen';
+  fsBtn.addEventListener('click', () => {
+    const url = new URL(location);
+    url.searchParams.set('mode', 'fullscreen');
+    history.replaceState(null, '', url);
+    fullscreenMode = true;
+    applyFullscreenMode();
+    startGame(currentVariant || 'standard');
+  });
+  toolbarEl.appendChild(fsBtn);
 }
 
 function removeMoveFromList() {
@@ -367,13 +479,26 @@ function startGame(variant) {
 
   // Lock container dimensions to prevent layout shift when innerHTML is cleared between renders
   const isBoardOnly = embedMode && params.get('boardonly') === '1';
-  const boardWidth = isBoardOnly ? container.parentElement.offsetWidth : 480;
+  let boardWidth;
+  if (isBoardOnly) {
+    boardWidth = container.parentElement.offsetWidth;
+  } else if (fullscreenMode) {
+    const maxH = window.innerHeight - 80;
+    const maxW = window.innerWidth - 40;
+    const aspectRatio = (game.cols || 8) / (game.rows || 8);
+    boardWidth = Math.min(maxW, maxH * aspectRatio);
+  } else {
+    boardWidth = 480;
+  }
   const tileSize = boardWidth / (game.cols || 8);
   const boardHeight = tileSize * (game.rows || 8);
   container.style.width = boardWidth + 'px';
   container.style.height = boardHeight + 'px';
 
-  renderPicker();
+  if (!fullscreenMode) {
+    renderPicker();
+    renderToolbar();
+  }
   renderDescription();
   renderControls();
   renderCaptured();
@@ -391,16 +516,25 @@ function isGameOver() {
 
 function render() {
   const isBoardOnly = embedMode && params.get('boardonly') === '1';
+  let renderSize;
+  if (isBoardOnly) {
+    renderSize = container.offsetWidth;
+  } else if (fullscreenMode) {
+    renderSize = parseInt(container.style.width) || 480;
+  } else {
+    renderSize = 480;
+  }
+  const animDuration = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
   const opts = {
-    size: isBoardOnly ? container.offsetWidth : 480,
+    size: renderSize,
     selected: selected,
     lastMove: lastMove,
     flipped: flipped,
-    animate: true,
-    animStyle: 'slide',
-    animDuration: 200,
+    animate: animDuration > 0,
+    animStyle: animStyle,
+    animDuration: animDuration,
     animEasing: 'ease-out',
-    animCaptureBurst: true,
+    animCaptureBurst: animDuration > 0,
     legalMoves: [],
     onSquareClick: handleClick,
     fogMask: null,
@@ -618,7 +752,11 @@ function executeMove(move) {
   renderControls();
   renderCaptured();
   render();
+  afterExecuteMove(move, side);
 
+}
+
+function afterExecuteMove(move, side) {
   if (game._pendingAction) {
     if (gameMode === 'solo' && game.turn === aiColor) {
       scheduleAIMove();
@@ -736,8 +874,8 @@ function placeDuck(sq) {
 
 function scheduleAIMove() {
   aiThinking = true;
-  render();
-  setTimeout(doAIMove, 150);
+  const dur = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
+  setTimeout(doAIMove, dur + 100);
 }
 
 function doAIMove() {
@@ -989,6 +1127,55 @@ function addMoveToList(move, side) {
   movesEl.appendChild(entry);
   movesEl.scrollTop = movesEl.scrollHeight;
   if (side === MCE.BLACK) moveNum++;
+}
+
+function applyFullscreenMode() {
+  document.body.classList.add('fullscreen-mode');
+  document.querySelectorAll('.site-nav, #sidebar, #right-panel, .site-footer, #board-toolbar, #board-controls, #status, #moves, #captured, #description').forEach(function(el) {
+    el.style.display = 'none';
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.site-footer').forEach(function(el) { el.style.display = 'none'; });
+  });
+  var app = document.getElementById('app');
+  if (app) {
+    app.style.justifyContent = 'center';
+    app.style.alignItems = 'center';
+    app.style.padding = '0';
+    app.style.height = '100vh';
+  }
+  var center = document.getElementById('center');
+  if (center) {
+    center.style.flex = 'none';
+  }
+  function exitFullscreenMode() {
+    fullscreenMode = false;
+    document.body.classList.remove('fullscreen-mode');
+    document.querySelectorAll('.site-nav, #sidebar, #right-panel, #board-toolbar, #board-controls, #status, #moves, #captured, #description').forEach(function(el) {
+      el.style.display = '';
+    });
+    document.querySelectorAll('.site-footer').forEach(function(el) { el.style.display = ''; });
+    var app = document.getElementById('app');
+    if (app) { app.style.justifyContent = ''; app.style.alignItems = ''; app.style.padding = ''; app.style.height = ''; }
+    var ctr = document.getElementById('center');
+    if (ctr) { ctr.style.flex = ''; }
+    var btn = document.querySelector('.fullscreen-exit');
+    if (btn) btn.remove();
+    var url = new URL(window.location.href);
+    url.searchParams.delete('mode');
+    history.replaceState(null, '', url);
+    renderPicker();
+    startGame(currentVariant || 'standard');
+  }
+
+  var exitBtn = document.createElement('button');
+  exitBtn.className = 'fullscreen-exit';
+  exitBtn.textContent = 'Exit';
+  exitBtn.addEventListener('click', exitFullscreenMode);
+  document.body.appendChild(exitBtn);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') exitFullscreenMode();
+  });
 }
 
 function setupEmbedBridge() {

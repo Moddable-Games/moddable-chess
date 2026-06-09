@@ -154,6 +154,18 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-09
+- Add animation style selector: slide, arc, bounce, warp (toolbar dropdown)
+- Add animation speed selector: slow (400ms), normal (200ms), fast (100ms), instant (toolbar dropdown)
+- Fix human move animations not playing (render was being destroyed before animation completed)
+- Add fullscreen mode: board-only viewport view via `?mode=fullscreen` or toolbar button
+- Add piece colour styles: auto, gold, charcoal, burgundy, navy (recolours SVG pieces at render time)
+- Add toolbar above board: theme selector, piece style selector, fullscreen button
+- Restructure controls bar: game actions (Flip, Undo, New Game) left, AI difficulty right
+- Rename AI difficulty labels to Elo-style: Novice (~600), Club (~1000), Intermediate (~1200), Advanced (~1400), Expert (~1600)
+- Add URL persistence for theme, piece style, and animation preferences
+- Update API docs with piece styles, animation styles, fullscreen mode, and URL parameter reference
+
 #### 2026-06-06 (v0.7.1)
 - Fix basePath selector: match game-controller.js not game-controller-core.js (broke live play page)
 - Fix variant URL param validation: check registry instead of hardcoded subset (fixes embed for 32 variants)

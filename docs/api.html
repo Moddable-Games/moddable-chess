@@ -13,13 +13,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="API Reference — Moddable Chess">
 <meta name="twitter:description" content="Complete API reference for all MCE namespace methods.">
-<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.1">
-<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.7.1">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.8.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.8.0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="stylesheet" href="../css/shared.css?v=0.7.1">
-<link rel="stylesheet" href="../css/docs.css?v=0.7.1">
-<link rel="stylesheet" href="../css/prism-custom.css?v=0.7.1">
+<link rel="stylesheet" href="../css/shared.css?v=0.8.0">
+<link rel="stylesheet" href="../css/docs.css?v=0.8.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.8.0">
 </head>
 <body>
 
@@ -159,7 +159,7 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board</code></pre>
   duckSq: null,          // duck position index (Duck Chess)
   lastMove: null,        // { from, to } — highlights last move squares
   animate: false,        // enable piece movement animation
-  animStyle: 'slide',    // 'slide' (CSS transition) or 'arc' (parabolic jump)
+  animStyle: 'slide',    // 'slide' | 'arc' | 'bounce' | 'warp'
   animDuration: 200,     // animation duration in ms
   animEasing: 'ease-out',// CSS easing (slide mode only)
   animArcHeight: 0.25,   // arc peak as fraction of distance (arc mode)
@@ -179,6 +179,8 @@ const capablanca = MCE.createGame('capablanca'); // 10×8 board</code></pre>
   <h3>Animation styles</h3>
   <p><code>animStyle: 'slide'</code> — Piece slides smoothly from origin to destination using a CSS transform transition. Clean and minimal.</p>
   <p><code>animStyle: 'arc'</code> — Piece lifts in a parabolic arc, scaling up mid-flight then landing on the target square. Suitable for dungeon/fantasy themes.</p>
+  <p><code>animStyle: 'bounce'</code> — Piece accelerates toward the target, overshoots slightly, then settles back. Gives a tactile, snappy feel.</p>
+  <p><code>animStyle: 'warp'</code> — Piece shrinks and fades out at the origin, then grows and fades in at the destination. A teleportation effect that pairs well with cosmic/neon themes.</p>
   <p><code>animCaptureBurst: true</code> — On captures, triggers an expanding ring + spark particles effect at the capture square after the move animation completes.</p>
 
   <h3>MCE.captureBurst(svg, cx, cy, tileSize)</h3>
@@ -276,6 +278,41 @@ MCE.setTheme('classic'); // default tan/brown</code></pre>
   label: 'Forest'
 };
 MCE.setTheme('forest');</code></pre>
+
+  <h3>MCE.setPieceStyle(name)</h3>
+  <p>Sets the active piece colour style. Recolours pieces on the next <code>renderBoard</code> call by cloning SVG symbol content and replacing fill/stroke values.</p>
+  <pre class="language-javascript"><code class="language-javascript">MCE.setPieceStyle('gold');      // white & amber/gold
+MCE.setPieceStyle('charcoal');  // cream & dark grey
+MCE.setPieceStyle('burgundy');  // white & deep red
+MCE.setPieceStyle('navy');      // white & dark blue
+MCE.setPieceStyle('auto');      // default (adapts on dark themes)</code></pre>
+
+  <h3>MCE.getPieceStyle()</h3>
+  <p>Returns the current piece style key string.</p>
+
+  <h3>MCE.PIECE_STYLES</h3>
+  <p>Object containing all available piece style definitions. Each has a <code>label</code>, <code>light</code> (fill/stroke for white pieces), and <code>dark</code> (fill/stroke/detail for black pieces).</p>
+  <table class="docs-table">
+    <tr><th>Key</th><th>Label</th><th>Dark fill</th><th>Description</th></tr>
+    <tr><td><code>auto</code></td><td>Auto</td><td>#000 (or tinted on dark boards)</td><td>Default. Adjusts black pieces automatically on dark themes for visibility</td></tr>
+    <tr><td><code>gold</code></td><td>White &amp; Gold</td><td>#b58863</td><td>Warm amber/gold pieces (chess.com style)</td></tr>
+    <tr><td><code>charcoal</code></td><td>Cream &amp; Charcoal</td><td>#3a3a3a</td><td>Off-white vs dark grey with light detail lines</td></tr>
+    <tr><td><code>burgundy</code></td><td>White &amp; Burgundy</td><td>#6b1a2a</td><td>Classic red set style</td></tr>
+    <tr><td><code>navy</code></td><td>White &amp; Navy</td><td>#1a3a5c</td><td>Dark blue with light blue details</td></tr>
+  </table>
+
+  <h3>MCE.DARK_THEMES</h3>
+  <p>Array of theme keys considered "dark" for auto piece style adjustment: <code>['cosmic', 'neon', 'transparent']</code>. When piece style is <code>auto</code> and the active board theme is in this list, black pieces are tinted to a visible blue-grey.</p>
+
+  <h3>Custom piece styles</h3>
+  <p>Add your own piece style by extending <code>MCE.PIECE_STYLES</code>:</p>
+  <pre class="language-javascript"><code class="language-javascript">MCE.PIECE_STYLES.forest = {
+  label: 'White &amp; Forest',
+  light: { fill: '#fff', stroke: '#000' },
+  dark: { fill: '#2d5a3a', stroke: '#1a3d2a', detail: '#a8e0b4' }
+};
+MCE.setPieceStyle('forest');</code></pre>
+  <p>The <code>detail</code> colour is used for inner decorative lines on black pieces (cross on bishops, lines on rooks/kings). If omitted, falls back to the stroke colour.</p>
 
   <h2>AI System</h2>
 
@@ -748,17 +785,28 @@ var fireVulnerable = MCE.buildUnitHandler({
     <tr><td><code>variant</code></td><td>Any variant key</td><td>Start with a specific variant (e.g. <code>atomic</code>, <code>fogOfWar</code>)</td></tr>
     <tr><td><code>embed</code></td><td><code>1</code></td><td>Hides nav, sidebar, and footer. Adds <code>embed-mode</code> class to body</td></tr>
     <tr><td><code>boardonly</code></td><td><code>1</code></td><td>Requires <code>embed=1</code>. Hides all UI except the board. Board fills container width</td></tr>
-    <tr><td><code>mode</code></td><td><code>solo</code> | <code>pass</code></td><td>Solo plays vs AI; pass-and-play is two humans alternating</td></tr>
+    <tr><td><code>mode</code></td><td><code>solo</code> | <code>pass</code> | <code>fullscreen</code></td><td>Solo plays vs AI; pass-and-play is two humans; fullscreen shows only the board scaled to viewport</td></tr>
+    <tr><td><code>theme</code></td><td>Any theme key</td><td>Sets the board colour theme (persists across refresh)</td></tr>
+    <tr><td><code>pieces</code></td><td>Any piece style key</td><td>Sets the piece colour style (persists across refresh)</td></tr>
+    <tr><td><code>difficulty</code></td><td><code>beginner</code> ... <code>expert</code></td><td>AI difficulty level (default: medium)</td></tr>
+    <tr><td><code>animStyle</code></td><td><code>slide</code> | <code>arc</code> | <code>bounce</code> | <code>warp</code></td><td>Piece movement animation style (default: slide)</td></tr>
+    <tr><td><code>animSpeed</code></td><td><code>slow</code> | <code>normal</code> | <code>fast</code> | <code>instant</code></td><td>Animation speed: 400ms, 200ms, 100ms, or disabled (default: normal)</td></tr>
     <tr><td><code>p1</code></td><td>Any string</td><td>White player name (default: "White")</td></tr>
     <tr><td><code>p2</code></td><td>Any string</td><td>Black player name (default: "Black")</td></tr>
   </table>
 
-  <h3>Styling parameters</h3>
+  <h3>Fullscreen mode</h3>
+  <p>Displays only the board at maximum viewport size with an exit button. Triggered by <code>?mode=fullscreen</code> or the Fullscreen button in the toolbar. Press Escape or click Exit to return to normal view.</p>
+  <pre class="language-javascript"><code class="language-javascript">// Direct URL:
+https://chess.moddable.games/play/?mode=fullscreen&amp;variant=atomic&amp;pieces=gold
+
+// Shareable with all preferences:
+https://chess.moddable.games/play/?variant=fogOfWar&amp;theme=cosmic&amp;pieces=navy</code></pre>
+
+  <h3>Embed-only styling parameters</h3>
   <p>These only apply when <code>embed=1</code> is set:</p>
   <table class="docs-table">
     <tr><th>Parameter</th><th>Values</th><th>Effect</th></tr>
-    <tr><td><code>theme</code></td><td><code>light</code>, <code>cosmic</code>, <code>wood</code>, <code>marble</code>, <code>neon</code>, <code>minimal</code>, <code>transparent</code></td><td><code>light</code> switches UI colour scheme. Others set the board colour theme</td></tr>
-    <tr><td><code>difficulty</code></td><td><code>beginner</code>, <code>easy</code>, <code>medium</code>, <code>hard</code>, <code>expert</code></td><td>AI difficulty level (default: medium)</td></tr>
     <tr><td><code>bg</code></td><td>CSS colour</td><td>Override background colour (e.g. <code>%23f0f0f0</code> for #f0f0f0)</td></tr>
     <tr><td><code>accent</code></td><td>CSS colour</td><td>Override accent colour for selection highlights and borders</td></tr>
     <tr><td><code>radius</code></td><td>CSS value</td><td>Border radius on the board container (e.g. <code>12px</code>)</td></tr>
@@ -807,11 +855,11 @@ iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');</code></pre>
 
 <footer class="site-footer">
   <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
-  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.7.1</p>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.8.0</p>
 </footer>
-<script src="../js/docs-toc.js?v=0.7.1"></script>
-<script src="../js/prism.js?v=0.7.1"></script>
-<script src="../js/prism-javascript.js?v=0.7.1"></script>
-<script src="../js/prism-copy.js?v=0.7.1"></script>
+<script src="../js/docs-toc.js?v=0.8.0"></script>
+<script src="../js/prism.js?v=0.8.0"></script>
+<script src="../js/prism-javascript.js?v=0.8.0"></script>
+<script src="../js/prism-copy.js?v=0.8.0"></script>
 </body>
 </html>
