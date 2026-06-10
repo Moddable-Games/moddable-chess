@@ -13,8 +13,8 @@ const GALLERY_VARIANTS = [
   { key: 'atomic', theme: 'cosmic' },
   { key: 'kingOfTheHill', theme: 'wood' },
   { key: 'capablanca', theme: 'marble' },
-  { key: 'horde', theme: 'neon' },
-  { key: 'racingKings', theme: 'minimal' }
+  { key: 'horde', theme: 'classic' },
+  { key: 'racingKings', theme: 'wood' }
 ];
 
 function loadPieceSprites() {
@@ -155,17 +155,14 @@ function initThemeGrid() {
   const SHOWCASE = [
     {
       theme: 'classic', pieces: 'gold', label: 'Classic + Gold',
-      bg: '#3d2b1a',
       fen: 'r1bqkb1r/pppppppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
     },
     {
-      theme: 'cosmic', pieces: 'navy', label: 'Cosmic + Navy',
-      bg: '#0a0d2a',
+      theme: 'cosmic', pieces: 'charcoal', label: 'Cosmic + Charcoal',
       fen: 'rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3'
     },
     {
-      theme: 'neon', pieces: 'burgundy', label: 'Neon + Burgundy',
-      bg: '#08080f',
+      theme: 'wood', pieces: 'burgundy', label: 'Wood + Burgundy',
       fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
     }
   ];
@@ -173,7 +170,6 @@ function initThemeGrid() {
   SHOWCASE.forEach(function(t) {
     const panel = document.createElement('div');
     panel.className = 'demo-panel';
-    panel.style.background = t.bg;
 
     const header = document.createElement('div');
     header.className = 'demo-panel__header';
