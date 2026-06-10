@@ -18,7 +18,7 @@ const GALLERY_VARIANTS = [
 ];
 
 function loadPieceSprites() {
-  return fetch('../../assets/pieces.svg')
+  return fetch('../assets/pieces.svg')
     .then(function(r) { return r.text(); })
     .then(function(svg) {
       var div = document.createElement('div');
