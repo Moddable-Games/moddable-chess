@@ -69,6 +69,12 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   padding: 40px 24px 0;
 }
 
+.demo-section + .demo-section {
+  margin-top: 16px;
+  padding-top: 48px;
+  border-top: 1px solid var(--mc-hairline);
+}
+
 .demo-section__title {
   font-size: 1.4rem;
   margin-bottom: 8px;
@@ -199,6 +205,128 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   white-space: pre-wrap;
 }
 
+/* Three-panel grid (Themes section) */
+.demo-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.demo-grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.demo-panel {
+  background: var(--mc-deep);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-panel__header h3 {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+}
+
+.demo-panel__board {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.demo-panel__caption {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* AI vs AI panel */
+.demo-ai-panel {
+  background: linear-gradient(135deg, #0a0d2a 0%, #1a1040 100%);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  align-items: start;
+  border: 1px solid rgba(111, 181, 255, 0.15);
+}
+
+.demo-ai-panel__board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-ai-panel__board .board-container {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+}
+
+.demo-ai-panel__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demo-ai-panel__sidebar label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.demo-ai-panel__sidebar select {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: #fff;
+}
+
+.demo-ai-panel__sidebar button {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--mc-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms;
+  flex: 1;
+}
+
+.demo-ai-panel__sidebar button:hover {
+  background: var(--mc-glow);
+  color: var(--mc-deep);
+}
+
+.demo-ai-panel__stats {
+  font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* Collapsible code blocks */
 .demo-code {
   margin-top: 16px;
@@ -227,6 +355,12 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
     grid-template-columns: repeat(2, 1fr);
   }
   .demo-controls {
+    grid-template-columns: 1fr;
+  }
+  .demo-grid--three {
+    grid-template-columns: 1fr;
+  }
+  .demo-ai-panel {
     grid-template-columns: 1fr;
   }
   .page-header {

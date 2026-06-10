@@ -4,7 +4,7 @@ import '../../js/chess-play.js';
 import '../../js/chess-units.js';
 import '../../js/chess-variants.js';
 import '../../js/variants/index.js';
-import '../../js/board-renderer.js';
+import { renderBoard, setTheme, setPieceStyle } from '../../js/board-renderer.js';
 import '../../js/chess-ai.js';
 import { createGameController } from '../../js/game-controller-core.js';
 
@@ -127,5 +127,105 @@ function initControls() {
   });
 }
 
+function initThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid) return;
+
+  const THEMES = [
+    { theme: 'classic', label: 'Classic', bg: '#4a3520' },
+    { theme: 'cosmic', label: 'Cosmic Dark', bg: '#0a0d2a' },
+    { theme: 'neon', label: 'Neon', bg: '#0a0a14' }
+  ];
+
+  THEMES.forEach(function(t) {
+    const panel = document.createElement('div');
+    panel.className = 'demo-panel';
+    panel.style.background = t.bg;
+
+    const header = document.createElement('div');
+    header.className = 'demo-panel__header';
+    header.innerHTML = '<h3>' + t.label + '</h3>';
+    panel.appendChild(header);
+
+    const boardEl = document.createElement('div');
+    boardEl.className = 'demo-panel__board';
+    panel.appendChild(boardEl);
+
+    const caption = document.createElement('p');
+    caption.className = 'demo-panel__caption';
+    caption.textContent = 'setTheme(\'' + t.theme + '\')';
+    panel.appendChild(caption);
+
+    grid.appendChild(panel);
+
+    const game = MCE.createGame('standard');
+    setTheme(t.theme);
+    renderBoard(boardEl, game, { size: 260 });
+  });
+
+  setTheme('classic');
+}
+
+function initAiPanel() {
+  const boardEl = document.getElementById('ai-board');
+  const variantSelect = document.getElementById('ai-variant');
+  const difficultySelect = document.getElementById('ai-difficulty');
+  const moveCountEl = document.getElementById('ai-move-count');
+  const statusEl = document.getElementById('ai-status');
+  if (!boardEl || !variantSelect) return;
+
+  var popularVariants = ['standard', 'atomic', 'kingOfTheHill', 'racingKings', 'threeCheck', 'horde', 'crazyhouse', 'fogOfWar'];
+  popularVariants.forEach(function(key) {
+    var config = MCE.getVariantConfig(key);
+    if (!config) return;
+    var opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = config.label || key;
+    if (key === 'atomic') opt.selected = true;
+    variantSelect.appendChild(opt);
+  });
+
+  var ctrl = null;
+  var moveCount = 0;
+  var paused = false;
+
+  function startAiGame() {
+    if (ctrl) ctrl.destroy();
+    boardEl.innerHTML = '';
+    moveCount = 0;
+    paused = false;
+    moveCountEl.textContent = '0';
+    statusEl.textContent = 'Playing';
+    document.getElementById('ai-pause').textContent = 'Pause';
+
+    var variant = variantSelect.value;
+    var depth = parseInt(difficultySelect.value, 10);
+    var game = MCE.createGame(variant);
+
+    ctrl = createGameController(boardEl, game, {
+      players: { w: 'ai', b: 'ai' },
+      aiDepth: depth,
+      onMove: function() {
+        moveCount++;
+        moveCountEl.textContent = moveCount;
+      },
+      onGameEnd: function(result) {
+        statusEl.textContent = result;
+      }
+    });
+  }
+
+  startAiGame();
+
+  document.getElementById('ai-start').addEventListener('click', startAiGame);
+  document.getElementById('ai-pause').addEventListener('click', function() {
+    paused = !paused;
+    this.textContent = paused ? 'Resume' : 'Pause';
+    statusEl.textContent = paused ? 'Paused' : 'Playing';
+  });
+}
+
 initGallery();
 initControls();
+initThemeGrid();
+initAiPanel();
