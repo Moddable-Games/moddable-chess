@@ -88,8 +88,8 @@ const ctrl = createGameController(
     <tr><td><code>chess-units.js</code></td><td>registerUnit, buildUnitHandler, getUnit</td><td>Unit template system for declarative piece definitions</td></tr>
     <tr><td><code>chess-ai.js</code></td><td>aiPickMove, AI_DIFFICULTIES, loadOpeningBook</td><td>Alpha-beta search, difficulty presets, opening book support</td></tr>
     <tr><td><code>board-renderer.js</code></td><td>renderBoard, setTheme, setPieceStyle, captureBurst</td><td>SVG board rendering, themes, animations</td></tr>
-    <tr><td><code>game-controller.js</code></td><td>createGameController</td><td>Full interaction loop: human/AI players, undo, move animation, callbacks</td></tr>
-    <tr><td><code>game-controller-core.js</code></td><td>createGameControllerCore</td><td>Headless controller for server/Worker contexts (no DOM)</td></tr>
+    <tr><td><code>game-controller-core.js</code></td><td>createGameController</td><td>Full interaction loop: human/AI players, undo, move animation, callbacks (<a href="sdk-demo.html">demo</a>)</td></tr>
+    <tr><td><code>game-controller.js</code></td><td>(play page orchestrator)</td><td>Imports all modules + variants, handles embed postMessage API</td></tr>
     <tr><td><code>replay.js</code></td><td>createReplay</td><td>Step through completed games move-by-move</td></tr>
     <tr><td><code>ai-worker.js</code></td><td>(Web Worker entry)</td><td>Offloads AI search to a background thread</td></tr>
     <tr><td><code>mcp/tools.js</code></td><td>7 MCP tool handlers</td><td>AI-callable chess analysis and puzzle generation</td></tr>
@@ -228,6 +228,7 @@ MCE.onBoard(row, col, game) // → boolean</code></pre>
     <li><a href="api.html">API Reference</a> — every method on the MCE namespace</li>
     <li><a href="variants.html">Plugin Reference</a> — all config flags and hooks for registerVariant()</li>
     <li><a href="guide.html">Developer Guides</a> — four step-by-step guides covering every engine hook</li>
+    <li><a href="sdk-demo.html">SDK Demo</a> — live interactive demo of the game controller, AI, and render hooks</li>
     <li><a href="api.html#embedding">Embedding</a> — iframe integration with themes and parameters</li>
     <li><a href="api.html#game-controller">Game Controller</a> — programmatic board control with AI players</li>
     <li><a href="api.html#mcp-server">MCP Server</a> — AI-callable chess tools for Claude and other assistants</li>
