@@ -8,13 +8,30 @@ import { renderBoard, setTheme, setPieceStyle } from '../../js/board-renderer.js
 import '../../js/chess-ai.js';
 import { createGameController } from '../../js/game-controller-core.js';
 
-const GALLERY_VARIANTS = ['standard', 'atomic', 'kingOfTheHill', 'capablanca', 'horde', 'racingKings'];
+const GALLERY_VARIANTS = [
+  { key: 'standard', theme: 'classic' },
+  { key: 'atomic', theme: 'cosmic' },
+  { key: 'kingOfTheHill', theme: 'wood' },
+  { key: 'capablanca', theme: 'marble' },
+  { key: 'horde', theme: 'neon' },
+  { key: 'racingKings', theme: 'minimal' }
+];
+
+function loadPieceSprites() {
+  return fetch('../../assets/pieces.svg')
+    .then(function(r) { return r.text(); })
+    .then(function(svg) {
+      var div = document.createElement('div');
+      div.innerHTML = svg;
+      document.body.insertBefore(div.firstChild, document.body.firstChild);
+    });
+}
 
 function initGallery() {
   const gallery = document.getElementById('gallery');
   if (!gallery) return;
 
-  GALLERY_VARIANTS.forEach(function(key) {
+  GALLERY_VARIANTS.forEach(function(v) {
     const item = document.createElement('div');
     item.className = 'demo-gallery__item';
 
@@ -24,18 +41,22 @@ function initGallery() {
 
     const label = document.createElement('div');
     label.className = 'demo-gallery__label';
-    const config = MCE.getVariantConfig(key);
-    label.textContent = config ? config.label || key : key;
+    const config = MCE.getVariantConfig(v.key);
+    label.textContent = config ? config.label || v.key : v.key;
     item.appendChild(label);
 
     gallery.appendChild(item);
 
-    const game = MCE.createGame(key);
+    setTheme(v.theme);
+    setPieceStyle('auto');
+    const game = MCE.createGame(v.key);
     createGameController(boardEl, game, {
       players: { w: 'ai', b: 'ai' },
       aiDepth: 2
     });
   });
+
+  setTheme('classic');
 }
 
 function initControls() {
@@ -131,13 +152,25 @@ function initThemeGrid() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
 
-  const THEMES = [
-    { theme: 'classic', label: 'Classic', bg: '#4a3520' },
-    { theme: 'cosmic', label: 'Cosmic Dark', bg: '#0a0d2a' },
-    { theme: 'neon', label: 'Neon', bg: '#0a0a14' }
+  const SHOWCASE = [
+    {
+      theme: 'classic', pieces: 'gold', label: 'Classic + Gold',
+      bg: '#3d2b1a',
+      fen: 'r1bqkb1r/pppppppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
+    },
+    {
+      theme: 'cosmic', pieces: 'navy', label: 'Cosmic + Navy',
+      bg: '#0a0d2a',
+      fen: 'rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3'
+    },
+    {
+      theme: 'neon', pieces: 'burgundy', label: 'Neon + Burgundy',
+      bg: '#08080f',
+      fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
+    }
   ];
 
-  THEMES.forEach(function(t) {
+  SHOWCASE.forEach(function(t) {
     const panel = document.createElement('div');
     panel.className = 'demo-panel';
     panel.style.background = t.bg;
@@ -153,17 +186,20 @@ function initThemeGrid() {
 
     const caption = document.createElement('p');
     caption.className = 'demo-panel__caption';
-    caption.textContent = 'setTheme(\'' + t.theme + '\')';
+    caption.textContent = "setTheme('" + t.theme + "') + setPieceStyle('" + t.pieces + "')";
     panel.appendChild(caption);
 
     grid.appendChild(panel);
 
     const game = MCE.createGame('standard');
+    MCE.loadFEN(game, t.fen);
     setTheme(t.theme);
+    setPieceStyle(t.pieces);
     renderBoard(boardEl, game, { size: 260 });
   });
 
   setTheme('classic');
+  setPieceStyle('auto');
 }
 
 function initAiPanel() {
@@ -225,7 +261,9 @@ function initAiPanel() {
   });
 }
 
-initGallery();
-initControls();
-initThemeGrid();
-initAiPanel();
+loadPieceSprites().then(function() {
+  initGallery();
+  initControls();
+  initThemeGrid();
+  initAiPanel();
+});
