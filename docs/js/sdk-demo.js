@@ -92,6 +92,8 @@ function initControls() {
     const game = MCE.createGame(variant);
     if (fen) MCE.loadFEN(game, fen);
 
+    setTheme('classic');
+    setPieceStyle('auto');
     currentCtrl = createGameController(boardEl, game, {
       players: { w: 'human', b: 'human' },
       renderOpts: { size: 480 },
@@ -228,13 +230,15 @@ function initAiPanel() {
     moveCount = 0;
     paused = false;
     moveCountEl.textContent = '0';
-    statusEl.textContent = 'Playing';
+    statusEl.textContent = 'Ready';
     document.getElementById('ai-pause').textContent = 'Pause';
 
     var variant = variantSelect.value;
     var depth = parseInt(difficultySelect.value, 10);
     var game = MCE.createGame(variant);
 
+    setTheme('cosmic');
+    setPieceStyle('charcoal');
     ctrl = createGameController(boardEl, game, {
       players: { w: 'human', b: 'human' },
       renderOpts: { size: 480 },
