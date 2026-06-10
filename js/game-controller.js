@@ -72,7 +72,7 @@ if (embedMode) {
   });
   document.body.classList.add('embed-mode');
   if (params.get('boardonly') === '1') {
-    document.querySelectorAll('#description, #captured, #board-controls, #status, #moves').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#description, #captured, #board-controls, #board-toolbar, #status, #moves').forEach(el => el.style.display = 'none');
     document.body.style.overflow = 'hidden';
     document.body.style.padding = '0';
     document.body.style.minHeight = 'auto';
@@ -495,7 +495,7 @@ function startGame(variant) {
   container.style.width = boardWidth + 'px';
   container.style.height = boardHeight + 'px';
 
-  if (!fullscreenMode) {
+  if (!fullscreenMode && !embedMode) {
     renderPicker();
     renderToolbar();
   }
