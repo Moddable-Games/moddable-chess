@@ -83,7 +83,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 /* Variant gallery grid */
 .demo-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -104,13 +104,21 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.demo-gallery__item .board-container svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .demo-gallery__label {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
   text-align: center;
   font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
+  letter-spacing: 0.02em;
 }
 
 /* Control panel */
@@ -216,7 +224,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 /* Responsive */
 @media (max-width: 768px) {
   .demo-gallery {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
   .demo-controls {
     grid-template-columns: 1fr;
