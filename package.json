@@ -4,13 +4,17 @@
   "type": "module",
   "description": "Moddable Chess Engine — 70 variants, zero dependencies, pure JavaScript",
   "main": "js/chess-engine.js",
+  "bin": {
+    "moddable-chess-mcp": "./mcp/server.js"
+  },
   "exports": {
     ".": "./js/chess-engine.js",
     "./moves": "./js/chess-moves.js",
     "./play": "./js/chess-play.js",
     "./ai": "./js/chess-ai.js",
     "./variants": "./js/chess-variants.js",
-    "./units": "./js/chess-units.js"
+    "./units": "./js/chess-units.js",
+    "./mcp": "./mcp/tools.js"
   },
   "license": "MIT"
 }

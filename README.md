@@ -158,6 +158,37 @@ console.log(MCE.getStatus(game));
 
 ---
 
+### MCP Server (AI Integration)
+
+Connect to Claude Code or Claude Desktop for AI-powered chess analysis:
+
+**Remote (zero install):**
+```json
+{
+  "mcpServers": {
+    "moddable-chess": {
+      "url": "https://mcp.moddable.games/chess"
+    }
+  }
+}
+```
+
+**Local (self-hosted):**
+```bash
+claude mcp add --transport stdio moddable-chess node /path/to/moddable-chess/mcp/server.js
+```
+
+**Available tools:**
+- `chess_list_variants` — Browse all 70 variants with descriptions and rules
+- `chess_get_legal_moves` — Get annotated legal moves for any position
+- `chess_analyze_position` — Engine evaluation with best move and principal variation
+- `chess_validate_move` — Check if a move is legal with explanation
+- `chess_make_moves` — Play a sequence of moves, get resulting position
+- `chess_get_opening_book` — Look up book moves for known positions
+- `chess_generate_puzzle` — Generate mate-in-1 or mate-in-2 puzzles
+
+---
+
 ### Run locally
 
 ```bash
