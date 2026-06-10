@@ -157,15 +157,15 @@ function initThemeGrid() {
 
   const SHOWCASE = [
     {
-      theme: 'classic', pieces: 'gold', label: 'Classic + Gold',
+      theme: 'classic', pieces: 'auto', label: 'Classic',
       fen: 'r1bqkb1r/pppppppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
     },
     {
-      theme: 'cosmic', pieces: 'charcoal', label: 'Cosmic + Charcoal',
+      theme: 'wood', pieces: 'burgundy', label: 'Wood + Burgundy',
       fen: 'rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3'
     },
     {
-      theme: 'wood', pieces: 'burgundy', label: 'Wood + Burgundy',
+      theme: 'marble', pieces: 'navy', label: 'Marble + Navy',
       fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
     }
   ];
@@ -237,8 +237,8 @@ function initAiPanel() {
     var depth = parseInt(difficultySelect.value, 10);
     var game = MCE.createGame(variant);
 
-    setTheme('cosmic');
-    setPieceStyle('charcoal');
+    setTheme('wood');
+    setPieceStyle('auto');
     ctrl = createGameController(boardEl, game, {
       players: { w: 'human', b: 'human' },
       renderOpts: { size: 480 },
