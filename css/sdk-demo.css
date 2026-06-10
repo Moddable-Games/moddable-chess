@@ -136,7 +136,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   padding: 24px;
   margin-bottom: 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 24px;
   align-items: start;
 }
@@ -148,9 +148,8 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 }
 
 .demo-controls__board .board-container {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
+  width: 360px;
+  height: 360px;
 }
 
 .demo-controls__panel {
@@ -261,7 +260,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   padding: 24px;
   margin-bottom: 24px;
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: auto 1fr;
   gap: 24px;
   align-items: start;
 }
@@ -273,9 +272,8 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 }
 
 .demo-ai-panel__board .board-container {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
+  width: 360px;
+  height: 360px;
 }
 
 .demo-ai-panel__sidebar {
