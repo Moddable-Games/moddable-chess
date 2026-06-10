@@ -12,8 +12,8 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: var(--mg-font-body, 'Barlow', system-ui, sans-serif); color: var(--mc-ink); background: var(--mc-canvas); }
-h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-serif); }
-p, li { line-height: 1.7; }
+h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-serif); text-wrap: pretty; }
+p, li { line-height: 1.7; text-wrap: pretty; }
 a { color: var(--mc-blue); }
 code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size: 0.85em; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; }
 
