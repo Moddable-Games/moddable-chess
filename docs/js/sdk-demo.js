@@ -94,6 +94,7 @@ function initControls() {
 
     currentCtrl = createGameController(boardEl, game, {
       players: { w: 'human', b: 'human' },
+      renderOpts: { size: 360 },
       onMove: function(move) {
         var from = MCE.sqToAlgebraic(move.from, game);
         var to = MCE.sqToAlgebraic(move.to, game);
@@ -237,14 +238,38 @@ function initAiPanel() {
     ctrl = createGameController(boardEl, game, {
       players: { w: 'ai', b: 'ai' },
       aiDepth: depth,
+      renderOpts: { size: 360 },
       onMove: function() {
         moveCount++;
         moveCountEl.textContent = moveCount;
+        if (!paused && !ctrl.isThinking()) {
+          setTimeout(function() { triggerNextAiMove(); }, 300);
+        }
       },
       onGameEnd: function(result) {
         statusEl.textContent = result;
       }
     });
+    setTimeout(function() { triggerNextAiMove(); }, 300);
+  }
+
+  function triggerNextAiMove() {
+    if (!ctrl || paused) return;
+    var game = ctrl.getGame();
+    var move = MCE.aiPickMove(game, parseInt(difficultySelect.value, 10), { variant: game.variant });
+    if (move) {
+      MCE.makeMove(game, move);
+      ctrl.render();
+      moveCount++;
+      moveCountEl.textContent = moveCount;
+      var status = MCE.getStatus(game);
+      var variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
+      if (status === 'checkmate' || status === 'stalemate' || status.startsWith('draw') || variantStatus) {
+        statusEl.textContent = variantStatus || status;
+        return;
+      }
+      setTimeout(function() { triggerNextAiMove(); }, 300);
+    }
   }
 
   startAiGame();
@@ -254,6 +279,7 @@ function initAiPanel() {
     paused = !paused;
     this.textContent = paused ? 'Resume' : 'Pause';
     statusEl.textContent = paused ? 'Paused' : 'Playing';
+    if (!paused) triggerNextAiMove();
   });
 }
 
