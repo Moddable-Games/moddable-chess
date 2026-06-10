@@ -94,7 +94,7 @@ function initControls() {
 
     currentCtrl = createGameController(boardEl, game, {
       players: { w: 'human', b: 'human' },
-      renderOpts: { size: 360 },
+      renderOpts: { size: 480 },
       onMove: function(move) {
         var from = MCE.sqToAlgebraic(move.from, game);
         var to = MCE.sqToAlgebraic(move.to, game);
@@ -238,7 +238,7 @@ function initAiPanel() {
     ctrl = createGameController(boardEl, game, {
       players: { w: 'ai', b: 'ai' },
       aiDepth: depth,
-      renderOpts: { size: 360 },
+      renderOpts: { size: 480 },
       onMove: function() {
         moveCount++;
         moveCountEl.textContent = moveCount;
