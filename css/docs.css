@@ -95,6 +95,22 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   margin-bottom: 8px;
 }
 
+.docs-body .docs-breadcrumb {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.docs-body .docs-breadcrumb a {
+  color: var(--mc-blue);
+  text-decoration: none;
+}
+
+.docs-body .docs-breadcrumb a:hover {
+  color: var(--mc-glow);
+}
+
 .docs-body .docs-lede {
   font-size: 1.05rem;
   color: #555;

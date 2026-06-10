@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDK Demo — Moddable Chess</title>
+<link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="SDK Demo — Moddable Chess">
+<meta property="og:description" content="Live demo of the Moddable Chess Game Controller. Interactive boards, AI players, programmatic control, and render hooks.">
+<meta property="og:url" content="https://chess.moddable.games/docs/sdk-demo.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SDK Demo — Moddable Chess">
+<meta name="twitter:description" content="Live demo of the Game Controller with interactive boards, AI, and programmatic control.">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.0">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="stylesheet" href="../css/shared.css?v=0.9.0">
+<link rel="stylesheet" href="../css/sdk-demo.css?v=0.9.0">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.9.0">
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../" class="site-nav__brand">
+    <img src="../assets/cube.svg" class="site-nav__cube" alt="">
+    <span class="site-nav__wordmark">Moddable Chess</span>
+  </a>
+  <div class="site-nav__links">
+    <a href="../play/">Play</a>
+    <a href="./">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Variants</a>
+    <a href="guide.html" class="active">Guides</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p class="page-header__breadcrumb"><a href="api.html#game-controller">API Reference</a> / Game Controller</p>
+  <h1>Game Controller SDK Demo</h1>
+  <p>Everything <code>createGameController</code> can do, demonstrated live</p>
+</div>
+
+<section class="demo-section">
+  <h2 class="demo-section__title">Variant Gallery</h2>
+  <p class="demo-section__desc">Multiple variants rendered simultaneously. Each controller is independent with its own game state, AI, and event listeners.</p>
+  <div class="demo-gallery" id="gallery"></div>
+  <details class="demo-code">
+    <summary>View source</summary>
+    <pre class="language-javascript"><code class="language-javascript">import MCE from './js/chess-engine.js';
+import './js/chess-moves.js';
+import './js/chess-play.js';
+import './js/chess-variants.js';
+import './js/board-renderer.js';
+import './js/chess-ai.js';
+import { createGameController } from './js/game-controller-core.js';
+
+const VARIANTS = ['standard', 'atomic', 'kingOfTheHill', 'capablanca', 'horde', 'racingKings'];
+
+VARIANTS.forEach(key =&gt; {
+  const game = MCE.createGame(key);
+  const container = document.createElement('div');
+  gallery.appendChild(container);
+
+  createGameController(container, game, {
+    players: { w: 'ai', b: 'ai' },
+    aiDepth: 3,
+    onGameEnd: (result) =&gt; console.log(key, result)
+  });
+});</code></pre>
+  </details>
+</section>
+
+<section class="demo-section">
+  <h2 class="demo-section__title">Programmatic Control</h2>
+  <p class="demo-section__desc">Load positions from FEN, make moves, undo, trigger AI, and observe the event stream in real time.</p>
+  <div class="demo-controls" id="controls">
+    <div class="demo-controls__board">
+      <div class="board-container" id="ctrl-board"></div>
+    </div>
+    <div class="demo-controls__panel">
+      <label>FEN</label>
+      <input type="text" id="fen-input" placeholder="Paste FEN or leave blank for start position">
+      <label>Variant</label>
+      <select id="variant-select"></select>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="btn-load">Load</button>
+        <button id="btn-undo">Undo</button>
+        <button id="btn-flip">Flip</button>
+        <button id="btn-ai">AI Move</button>
+        <button id="btn-new">New Game</button>
+      </div>
+      <label>Event Log</label>
+      <div class="demo-controls__log" id="event-log"></div>
+    </div>
+  </div>
+  <details class="demo-code">
+    <summary>View source</summary>
+    <pre class="language-javascript"><code class="language-javascript">import MCE from './js/chess-engine.js';
+import { createGameController } from './js/game-controller-core.js';
+// ... other imports omitted for brevity
+
+const game = MCE.createGame('standard');
+const ctrl = createGameController(
+  document.getElementById('board'), game, {
+    players: { w: 'human', b: 'human' },
+    onMove: (move) =&gt; log(`Move: ${MCE.sqToAlgebraic(move.from, game)}${MCE.sqToAlgebraic(move.to, game)}`),
+    onGameEnd: (result) =&gt; log(`Game over: ${result}`),
+    onTurnChange: (turn) =&gt; log(`Turn: ${turn}`)
+  }
+);
+
+// Programmatic API
+ctrl.undo();
+ctrl.setFlipped(true);
+ctrl.setDifficulty(4);
+ctrl.getGame(); // current game object</code></pre>
+  </details>
+</section>
+
+<section class="demo-section">
+  <h2 class="demo-section__title">Render Hooks</h2>
+  <p class="demo-section__desc">The controller accepts custom rendering functions for terrain painting, piece replacement, post-render overlays, and surround decorations.</p>
+  <details class="demo-code">
+    <summary>View source</summary>
+    <pre class="language-javascript"><code class="language-javascript">import MCE from './js/chess-engine.js';
+import { createGameController } from './js/game-controller-core.js';
+
+const game = MCE.createGame('standard');
+const ctrl = createGameController(container, game, {
+  players: { w: 'human', b: 'ai' },
+  renderOpts: {
+    // Replace default square colours
+    tilePainter: function(sq, row, col, isLight) {
+      if (game.terrain &amp;&amp; game.terrain[sq] === 'water') return '#2196F3';
+      return null; // use default
+    },
+
+    // Replace piece rendering (e.g. custom SVG sprites)
+    pieceProvider: function(piece, sq, tileSize) {
+      const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      img.setAttribute('href', `assets/pieces/${piece}.svg`);
+      img.setAttribute('width', tileSize);
+      img.setAttribute('height', tileSize);
+      return img;
+    },
+
+    // Draw after the board renders (overlays, arrows, labels)
+    afterRender: function(svg, game, opts) {
+      const from = MCE.sq(6, 4, game), to = MCE.sq(4, 4, game);
+      drawArrow(svg, from, to, opts);
+    },
+
+    // Draw around the board (coordinate labels, borders)
+    surroundRenderer: function(svg, boardRect, opts) {
+      addCoordinateLabels(svg, boardRect, opts);
+    }
+  }
+});</code></pre>
+  </details>
+</section>
+
+<section class="demo-section" style="padding-bottom: 80px;">
+  <h2 class="demo-section__title">AI Configuration</h2>
+  <p class="demo-section__desc">Five difficulty presets with configurable search depth. The AI runs in a Web Worker to keep the UI responsive.</p>
+  <details class="demo-code">
+    <summary>View source</summary>
+    <pre class="language-javascript"><code class="language-javascript">// Difficulty presets
+MCE.AI_DIFFICULTIES
+// { beginner: { depth: 1 }, easy: { depth: 2 }, medium: { depth: 3 }, hard: { depth: 4 }, expert: { depth: 5 } }
+
+// Use with controller
+const ctrl = createGameController(container, game, {
+  players: { w: 'human', b: 'ai' },
+  aiDepth: 4,
+  onMove: (move, undo, captured) =&gt; {
+    if (captured) playSound('capture');
+    else playSound('move');
+  }
+});
+
+// Change difficulty mid-game
+ctrl.setDifficulty(5); // expert
+
+// Or use aiPickMove directly for headless contexts (Node.js, Workers)
+const bestMove = MCE.aiPickMove(game, 4, { variant: 'atomic' });</code></pre>
+  </details>
+</section>
+
+<footer class="site-footer">
+  <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.9.0</p>
+</footer>
+<script type="module" src="../js/prism.js?v=0.9.0"></script>
+<script type="module" src="../js/prism-javascript.js?v=0.9.0"></script>
+<script type="module" src="../js/prism-copy.js?v=0.9.0"></script>
+<script type="module" src="js/sdk-demo.js?v=0.9.0"></script>
+</body>
+</html>

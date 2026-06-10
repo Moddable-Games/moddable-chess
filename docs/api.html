@@ -470,6 +470,7 @@ if (move.flag === 'action' && move.action === 'hex') {
   </table>
 
   <h2 id="game-controller">Game Controller</h2>
+  <p>See the <a href="sdk-demo.html">live SDK demo</a> for interactive examples of everything below.</p>
 
   <h3>MCE.createGameController(container, game, opts)</h3>
   <p>Mounts a full game interaction loop (select → move → animate → AI → repeat) on a DOM container. Consumer games use this instead of reimplementing click handling, AI scheduling, and undo logic.</p>
@@ -850,6 +851,47 @@ iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');</code></pre>
   <p>Neon theme, board only:</p>
   <pre class="language-javascript"><code class="language-javascript">&lt;iframe src="https://chess.moddable.games/play/?embed=1&boardonly=1&theme=neon&variant=standard"
   width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
+
+  <h2 id="mcp-server">MCP Server</h2>
+  <p>The engine is available as an MCP (Model Context Protocol) server for use with Claude Code, Claude Desktop, or any MCP-compatible client. Seven tools expose the full game engine for position analysis, move validation, and puzzle generation.</p>
+
+  <h3>Setup</h3>
+  <pre class="language-javascript"><code class="language-javascript"># Run standalone
+node mcp/server.js
+
+# Add to Claude Code
+claude mcp add --transport stdio moddable-chess node mcp/server.js</code></pre>
+
+  <h3>Available tools</h3>
+  <table class="docs-table">
+    <tr><th>Tool</th><th>Parameters</th><th>Description</th></tr>
+    <tr><td><code>chess_list_variants</code></td><td><code>group?</code></td><td>All 70 variants with board sizes, win conditions, descriptions. Optional group filter (Classic, Tactical, Alternate Rules, Asymmetric, Small Boards, Large Boards)</td></tr>
+    <tr><td><code>chess_get_legal_moves</code></td><td><code>variant?, fen?</code></td><td>All legal moves for a position in algebraic notation with annotations (capture, promotion, castling)</td></tr>
+    <tr><td><code>chess_analyze_position</code></td><td><code>variant?, fen?, depth?</code></td><td>AI evaluation: score in centipawns, best move, principal variation. Depth 1-6 (default 4)</td></tr>
+    <tr><td><code>chess_validate_move</code></td><td><code>move, variant?, fen?</code></td><td>Check if a specific move is legal. Returns resulting position FEN if valid</td></tr>
+    <tr><td><code>chess_make_moves</code></td><td><code>moves, variant?, fen?</code></td><td>Play a sequence of moves, return final FEN and game status</td></tr>
+    <tr><td><code>chess_get_opening_book</code></td><td><code>variant?, fen?</code></td><td>Opening book continuations for the current position (where available)</td></tr>
+    <tr><td><code>chess_generate_puzzle</code></td><td><code>variant?, type?</code></td><td>Generate tactical puzzles. Types: mate-in-1, mate-in-2, tactics</td></tr>
+  </table>
+
+  <h3>Example: position analysis</h3>
+  <pre class="language-javascript"><code class="language-javascript">// chess_analyze_position
+{ "variant": "standard", "fen": "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "depth": 5 }
+// Returns: { score: 35, bestMove: "d2d4", pv: ["d2d4", "d7d5", "e4d5"], material: { w: 39, b: 39 } }</code></pre>
+
+  <h3>Example: move validation</h3>
+  <pre class="language-javascript"><code class="language-javascript">// chess_validate_move
+{ "variant": "standard", "move": "e2e4" }
+// Returns: { legal: true, resultFen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", notation: "e4" }
+
+// chess_validate_move (illegal)
+{ "variant": "standard", "move": "e2e5" }
+// Returns: { legal: false, reason: "No legal move from e2 to e5" }</code></pre>
+
+  <h3>Example: puzzle generation</h3>
+  <pre class="language-javascript"><code class="language-javascript">// chess_generate_puzzle
+{ "variant": "standard", "type": "mate-in-2" }
+// Returns: { fen: "2r3k1/5ppp/...", solution: ["d1d8", "c8d8", "e1e8"], sideToMove: "w" }</code></pre>
 </div>
 </div>
 

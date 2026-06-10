@@ -42,33 +42,83 @@
 <nav class="docs-toc" id="docs-toc"></nav>
 <div class="docs-body">
   <h1>Documentation</h1>
-  <p class="docs-lede">Everything you need to integrate Moddable Chess into your project or extend it with new variants.</p>
+  <p class="docs-lede">Everything you need to integrate Moddable Chess into your project or extend it with new variants. Three ways to integrate: <a href="api.html#embedding">embed via iframe</a>, <a href="api.html#game-controller">mount directly via JavaScript</a>, or <a href="api.html#mcp-server">query from an AI assistant</a>.</p>
 
-  <h2>Quick Start</h2>
-  <p>Include the engine scripts in your HTML (order matters):</p>
-  <pre class="language-javascript"><code class="language-javascript">&lt;script src="js/chess-engine.js"&gt;&lt;/script&gt;
-&lt;script src="js/chess-moves.js"&gt;&lt;/script&gt;
-&lt;script src="js/chess-play.js"&gt;&lt;/script&gt;
-&lt;script src="js/chess-variants.js"&gt;&lt;/script&gt;
-&lt;script src="js/board-renderer.js"&gt;&lt;/script&gt;</code></pre>
+  <h2 id="quick-start">Quick Start</h2>
+  <p>The engine uses native ES modules. Import what you need:</p>
+  <pre class="language-javascript"><code class="language-javascript">&lt;script type="module"&gt;
+import MCE from './js/chess-engine.js';
+import './js/chess-moves.js';
+import './js/chess-play.js';
+import './js/chess-variants.js';
+import './js/board-renderer.js';
 
-  <p>Create a game and render it:</p>
-  <pre class="language-javascript"><code class="language-javascript">const game = MCE.createGame('standard');
+const game = MCE.createGame('standard');
 MCE.renderBoard(document.getElementById('board'), game, {
   size: 480,
   onSquareClick: (sq) =&gt; { /* handle click */ }
-});</code></pre>
+});
+&lt;/script&gt;</code></pre>
 
-  <h2>Architecture</h2>
-  <p>The engine is split into focused modules that extend the global <code>MCE</code> namespace:</p>
+  <p>Or use the game controller for a complete interactive experience (AI, undo, animation):</p>
+  <pre class="language-javascript"><code class="language-javascript">&lt;script type="module"&gt;
+import MCE from './js/chess-engine.js';
+import './js/chess-moves.js';
+import './js/chess-play.js';
+import './js/chess-variants.js';
+import './js/board-renderer.js';
+import './js/chess-ai.js';
+import { createGameController } from './js/game-controller-core.js';
+
+const game = MCE.createGame('atomic');
+const ctrl = createGameController(
+  document.getElementById('board'), game,
+  { players: { w: 'human', b: 'ai' }, aiDepth: 4 }
+);
+&lt;/script&gt;</code></pre>
+
+  <h2 id="architecture">Architecture</h2>
+  <p>The engine is split into focused ESM modules. Each extends the <code>MCE</code> namespace via side-effect imports:</p>
   <table class="docs-table">
     <tr><th>File</th><th>Exports</th><th>Purpose</th></tr>
-    <tr><td><code>chess-engine.js</code></td><td>MCE core</td><td>Board state, FEN, coordinate helpers, game creation</td></tr>
-    <tr><td><code>chess-moves.js</code></td><td>pseudoLegalMoves, legalMoves, inCheck</td><td>Move generation for all piece types</td></tr>
-    <tr><td><code>chess-play.js</code></td><td>makeMove, unmakeMove, getStatus</td><td>Move execution, undo, game state and draw detection (threefold repetition, insufficient material, 50-move rule)</td></tr>
-    <tr><td><code>chess-variants.js</code></td><td>VARIANTS, getVariantStatus, variantLegalMoves</td><td>Variant-specific rule overrides</td></tr>
-    <tr><td><code>board-renderer.js</code></td><td>renderBoard</td><td>SVG board rendering with click handling</td></tr>
+    <tr><td><code>chess-engine.js</code></td><td>MCE (default), createGame, loadFEN, toFEN, positionKey, registerVariant, registerPiece, effects API</td><td>Core: board state, FEN, coordinates, variant/piece registry, effects system, board mutations</td></tr>
+    <tr><td><code>chess-moves.js</code></td><td>pseudoLegalMoves, legalMoves, inCheck</td><td>Move generation for all piece types including custom pieces</td></tr>
+    <tr><td><code>chess-play.js</code></td><td>makeMove, unmakeMove, getStatus</td><td>Move execution, undo, draw detection (threefold, insufficient material, 50-move)</td></tr>
+    <tr><td><code>chess-variants.js</code></td><td>variantLegalMoves, getVariantStatus</td><td>70 variant plugins with rule overrides</td></tr>
+    <tr><td><code>chess-units.js</code></td><td>registerUnit, buildUnitHandler, getUnit</td><td>Unit template system for declarative piece definitions</td></tr>
+    <tr><td><code>chess-ai.js</code></td><td>aiPickMove, AI_DIFFICULTIES, loadOpeningBook</td><td>Alpha-beta search, difficulty presets, opening book support</td></tr>
+    <tr><td><code>board-renderer.js</code></td><td>renderBoard, setTheme, setPieceStyle, captureBurst</td><td>SVG board rendering, themes, animations</td></tr>
+    <tr><td><code>game-controller.js</code></td><td>createGameController</td><td>Full interaction loop: human/AI players, undo, move animation, callbacks</td></tr>
+    <tr><td><code>game-controller-core.js</code></td><td>createGameControllerCore</td><td>Headless controller for server/Worker contexts (no DOM)</td></tr>
+    <tr><td><code>replay.js</code></td><td>createReplay</td><td>Step through completed games move-by-move</td></tr>
+    <tr><td><code>ai-worker.js</code></td><td>(Web Worker entry)</td><td>Offloads AI search to a background thread</td></tr>
+    <tr><td><code>mcp/tools.js</code></td><td>7 MCP tool handlers</td><td>AI-callable chess analysis and puzzle generation</td></tr>
+    <tr><td><code>mcp/server.js</code></td><td>(MCP server entry)</td><td>Stdio MCP server for Claude Code / Claude Desktop</td></tr>
   </table>
+
+  <h2 id="embedding">Embedding</h2>
+  <p>Embed a playable chess board in any page with a single iframe:</p>
+  <pre class="language-javascript"><code class="language-javascript">&lt;iframe
+  src="https://chess.moddable.games/play/?embed=1&amp;variant=atomic&amp;boardonly=1"
+  width="480" height="480" frameborder="0"
+&gt;&lt;/iframe&gt;</code></pre>
+  <p>See <a href="api.html#embedding">API: Embedding</a> for all parameters (themes, player names, accent colours, game modes).</p>
+
+  <h2 id="mcp-server">MCP Server</h2>
+  <p>The engine is available as an MCP server for Claude Code, Claude Desktop, or any MCP-compatible AI client. Seven tools expose game creation, move generation, position analysis, and puzzle generation.</p>
+  <pre class="language-javascript"><code class="language-javascript"># Add to Claude Code
+claude mcp add --transport stdio moddable-chess node mcp/server.js</code></pre>
+  <table class="docs-table">
+    <tr><th>Tool</th><th>Description</th></tr>
+    <tr><td><code>chess_list_variants</code></td><td>All 70 variants with board sizes, win conditions, and descriptions</td></tr>
+    <tr><td><code>chess_get_legal_moves</code></td><td>Legal moves for a position (FEN or variant start)</td></tr>
+    <tr><td><code>chess_analyze_position</code></td><td>AI evaluation with best move, score, and material balance</td></tr>
+    <tr><td><code>chess_validate_move</code></td><td>Check if a move is legal and get the resulting position</td></tr>
+    <tr><td><code>chess_make_moves</code></td><td>Play a sequence of moves and return the final position</td></tr>
+    <tr><td><code>chess_get_opening_book</code></td><td>Opening book moves for a variant (where available)</td></tr>
+    <tr><td><code>chess_generate_puzzle</code></td><td>Generate tactical puzzles from random positions</td></tr>
+  </table>
+  <p>See <a href="api.html#mcp-server">API: MCP Server</a> for full parameter documentation and examples.</p>
 
   <h2>Board Representation</h2>
   <p>The board is a flat array of size <code>rows × cols</code>. Index 0 is the top-left square (a8 in standard chess). Pieces are single characters — uppercase for White, lowercase for Black:</p>
@@ -173,13 +223,14 @@ MCE.onBoard(row, col, game) // → boolean</code></pre>
     <li><a href="https://hex.moddable.games" target="_blank" rel="noopener">Moddable Hexmaps</a> — hex-grid engine for Hexagonal Chess, Glinski, and other hex-board games</li>
   </ul>
 
-  <h2>Next Steps</h2>
+  <h2 id="next-steps">Next Steps</h2>
   <ul>
-    <li><a href="api.html">Full API reference</a> — every method on the MCE namespace</li>
-    <li><a href="variants.html">Plugin Reference</a> — all config flags and hooks for MCE.registerVariant()</li>
-    <li><a href="guide.html">Guide: Orda Chess</a> — custom pieces, divergent movement, attack functions</li>
-    <li><a href="guide-crazyhouse.html">Guide: Crazyhouse</a> — action moves, moveFilter, afterMove, hand state</li>
-    <li><a href="guide-poison.html">Guide: Poison Chess</a> — effects system, board mutations, timed effects</li>
+    <li><a href="api.html">API Reference</a> — every method on the MCE namespace</li>
+    <li><a href="variants.html">Plugin Reference</a> — all config flags and hooks for registerVariant()</li>
+    <li><a href="guide.html">Developer Guides</a> — four step-by-step guides covering every engine hook</li>
+    <li><a href="api.html#embedding">Embedding</a> — iframe integration with themes and parameters</li>
+    <li><a href="api.html#game-controller">Game Controller</a> — programmatic board control with AI players</li>
+    <li><a href="api.html#mcp-server">MCP Server</a> — AI-callable chess tools for Claude and other assistants</li>
   </ul>
 </div>
 </div>
