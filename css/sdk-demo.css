@@ -83,7 +83,6 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 .demo-section__desc {
   color: #555;
   margin-bottom: 24px;
-  max-width: 720px;
 }
 
 /* Variant gallery grid */
