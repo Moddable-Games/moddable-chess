@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('minichess', {
   label: 'Minichess (5×5)',
   group: 'Small Boards',

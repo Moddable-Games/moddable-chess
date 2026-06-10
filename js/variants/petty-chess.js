@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('pettyChess', {
   label: 'Petty Chess (5×6)',
   group: 'Alternate Rules',

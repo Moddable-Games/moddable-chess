@@ -1,7 +1,4 @@
-'use strict';
-(function() {
-
-const { rc, sq, sqToAlgebraic } = MCE;
+import MCE, { rc, sq, sqToAlgebraic } from './chess-engine.js';
 const SVGns = 'http://www.w3.org/2000/svg';
 
 const THEMES = {
@@ -686,4 +683,5 @@ function captureBurst(svg, cx, cy, tileSize) {
 }
 
 Object.assign(MCE, { renderBoard, captureBurst, setTheme, getTheme, THEMES, setPieceStyle, getPieceStyle, PIECE_STYLES, DARK_THEMES });
-})();
+
+export { renderBoard, captureBurst, setTheme, getTheme, THEMES, setPieceStyle, getPieceStyle, PIECE_STYLES, DARK_THEMES };

@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('chess960', {
   group: 'Classic',
   label: 'Fischer Random (960)',

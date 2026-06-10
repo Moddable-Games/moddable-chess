@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerPiece('y', {
   genMoves: function(g, from, side) {
     var moves = [];

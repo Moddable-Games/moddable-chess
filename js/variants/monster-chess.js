@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('monsterChess', {
   label: 'Monster Chess',
   group: 'Alternate Rules',

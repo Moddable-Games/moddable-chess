@@ -7,7 +7,7 @@ Modular chess engine with 70 playable variants on boards from 4×8 to 12×8. Zer
 ### Stack
 
 ```
-HTML + Vanilla JS + Zero dependencies + Zero build step
+Native ESM + Vanilla JS + Zero dependencies + Zero build step
 ```
 
 ---
@@ -16,6 +16,7 @@ HTML + Vanilla JS + Zero dependencies + Zero build step
 
 ```
 moddable-chess/
+├── package.json            ← ESM config + npm exports map
 ├── index.html              ← Homepage / marketing page
 ├── play/
 │   └── index.html          ← Interactive demo (variant picker + board)
@@ -39,8 +40,8 @@ moddable-chess/
 │   ├── replay.js               ← MCE.createReplay() for move-by-move playback
 │   ├── game-controller.js      ← Play page: wires engine to renderer
 │   ├── home.js                 ← Homepage: variant grid from JSON
-│   └── variants/               ← Plugin files (one per variant)
-│       ├── index.js            ← Auto-loader
+│   └── variants/               ← Plugin files (one per variant, ESM)
+│       ├── index.js            ← Barrel import (loads all 70)
 │       ├── standard.js
 │       ├── atomic.js
 │       └── ...                 ← 70 total
@@ -123,21 +124,36 @@ moddable-chess/
 
 ### Usage
 
+**Browser (ESM):**
+
 ```html
-<script src="js/chess-engine.js"></script>
-<script src="js/chess-moves.js"></script>
-<script src="js/chess-play.js"></script>
-<script src="js/chess-variants.js"></script>
-<script src="js/board-renderer.js"></script>
-<script src="js/variants/standard.js"></script>
-<script src="js/variants/atomic.js"></script>
-<!-- or load all: <script src="js/variants/index.js"></script> -->
-<script>
+<script type="module">
+import MCE from './js/chess-engine.js';
+import './js/chess-moves.js';
+import './js/chess-play.js';
+import './js/board-renderer.js';
+import './js/variants/standard.js';
+import './js/variants/atomic.js';
+
 const game = MCE.createGame('atomic');
 const moves = MCE.legalMoves(game);
 MCE.makeMove(game, moves[0]);
 MCE.renderBoard(document.getElementById('board'), game, { size: 480 });
 </script>
+```
+
+**Node.js / Cloudflare Workers (no DOM):**
+
+```javascript
+import MCE, { createGame } from './js/chess-engine.js';
+import './js/chess-moves.js';
+import './js/chess-play.js';
+import './js/variants/standard.js';
+
+const game = createGame('standard');
+const moves = MCE.legalMoves(game);
+MCE.makeMove(game, moves[0]);
+console.log(MCE.getStatus(game));
 ```
 
 ---
@@ -153,6 +169,16 @@ Open `http://localhost:8000/`
 ---
 
 ### Changelog
+
+#### 2026-06-10 (v0.9.0)
+- Migrate entire codebase to native ESM (`<script type="module">`, `import`/`export`)
+- Same source files now run in browser, Node.js, and Cloudflare Workers without any build step
+- Add package.json with `"type": "module"` and npm-style exports map
+- Convert AI worker to module worker (`{ type: 'module' }`)
+- Replace IIFE wrappers with proper import/export across all 80+ source files
+- All 70 variants produce legal moves in Node.js without browser globals
+- Update homepage developer examples to show ESM usage
+- Prerequisite for multiplayer (#93), MCP server (website#101), and npm distribution
 
 #### 2026-06-09
 - Add animation style selector: slide, arc, bounce, warp (toolbar dropdown)

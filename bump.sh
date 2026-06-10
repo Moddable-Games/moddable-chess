@@ -25,5 +25,10 @@ find . -name "*.html" -not -path "./.git/*" | while read -r file; do
   sed -i '' "s/· v[0-9][0-9.]*/· v${NEW}/g" "$file"
 done
 
+# Update package.json version
+if [ -f "package.json" ]; then
+  sed -i '' "s/\"version\": \"[0-9][0-9.]*\"/\"version\": \"${NEW}\"/" package.json
+fi
+
 echo "Bumped: ${CURRENT} → ${NEW}"
-echo "Updated all ?v= query strings and footer versions in HTML files."
+echo "Updated all ?v= query strings, footer versions, and package.json."

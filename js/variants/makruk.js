@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 var makrukOpeningBook = {
   "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSMKSNR w - -": ["e3e4", "d3d4", "f3f4", "c3c4"],
   "rnsmksnr/8/pppppppp/8/4P3/PPPP1PPP/8/RNSMKSNR b - -": ["e6e5", "d6d5", "f6f5"],

@@ -1,7 +1,6 @@
-'use strict';
-(function() {
-
-const { WHITE, BLACK, pieceColor, pieceType, legalMoves, makeMove, unmakeMove, inCheck } = MCE;
+import MCE, { WHITE, BLACK, pieceColor, pieceType } from './chess-engine.js';
+import { legalMoves, inCheck } from './chess-moves.js';
+import { makeMove, unmakeMove } from './chess-play.js';
 
 const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000, a: 650, c: 830, s: 150 };
 
@@ -362,4 +361,5 @@ Object.assign(MCE, {
   AI_DIFFICULTIES: DIFFICULTIES,
   loadOpeningBook: loadOpeningBook
 });
-})();
+
+export { pickMove as aiPickMove, pickDuckSquare as aiPickDuckSquare, DIFFICULTIES as AI_DIFFICULTIES, loadOpeningBook };

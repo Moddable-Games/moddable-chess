@@ -11,15 +11,15 @@
 <meta property="og:title" content="Moddable Chess — One engine, infinite rulesets">
 <meta property="og:description" content="Modular chess engine with 70 variants. Zero dependencies, pure JavaScript, open source.">
 <meta property="og:url" content="https://chess.moddable.games/">
-<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.8.0">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Moddable Chess — One engine, infinite rulesets">
 <meta name="twitter:description" content="Modular chess engine with 70 variants. Zero dependencies, pure JavaScript, open source.">
-<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.8.0">
-<link rel="stylesheet" href="css/shared.css?v=0.8.0">
-<link rel="stylesheet" href="css/home.css?v=0.8.0">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.0">
+<link rel="stylesheet" href="css/shared.css?v=0.9.0">
+<link rel="stylesheet" href="css/home.css?v=0.9.0">
 </head>
 <body>
 
@@ -75,18 +75,23 @@
       </div>
       <div class="dev-tabs__panel active" data-panel="0">
         <div class="mc-dev__code">
-&lt;script src="https://chess.moddable.games/js/chess-engine.js"&gt;&lt;/script&gt;<br>
-&lt;script src="https://chess.moddable.games/js/chess-render.js"&gt;&lt;/script&gt;<br>
-&lt;script src="https://chess.moddable.games/js/variants/standard.js"&gt;&lt;/script&gt;
+&lt;script type="module"&gt;<br>
+&nbsp;&nbsp;import MCE from 'https://chess.moddable.games/js/chess-engine.js';<br>
+&nbsp;&nbsp;import 'https://chess.moddable.games/js/chess-moves.js';<br>
+&nbsp;&nbsp;import 'https://chess.moddable.games/js/chess-play.js';<br>
+&nbsp;&nbsp;import 'https://chess.moddable.games/js/variants/standard.js';<br>
+&lt;/script&gt;
         </div>
       </div>
       <div class="dev-tabs__panel" data-panel="1">
         <div class="mc-dev__code">
-const game = MCE.createGame('standard');<br>
-const moves = MCE.legalMoves(game);<br>
-MCE.makeMove(game, moves[0]);<br>
-const status = MCE.getStatus(game);<br>
-MCE.renderBoard(el, game, { size: 480 });
+import { createGame, legalMoves } from './js/chess-engine.js';<br>
+import { makeMove, getStatus } from './js/chess-play.js';<br>
+<br>
+const game = createGame('standard');<br>
+const moves = legalMoves(game);<br>
+makeMove(game, moves[0]);<br>
+console.log(getStatus(game));
         </div>
       </div>
       <div class="dev-tabs__panel" data-panel="2">
@@ -169,11 +174,11 @@ MCE.renderBoard(el, game, { size: 480 });
 
 <footer class="site-footer">
   <a href="https://web.moddable.games/engines/" target="_blank" rel="noopener"><img src="assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
-  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.8.0</p>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.9.0</p>
 </footer>
 
-<script src="js/home.js?v=0.8.0"></script>
-<script src="js/dev-tabs.js?v=0.8.0"></script>
-<script src="js/parallax.js?v=0.8.0"></script>
+<script type="module" src="js/home.js?v=0.9.0"></script>
+<script type="module" src="js/dev-tabs.js?v=0.9.0"></script>
+<script type="module" src="js/parallax.js?v=0.9.0"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('codrus', {
   label: 'Codrus',
   group: 'Alternate Rules',

@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('maharaja', {
   label: 'Maharaja & Sepoys',
   group: 'Alternate Rules',

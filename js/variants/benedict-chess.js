@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('benedictChess', {
   label: 'Benedict',
   group: 'Alternate Rules',

@@ -1,4 +1,4 @@
-'use strict';
+import MCE from '../chess-engine.js';
 MCE.registerVariant('losAlamos', {
   label: 'Los Alamos (6×6)',
   group: 'Small Boards',

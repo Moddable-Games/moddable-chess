@@ -1,5 +1,82 @@
-'use strict';
-(function() {
+import MCE from './chess-engine.js';
+import './chess-moves.js';
+import './chess-play.js';
+import './chess-units.js';
+import './chess-variants.js';
+import './chess-ai.js';
+import './board-renderer.js';
+import './game-controller-core.js';
+import './replay.js';
+import './variants/standard.js';
+import './variants/chess960.js';
+import './variants/torpedo.js';
+import './variants/no-castling.js';
+import './variants/single-check.js';
+import './variants/los-alamos.js';
+import './variants/knightmate.js';
+import './variants/progressive.js';
+import './variants/marseillais.js';
+import './variants/monster-chess.js';
+import './variants/fog-of-war.js';
+import './variants/duck-chess.js';
+import './variants/antichess.js';
+import './variants/giveaway.js';
+import './variants/suicide-chess.js';
+import './variants/stalemate-wins.js';
+import './variants/makpong.js';
+import './variants/rifle.js';
+import './variants/atomic.js';
+import './variants/chigorin.js';
+import './variants/almost-chess.js';
+import './variants/amazon-chess.js';
+import './variants/upside-down.js';
+import './variants/endgame-chess.js';
+import './variants/peasants-revolt.js';
+import './variants/pawns-only.js';
+import './variants/breakthrough.js';
+import './variants/minichess.js';
+import './variants/capablanca.js';
+import './variants/grand.js';
+import './variants/courier.js';
+import './variants/maharaja.js';
+import './variants/king-of-the-hill.js';
+import './variants/three-check.js';
+import './variants/five-check.js';
+import './variants/racing-kings.js';
+import './variants/extinction.js';
+import './variants/horde.js';
+import './variants/codrus.js';
+import './variants/dice-chess.js';
+import './variants/grid-chess.js';
+import './variants/checkless-chess.js';
+import './variants/no-retreat.js';
+import './variants/weak-chess.js';
+import './variants/patrol-chess.js';
+import './variants/madrasi-chess.js';
+import './variants/omnicide.js';
+import './variants/dark-chess.js';
+import './variants/berserk-chess.js';
+import './variants/benedict-chess.js';
+import './variants/andernach-chess.js';
+import './variants/half-chess.js';
+import './variants/diana-chess.js';
+import './variants/petty-chess.js';
+import './variants/shatar.js';
+import './variants/cylinder-chess.js';
+import './variants/toroidal-chess.js';
+import './variants/berolina-chess.js';
+import './variants/legan-chess.js';
+import './variants/hoppel-poppel.js';
+import './variants/makruk.js';
+import './variants/orda-chess.js';
+import './variants/einstein-chess.js';
+import './variants/displacement-chess.js';
+import './variants/crazyhouse.js';
+import './variants/recruitment-chess.js';
+import './variants/teleport-chess.js';
+import './variants/poison-chess.js';
+import './variants/medusa-chess.js';
+import './variants/immunization-chess.js';
 
 const container = document.getElementById('board-container');
 const controlsEl = document.getElementById('board-controls');
@@ -117,7 +194,7 @@ if (embedMode) {
   if (radius) document.getElementById('board-container').style.borderRadius = radius;
 }
 
-const basePath = document.querySelector('script[src*="game-controller.js"]').src.replace(/js\/game-controller\.js.*/, '');
+const basePath = import.meta.url.replace(/js\/game-controller\.js.*/, '');
 MCE.loadOpeningBook(basePath);
 
 const ANIM_STYLES = { slide: 'Slide', arc: 'Arc', bounce: 'Bounce', warp: 'Warp' };
@@ -129,12 +206,29 @@ let aiWorker = null;
 let aiWorkerReady = false;
 let aiMoveId = 0;
 
+const VARIANT_FILES = [
+  'standard.js','chess960.js','torpedo.js','no-castling.js','single-check.js',
+  'los-alamos.js','knightmate.js','progressive.js','marseillais.js','monster-chess.js',
+  'fog-of-war.js','duck-chess.js','antichess.js','giveaway.js','suicide-chess.js',
+  'stalemate-wins.js','makpong.js','rifle.js','atomic.js','chigorin.js',
+  'almost-chess.js','amazon-chess.js','upside-down.js','endgame-chess.js',
+  'peasants-revolt.js','pawns-only.js','breakthrough.js','minichess.js',
+  'capablanca.js','grand.js','courier.js','maharaja.js','king-of-the-hill.js',
+  'three-check.js','five-check.js','racing-kings.js','extinction.js','horde.js',
+  'codrus.js','dice-chess.js','grid-chess.js','checkless-chess.js','no-retreat.js',
+  'weak-chess.js','patrol-chess.js','madrasi-chess.js','omnicide.js','dark-chess.js',
+  'berserk-chess.js','benedict-chess.js','andernach-chess.js','half-chess.js',
+  'diana-chess.js','petty-chess.js','shatar.js','cylinder-chess.js','toroidal-chess.js',
+  'berolina-chess.js','legan-chess.js','hoppel-poppel.js','makruk.js','orda-chess.js',
+  'einstein-chess.js','displacement-chess.js','crazyhouse.js','recruitment-chess.js',
+  'teleport-chess.js','poison-chess.js','medusa-chess.js','immunization-chess.js',
+];
+
 function initWorker() {
   try {
-    aiWorker = new Worker(basePath + 'js/ai-worker.js');
+    aiWorker = new Worker(basePath + 'js/ai-worker.js', { type: 'module' });
     aiWorker.addEventListener('message', onWorkerMessage);
-    const variantPaths = Array.from(document.querySelectorAll('script[src*="variants/"]'))
-      .map(s => s.src.replace(/\?.*/, ''));
+    const variantPaths = VARIANT_FILES.map(f => basePath + 'js/variants/' + f);
     aiWorker.postMessage({ type: 'init', variantPaths: variantPaths });
   } catch (e) {
     aiWorker = null;
@@ -1218,5 +1312,3 @@ function setupEmbedBridge() {
     }
   });
 }
-
-})();
