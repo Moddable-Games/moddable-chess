@@ -236,21 +236,14 @@ function initAiPanel() {
     var game = MCE.createGame(variant);
 
     ctrl = createGameController(boardEl, game, {
-      players: { w: 'ai', b: 'ai' },
-      aiDepth: depth,
+      players: { w: 'human', b: 'human' },
       renderOpts: { size: 480 },
-      onMove: function() {
-        moveCount++;
-        moveCountEl.textContent = moveCount;
-        if (!paused && !ctrl.isThinking()) {
-          setTimeout(function() { triggerNextAiMove(); }, 300);
-        }
-      },
       onGameEnd: function(result) {
         statusEl.textContent = result;
+        paused = true;
       }
     });
-    setTimeout(function() { triggerNextAiMove(); }, 300);
+    statusEl.textContent = 'Ready';
   }
 
   function triggerNextAiMove() {
@@ -274,7 +267,12 @@ function initAiPanel() {
 
   startAiGame();
 
-  document.getElementById('ai-start').addEventListener('click', startAiGame);
+  document.getElementById('ai-start').addEventListener('click', function() {
+    startAiGame();
+    paused = false;
+    statusEl.textContent = 'Playing';
+    triggerNextAiMove();
+  });
   document.getElementById('ai-pause').addEventListener('click', function() {
     paused = !paused;
     this.textContent = paused ? 'Resume' : 'Pause';
