@@ -145,6 +145,13 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   min-width: 0;
 }
 
+.demo-controls__board svg,
+.demo-ai-panel__board svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .demo-controls__panel {
   display: flex;
   flex-direction: column;
