@@ -549,4 +549,114 @@ a.mc-consumer-card {
   .mc-consumer__showcase {
     grid-template-columns: 1fr;
   }
+
+  .mc-ai {
+    padding: 60px 16px;
+  }
+
+  .mc-ai__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* AI Integration section */
+.mc-ai {
+  background: #050818;
+  padding: 80px 24px;
+  border-top: 1px solid rgba(111,181,255,0.15);
+}
+.mc-ai__inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+.mc-ai__eyebrow {
+  font-family: var(--mg-font-pixel, 'Press Start 2P', monospace);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--mc-glow);
+  margin-bottom: 12px;
+}
+.mc-ai__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.mc-ai__text {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+.mc-ai__connect {
+  margin-bottom: 40px;
+}
+.mc-ai__code-block {
+  position: relative;
+  background: #0f1225;
+  border: 1px solid rgba(111,181,255,0.2);
+  border-radius: 8px;
+  padding: 16px 20px;
+  text-align: left;
+  overflow-x: auto;
+}
+.mc-ai__code-block code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #6fb5ff;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.mc-ai__copy {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--mc-glow);
+  color: #0a0d2a;
+  border: none;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mc-ai__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  text-align: left;
+  margin-bottom: 32px;
+}
+.mc-ai-card {
+  background: #0f1225;
+  border: 1px solid rgba(111,181,255,0.1);
+  border-radius: 8px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.mc-ai-card:hover {
+  border-color: rgba(111,181,255,0.4);
+}
+.mc-ai-card__icon {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+.mc-ai-card__name {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+.mc-ai-card__desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+}
+.mc-ai__btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }

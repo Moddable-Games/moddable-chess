@@ -154,6 +154,49 @@ console.log(getStatus(game));
   </div>
 </section>
 
+<section class="mc-ai">
+  <div class="mc-ai__inner">
+    <div class="mc-ai__eyebrow">AI INTEGRATION</div>
+    <h2 class="mc-ai__title">Ask Claude to play chess.</h2>
+    <p class="mc-ai__text">Connect in one command. Claude can analyze positions, generate puzzles, validate moves, and explain variant rules across all 70 chess variants.</p>
+
+    <div class="mc-ai__connect">
+      <div class="mc-ai__code-block">
+        <code>claude mcp add --transport http moddable-tools https://tools.moddable.games/mcp</code>
+        <button class="mc-ai__copy" onclick="navigator.clipboard.writeText('claude mcp add --transport http moddable-tools https://tools.moddable.games/mcp');this.textContent='Copied';setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+      </div>
+    </div>
+
+    <div class="mc-ai__grid">
+      <div class="mc-ai-card">
+        <div class="mc-ai-card__icon">&#9812;</div>
+        <div class="mc-ai-card__name">Position Analysis</div>
+        <p class="mc-ai-card__desc">Engine evaluation with best move and principal variation for any variant.</p>
+      </div>
+      <div class="mc-ai-card">
+        <div class="mc-ai-card__icon">&#9823;</div>
+        <div class="mc-ai-card__name">Puzzle Generator</div>
+        <p class="mc-ai-card__desc">Create mate-in-1 or mate-in-2 puzzles in standard or variant chess.</p>
+      </div>
+      <div class="mc-ai-card">
+        <div class="mc-ai-card__icon">&#10003;</div>
+        <div class="mc-ai-card__name">Move Validation</div>
+        <p class="mc-ai-card__desc">Check if a move is legal with human-readable explanations of why not.</p>
+      </div>
+      <div class="mc-ai-card">
+        <div class="mc-ai-card__icon">&#9733;</div>
+        <div class="mc-ai-card__name">Variant Rules</div>
+        <p class="mc-ai-card__desc">Look up rules, board sizes, and descriptions for 70+ chess variants.</p>
+      </div>
+    </div>
+
+    <div class="mc-ai__btns">
+      <a href="https://tools.moddable.games/" target="_blank" rel="noopener" class="mc-btn mc-btn--primary">View API Docs</a>
+      <a href="https://web.moddable.games/developers/" target="_blank" rel="noopener" class="mc-btn mc-btn--outline">Developer Guide</a>
+    </div>
+  </div>
+</section>
+
 <section class="mc-engines">
   <div class="mc-engines__inner">
     <div class="mc-engines__eyebrow">MODDABLE ENGINES</div>
