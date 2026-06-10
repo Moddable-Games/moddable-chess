@@ -130,7 +130,8 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 
 /* Control panel */
 .demo-controls {
-  background: var(--mc-deep);
+  background: #f0ede6;
+  border: 1px solid var(--mc-hairline);
   border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
@@ -160,7 +161,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 
 .demo-controls__panel label {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.6);
+  color: #777;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -171,10 +172,10 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   padding: 8px 12px;
   font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
   font-size: 0.85rem;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: #fff;
+  border: 1px solid var(--mc-hairline);
   border-radius: 6px;
-  color: #fff;
+  color: var(--mc-ink);
 }
 
 .demo-controls__panel button {
@@ -197,8 +198,9 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 .demo-controls__log {
   font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.7);
-  background: rgba(0,0,0,0.3);
+  color: #555;
+  background: #fff;
+  border: 1px solid var(--mc-hairline);
   border-radius: 6px;
   padding: 12px;
   max-height: 180px;
@@ -253,7 +255,8 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 
 /* AI vs AI panel */
 .demo-ai-panel {
-  background: linear-gradient(135deg, #0a0d2a 0%, #1a1040 100%);
+  background: #f0ede6;
+  border: 1px solid var(--mc-hairline);
   border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
@@ -261,7 +264,6 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   grid-template-columns: 1.2fr 0.8fr;
   gap: 24px;
   align-items: start;
-  border: 1px solid rgba(111, 181, 255, 0.15);
 }
 
 .demo-ai-panel__board {
@@ -284,7 +286,7 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 
 .demo-ai-panel__sidebar label {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.6);
+  color: #777;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -294,10 +296,10 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
   padding: 8px 12px;
   font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
   font-size: 0.85rem;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: #fff;
+  border: 1px solid var(--mc-hairline);
   border-radius: 6px;
-  color: #fff;
+  color: var(--mc-ink);
 }
 
 .demo-ai-panel__sidebar button {
@@ -321,8 +323,9 @@ code { font-family: var(--mg-font-mono, 'JetBrains Mono', monospace); font-size:
 .demo-ai-panel__stats {
   font-family: var(--mg-font-mono, 'JetBrains Mono', monospace);
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.7);
-  background: rgba(0,0,0,0.3);
+  color: #555;
+  background: #fff;
+  border: 1px solid var(--mc-hairline);
   border-radius: 6px;
   padding: 12px;
   display: flex;
