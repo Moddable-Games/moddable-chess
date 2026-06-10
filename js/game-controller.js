@@ -78,6 +78,10 @@ import './variants/poison-chess.js';
 import './variants/medusa-chess.js';
 import './variants/immunization-chess.js';
 
+function track(event, params) {
+  if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
+}
+
 const container = document.getElementById('board-container');
 const controlsEl = document.getElementById('board-controls');
 const toolbarEl = document.getElementById('board-toolbar');
@@ -444,6 +448,7 @@ function renderControls() {
     });
     diffSelect.addEventListener('change', () => {
       aiDifficulty = diffSelect.value;
+      track('difficulty_change', { difficulty: aiDifficulty, variant_name: currentVariant });
     });
     rightGroup.appendChild(diffSelect);
     controlsEl.appendChild(rightGroup);
@@ -468,6 +473,7 @@ function renderToolbar() {
   });
   themeSelect.addEventListener('change', () => {
     MCE.setTheme(themeSelect.value);
+    track('theme_change', { theme_name: themeSelect.value });
     const url = new URL(location);
     url.searchParams.set('theme', themeSelect.value);
     history.replaceState(null, '', url);
@@ -554,12 +560,16 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
+  const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
+  const groupLabel = g ? g.label : '';
+  track('variant_select', { variant_name: variant, variant_group: groupLabel });
+  const mode = gameMode === 'solo' ? 'ai' : gameMode;
+  track('game_start', { variant_name: variant, mode: mode, difficulty: gameMode === 'solo' ? aiDifficulty : undefined });
   if (!embedMode) {
     const url = new URL(location);
     url.searchParams.set('variant', variant);
     history.replaceState(null, '', url);
   }
-  const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   if (g) openGroup = g.label;
   game = MCE.createGame(variant);
   selected = null;
@@ -683,6 +693,10 @@ function getMovesForVariant() {
 function nameFor(color) { return color === MCE.WHITE ? playerNames.w : playerNames.b; }
 function nameForOpp(color) { return color === MCE.WHITE ? playerNames.b : playerNames.w; }
 
+function trackGameComplete(result) {
+  track('game_complete', { variant_name: currentVariant, result: result, move_count: undoStack.length });
+}
+
 function updateStatus() {
   if (game.duckPhase) {
     statusEl.textContent = nameFor(game.turn) + ' — place the duck';
@@ -698,6 +712,7 @@ function updateStatus() {
   const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
   if (variantStatus) {
     gameOver = true;
+    trackGameComplete(variantStatus);
     if (variantStatus.startsWith('koth-')) {
       statusEl.textContent = (variantStatus === 'koth-w' ? playerNames.w : playerNames.b) + ' wins — King of the Hill!';
       return;
@@ -740,9 +755,11 @@ function updateStatus() {
   const turn = nameFor(game.turn);
   if (status === 'checkmate') {
     gameOver = true;
+    trackGameComplete('checkmate');
     statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
   } else if (status === 'stalemate') {
     gameOver = true;
+    trackGameComplete('stalemate');
     const sm = game.stalemateMeaning || (currentVariant === 'giveaway' ? 'loss' : currentVariant === 'stalemateWins' ? 'win' : 'draw');
     if (sm === 'loss') {
       statusEl.textContent = nameForOpp(game.turn) + ' wins — opponent stalemated!';
@@ -753,12 +770,15 @@ function updateStatus() {
     }
   } else if (status === 'draw-repetition') {
     gameOver = true;
+    trackGameComplete('draw-repetition');
     statusEl.textContent = 'Draw — threefold repetition';
   } else if (status === 'draw-material') {
     gameOver = true;
+    trackGameComplete('draw-material');
     statusEl.textContent = 'Draw — insufficient material';
   } else if (status === 'draw-50') {
     gameOver = true;
+    trackGameComplete('draw-50');
     statusEl.textContent = 'Draw — 50-move rule';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
@@ -767,6 +787,7 @@ function updateStatus() {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= threshold) {
         gameOver = true;
+        trackGameComplete('check-threshold');
         statusEl.textContent = nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!');
       }
     }

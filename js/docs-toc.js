@@ -1,6 +1,10 @@
 'use strict';
 (function() {
 
+function track(event, params) {
+  if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
+}
+
 var tocEl = document.getElementById('docs-toc');
 var body = document.querySelector('.docs-body');
 if (!tocEl || !body) return;
@@ -51,11 +55,16 @@ updateActive();
 
 var navLinks = document.querySelectorAll('.docs-nav__links a');
 var currentPath = window.location.pathname;
+var currentPage = currentPath.split('/').filter(Boolean).pop() || 'index';
 navLinks.forEach(function(a) {
   var href = a.getAttribute('href');
   if (currentPath.endsWith(href) || (href === './' && (currentPath.endsWith('/docs/') || currentPath.endsWith('/docs/index.html')))) {
     a.classList.add('active');
   }
+  a.addEventListener('click', function() {
+    var toPage = href.replace('./', '').replace('.html', '') || 'index';
+    track('docs_navigate', { from_page: currentPage, to_page: toPage });
+  });
 });
 
 })();

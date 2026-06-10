@@ -201,6 +201,9 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-10 (v0.9.2)
+- Add GA4 event tracking: variant_select, game_start, game_complete, difficulty_change, theme_change, code_copy, docs_navigate, outbound_click, section_scroll
+
 #### 2026-06-10 (v0.9.0)
 - Migrate entire codebase to native ESM (`<script type="module">`, `import`/`export`)
 - Same source files now run in browser, Node.js, and Cloudflare Workers without any build step

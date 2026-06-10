@@ -1,3 +1,33 @@
+function track(event, params) {
+  if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
+}
+
+document.querySelectorAll('a[href^="http"]').forEach(function(a) {
+  a.addEventListener('click', function() {
+    track('outbound_click', { link_url: a.href, link_label: a.textContent.trim() });
+  });
+});
+
+(function() {
+  var tracked = {};
+  var sections = document.querySelectorAll('[data-section]');
+  if (sections.length === 0) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var name = entry.target.getAttribute('data-section');
+        if (name && !tracked[name]) {
+          tracked[name] = true;
+          track('section_scroll', { section_name: name });
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(function(s) { observer.observe(s); });
+})();
+
 fetch('data/variants.json')
   .then(r => r.json())
   .then(variants => {

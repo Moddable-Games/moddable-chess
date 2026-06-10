@@ -1,6 +1,12 @@
 'use strict';
 (function() {
-  document.querySelectorAll('pre[class*="language-"]').forEach(function(pre) {
+  function track(event, params) {
+    if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
+  }
+
+  var page = window.location.pathname.split('/').filter(Boolean).pop() || 'index';
+
+  document.querySelectorAll('pre[class*="language-"]').forEach(function(pre, index) {
     var btn = document.createElement('button');
     btn.className = 'copy-btn';
     btn.textContent = 'Copy';
@@ -9,6 +15,7 @@
       var code = pre.querySelector('code');
       var text = code ? code.textContent : pre.textContent;
       navigator.clipboard.writeText(text).then(function() {
+        track('code_copy', { page: page, snippet_index: index });
         btn.textContent = 'Copied';
         btn.classList.add('copied');
         setTimeout(function() {
