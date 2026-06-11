@@ -542,17 +542,26 @@ a.mc-consumer-card {
   .mc-variant-card {
     text-align: center;
   }
+  .mc-consumer__grid {
+    grid-template-columns: 1fr;
+  }
   .mc-consumer-card {
     text-align: center;
   }
   .mc-consumer__showcase {
+    grid-template-columns: 1fr;
     text-align: center;
   }
+  .mc-consumer__btns {
+    align-items: center;
+  }
   .mc-engines__grid {
-    text-align: center;
+    grid-template-columns: 1fr;
+    justify-items: center;
   }
   .mc-engines-card {
     text-align: center;
+    max-width: 360px;
   }
 }
 
