@@ -444,6 +444,7 @@ a.mc-consumer-card {
   color: rgba(255,255,255,0.65);
   line-height: 1.6;
   margin-bottom: 20px;
+  text-wrap: balance;
 }
 
 .mc-consumer__btns {
