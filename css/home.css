@@ -536,6 +536,18 @@ a.mc-consumer-card {
     flex-direction: column;
     align-items: center;
   }
+  .mc-ai-card {
+    text-align: center;
+  }
+  .mc-variant-card {
+    text-align: center;
+  }
+  .mc-consumer-card {
+    text-align: center;
+  }
+  .mc-consumer__showcase {
+    text-align: center;
+  }
 }
 
 /* Responsive: very small screens */
