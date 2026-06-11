@@ -548,6 +548,12 @@ a.mc-consumer-card {
   .mc-consumer__showcase {
     text-align: center;
   }
+  .mc-engines__grid {
+    text-align: center;
+  }
+  .mc-engines-card {
+    text-align: center;
+  }
 }
 
 /* Responsive: very small screens */
