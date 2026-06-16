@@ -313,19 +313,29 @@ function renderAnnotations(annotations, ctx, provider, colors) {
 
   if (annotations.legend && annotations.legend.length > 0) {
     const pad = 24;
-    const legendY = oy + (ctx.boardH) + pad + 5;
-    let lx = ox;
+    const legendY = oy + ctx.boardH + pad + 5;
+    const swatchSize = 12;
+    const swatchTextGap = 5;
+    const itemGap = 14;
+    const charWidth = 5.8;
+    const fs = 10;
+
+    const totalW = annotations.legend.reduce((sum, leg) =>
+      sum + swatchSize + swatchTextGap + leg.text.length * charWidth + itemGap, -itemGap);
+    const startX = ox + (ctx.boardW - totalW) / 2;
+    let lx = startX;
+
     for (const leg of annotations.legend) {
       const style = ANNOTATION_STYLES[leg.style] || ANNOTATION_STYLES.valid;
       if (leg.style === 'blocked') {
-        parts.push(`<line x1="${lx}" y1="${legendY + 2}" x2="${lx + 10}" y2="${legendY + 12}" stroke="${style.color}" stroke-width="2"/>`);
-        parts.push(`<line x1="${lx + 10}" y1="${legendY + 2}" x2="${lx}" y2="${legendY + 12}" stroke="${style.color}" stroke-width="2"/>`);
+        parts.push(`<line x1="${lx + 1}" y1="${legendY + 1}" x2="${lx + swatchSize - 1}" y2="${legendY + swatchSize - 1}" stroke="${style.color}" stroke-width="2"/>`);
+        parts.push(`<line x1="${lx + swatchSize - 1}" y1="${legendY + 1}" x2="${lx + 1}" y2="${legendY + swatchSize - 1}" stroke="${style.color}" stroke-width="2"/>`);
       } else {
-        parts.push(`<rect x="${lx}" y="${legendY + 2}" width="14" height="10" fill="none" stroke="${style.stroke || '#2aaa10'}" stroke-width="2"/>`);
+        parts.push(`<rect x="${lx}" y="${legendY}" width="${swatchSize}" height="${swatchSize}" fill="none" stroke="${style.stroke || '#2aaa10'}" stroke-width="2"/>`);
       }
-      lx += 20;
-      parts.push(`<text x="${lx}" y="${legendY + 11}" font-size="10" fill="${esc(colors.labelText)}" font-family="sans-serif">${esc(leg.text)}</text>`);
-      lx += leg.text.length * 6 + 15;
+      lx += swatchSize + swatchTextGap;
+      parts.push(`<text x="${lx}" y="${legendY + 9}" font-size="${fs}" fill="${esc(colors.labelText)}" font-family="sans-serif">${esc(leg.text)}</text>`);
+      lx += leg.text.length * charWidth + itemGap;
     }
   }
 
