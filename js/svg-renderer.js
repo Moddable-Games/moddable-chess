@@ -197,11 +197,13 @@ function collectChessDefs(position) {
 
 function drawDraughtsPiece(piece, cx, cy, r, C) {
   const isW = piece.color === 'white';
-  const fill = isW ? C.whitePieceFill : C.blackPieceFill;
-  const stroke = isW ? C.whitePieceStroke : C.blackPieceStroke;
-  let svg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${esc(fill)}" stroke="${esc(stroke)}" stroke-width="2"/>`;
+  const fill = isW ? '#fff' : '#333';
+  const stroke = isW ? '#333' : '#111';
+  const innerStroke = isW ? '#ccc' : '#555';
+  let svg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r * 0.64}" fill="none" stroke="${innerStroke}" stroke-width="1"/>`;
   if (piece.type === 'king') {
-    svg += `<circle cx="${cx}" cy="${cy}" r="${r * 0.55}" fill="none" stroke="${esc(stroke)}" stroke-width="1.5" opacity="0.6"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r * 0.4}" fill="none" stroke="${innerStroke}" stroke-width="1.5"/>`;
   }
   return svg;
 }

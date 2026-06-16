@@ -56,8 +56,8 @@ test('draughts-english-8x8', {
     ...darkSquares(8, 8, 5, 8).map(sq => [sq, { type: 'man', color: 'white' }]),
   ])
 }, {
-  'has 12 black pieces': s => (s.match(/fill="#1c1c1c"/g) || []).length === 12,
-  'has 12 white pieces': s => (s.match(/fill="#ffffff"/g) || []).length === 12,
+  'has 12 black pieces': s => (s.match(/fill="#333"/g) || []).length === 12,
+  'has 12 white pieces': s => (s.match(/fill="#fff"/g) || []).length === 12,
   'has 64 squares': s => (s.match(/<rect x="\d+" y="\d+" width="40" height="40"/g) || []).length === 64,
 });
 
@@ -85,8 +85,8 @@ test('draughts-turkish-8x8', {
 }, {
   'has mono background': s => s.includes('#d9b483'),
   'has grid lines': s => (s.match(/<line/g) || []).length === 18,
-  'has 16 black pieces': s => (s.match(/fill="#1c1c1c"/g) || []).length === 16,
-  'has 16 white pieces': s => (s.match(/fill="#ffffff"/g) || []).length === 16,
+  'has 16 black pieces': s => (s.match(/fill="#333"/g) || []).length === 16,
+  'has 16 white pieces': s => (s.match(/fill="#fff"/g) || []).length === 16,
 });
 
 // --- Alquerque ---

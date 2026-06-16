@@ -10,7 +10,8 @@ export const go = {
   labelStyle: 'go',
 
   defaultColors: {
-    background: '#dcb35c',
+    background: 'none',
+    woodLight: '#dcb35c',
     woodDark: '#d4a843',
     gridLine: '#3d2b1a',
     labelText: '#5a4020',
@@ -39,7 +40,8 @@ export const go = {
     const boardH = (rows - 1) * gridSpacing + inset * 2;
     const parts = [];
 
-    parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" fill="${colors.woodDark}" rx="2"/>`);
+    parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" fill="${colors.woodLight}"/>`);
+    parts.push(`<rect x="${ox + inset}" y="${oy + inset}" width="${boardW - inset * 2}" height="${boardH - inset * 2}" fill="${colors.woodDark}" rx="2"/>`);
 
     const gridOx = ox + inset;
     const gridOy = oy + inset;
