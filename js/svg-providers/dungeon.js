@@ -43,7 +43,7 @@ export const dungeon = {
 
     const hasVoid = terrain.some(row => row.some(c => c === null || c === 'void'));
     if (hasVoid) {
-      parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" rx="6" ry="6" fill="${colors.voidFill}"/>`);
+      parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" fill="${colors.voidFill}"/>`);
     }
 
     for (let r = 0; r < rows; r++) {
