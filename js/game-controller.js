@@ -267,7 +267,7 @@ function serializeGame(g) {
     'promotionPieces', 'promotionRank', 'pawnMoveStyle', 'divergentPieces',
     'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode', 'effects'];
   for (let i = 0; i < keys.length; i++) {
-    if (g[keys[i]] !== undefined) snap[keys[i]] = g[keys[i]];
+    if (g[keys[i]] !== undefined && typeof g[keys[i]] !== 'function') snap[keys[i]] = g[keys[i]];
   }
   snap._eliminated = Array.from(g.eliminated || []);
   snap.positionHistory = g.positionHistory ? g.positionHistory.slice() : [];

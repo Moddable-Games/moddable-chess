@@ -43,6 +43,9 @@ function rebuildGame(snapshot) {
 
   var vc = MCE.getVariantConfig(g.variant);
   if (vc) {
+    if (vc.pawnStartRow) g.pawnStartRow = vc.pawnStartRow;
+    if (vc.pawnDirection) g.pawnDirection = vc.pawnDirection;
+    if (vc.promotionRank) g.promotionRank = vc.promotionRank;
     if (vc.init && !g._initDone) vc.init(g);
     g._initDone = true;
   }
