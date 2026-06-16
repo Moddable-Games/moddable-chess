@@ -186,6 +186,7 @@ claude mcp add --transport stdio moddable-chess node /path/to/moddable-chess/mcp
 - `chess_make_moves` — Play a sequence of moves, get resulting position
 - `chess_get_opening_book` — Look up book moves for known positions
 - `chess_generate_puzzle` — Generate mate-in-1 or mate-in-2 puzzles
+- `chess_render_svg` — Render any position as a self-contained SVG image
 
 ---
 

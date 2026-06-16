@@ -14,6 +14,7 @@
     "./ai": "./js/chess-ai.js",
     "./variants": "./js/chess-variants.js",
     "./units": "./js/chess-units.js",
+    "./svg": "./js/chess-svg.js",
     "./mcp": "./mcp/tools.js"
   },
   "license": "MIT"

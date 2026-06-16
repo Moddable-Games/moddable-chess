@@ -855,7 +855,7 @@ iframe.contentWindow.postMessage({ type: 'chess:newGame' }, '*');</code></pre>
   width="400" height="400" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
 
   <h2 id="mcp-server">MCP Server</h2>
-  <p>The engine is available as an MCP (Model Context Protocol) server for use with Claude Code, Claude Desktop, or any MCP-compatible client. Seven tools expose the full game engine for position analysis, move validation, and puzzle generation.</p>
+  <p>The engine is available as an MCP (Model Context Protocol) server for use with Claude Code, Claude Desktop, or any MCP-compatible client. Eight tools expose the full game engine for position analysis, move validation, board rendering, and puzzle generation.</p>
 
   <h3>Setup</h3>
   <pre class="language-javascript"><code class="language-javascript"># Run standalone
@@ -874,6 +874,7 @@ claude mcp add --transport stdio moddable-chess node mcp/server.js</code></pre>
     <tr><td><code>chess_make_moves</code></td><td><code>moves, variant?, fen?</code></td><td>Play a sequence of moves, return final FEN and game status</td></tr>
     <tr><td><code>chess_get_opening_book</code></td><td><code>variant?, fen?</code></td><td>Opening book continuations for the current position (where available)</td></tr>
     <tr><td><code>chess_generate_puzzle</code></td><td><code>variant?, type?</code></td><td>Generate tactical puzzles. Types: mate-in-1, mate-in-2, tactics</td></tr>
+    <tr><td><code>chess_render_svg</code></td><td><code>variant?, fen?, theme?, highlights?, size?</code></td><td>Render a board position as a self-contained SVG string. Supports all board sizes and 6 themes. No DOM required (works in Cloudflare Workers)</td></tr>
   </table>
 
   <h3>Example: position analysis</h3>
