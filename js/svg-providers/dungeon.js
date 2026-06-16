@@ -4,7 +4,8 @@ export const dungeon = {
   labelStyle: 'none',
 
   defaultColors: {
-    background: '#1a1a2e',
+    background: 'none',
+    voidFill: '#1a1a2e',
     floor: '#d4c4a8',
     water: '#4a90c8',
     'spawn-a': '#f0d080',
@@ -39,7 +40,11 @@ export const dungeon = {
 
     const boardW = cols * step + gap;
     const boardH = rows * step + gap;
-    parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" rx="6" ry="6" fill="${colors.background}"/>`);
+
+    const hasVoid = terrain.some(row => row.some(c => c === null || c === 'void'));
+    if (hasVoid) {
+      parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" rx="6" ry="6" fill="${colors.voidFill}"/>`);
+    }
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {

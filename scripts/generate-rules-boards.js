@@ -131,7 +131,7 @@ const dcMapsPath = '../dungeon-chess/data/maps.json';
 if (existsSync(dcMapsPath)) {
   const dcData = JSON.parse(readFileSync(dcMapsPath, 'utf8'));
   const DC_SLUG_MAP = {
-    'compact_skirmish': 'compact-skirmish',
+    'compact': 'compact-skirmish',
     'two_player': 'two-player-dungeon',
     'four_player': 'four-player-dungeon',
   };
