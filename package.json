@@ -17,5 +17,12 @@
     "./svg": "./js/chess-svg.js",
     "./mcp": "./mcp/tools.js"
   },
-  "license": "MIT"
+  "scripts": {
+    "test": "node --experimental-vm-modules tests/smoke-all-variants.js",
+    "test:visual": "node --experimental-vm-modules tests/visual-all-variants.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
 }
