@@ -1,4 +1,4 @@
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
 import { renderBoardSVG } from '../js/svg-renderer.js';
 
 const RULES_ROOT = '../moddable-rules/games';
@@ -127,21 +127,69 @@ for (const m of MORRIS_CONFIGS) {
 
 console.log('\nGenerating Dungeon Chess boards...');
 
-const DUNGEON_CONFIGS = [
-  { key: 'two-player-dungeon', name: 'Two-Player Dungeon (20×8)', terrain: buildTwoPlayerDungeon() },
-  { key: 'compact-skirmish', name: 'Compact Skirmish (12×8)', terrain: buildCompactSkirmish() },
-  { key: 'four-player-dungeon', name: 'Four-Player Dungeon (16×16)', terrain: buildFourPlayerDungeon() },
-];
+const dcMapsPath = '../dungeon-chess/data/maps.json';
+if (existsSync(dcMapsPath)) {
+  const dcData = JSON.parse(readFileSync(dcMapsPath, 'utf8'));
+  const DC_SLUG_MAP = {
+    'compact_skirmish': 'compact-skirmish',
+    'two_player': 'two-player-dungeon',
+    'four_player': 'four-player-dungeon',
+  };
 
-for (const d of DUNGEON_CONFIGS) {
-  const svg = renderBoardSVG({
-    boardStyle: 'dungeon',
-    tileSize: 19,
-    showLabels: false,
-    title: d.name,
-    terrain: d.terrain,
-  });
-  write(`${DUNGEON_DIAGRAMS}/${d.key}.svg`, svg, d.key);
+  for (const m of dcData.maps) {
+    const slug = DC_SLUG_MAP[m.id] || m.id;
+    const terrain = convertDcGrid(m);
+    const svg = renderBoardSVG({
+      boardStyle: 'dungeon',
+      tileSize: 19,
+      showLabels: false,
+      title: `${m.name} (${m.rows}×${m.cols})`,
+      terrain,
+    });
+    write(`${DUNGEON_DIAGRAMS}/${slug}.svg`, svg, slug);
+  }
+} else {
+  console.log('  Warning: dungeon-chess/data/maps.json not found, skipping');
+}
+
+function convertDcGrid(map) {
+  const { grid, rows, cols } = map;
+  const terrain = [];
+  const spawnTopRows = [];
+  const spawnBottomRows = [];
+
+  for (let r = 0; r < rows; r++) {
+    const validCols = grid[r].filter(c => c !== null);
+    if (validCols.length >= 4) {
+      if (spawnBottomRows.length < 2) spawnBottomRows.push(r);
+    }
+  }
+  for (let r = rows - 1; r >= 0; r--) {
+    const validCols = grid[r].filter(c => c !== null);
+    if (validCols.length >= 4) {
+      if (spawnTopRows.length < 2) spawnTopRows.push(r);
+    }
+  }
+
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      const cell = grid[r][c];
+      if (cell === null) {
+        row.push(null);
+      } else if (cell === 'w') {
+        row.push('water');
+      } else if (spawnBottomRows.includes(r)) {
+        row.push('spawn-b');
+      } else if (spawnTopRows.includes(r)) {
+        row.push('spawn-a');
+      } else {
+        row.push('floor');
+      }
+    }
+    terrain.push(row);
+  }
+  return terrain;
 }
 
 // --- Royal Ur ---
@@ -303,54 +351,3 @@ function buildAlquerquePosition() {
   return position;
 }
 
-function buildTwoPlayerDungeon() {
-  const terrain = [];
-  for (let r = 0; r < 20; r++) {
-    const row = [];
-    for (let c = 0; c < 8; c++) {
-      if (r < 2) row.push('spawn-b');
-      else if (r >= 18) row.push('spawn-a');
-      else if (r === 2 || r === 17) row.push('floor');
-      else if ((r >= 3 && r <= 5) && (c < 3 || c > 4)) row.push(null);
-      else if ((r >= 14 && r <= 16) && (c < 3 || c > 4)) row.push(null);
-      else if (r >= 8 && r <= 11 && c >= 2 && c <= 5) row.push('water');
-      else row.push('floor');
-    }
-    terrain.push(row);
-  }
-  return terrain;
-}
-
-function buildCompactSkirmish() {
-  const terrain = [];
-  for (let r = 0; r < 12; r++) {
-    const row = [];
-    for (let c = 0; c < 8; c++) {
-      if (r < 2) row.push('spawn-b');
-      else if (r >= 10) row.push('spawn-a');
-      else if (r >= 5 && r <= 6 && c >= 3 && c <= 4) row.push('water');
-      else row.push('floor');
-    }
-    terrain.push(row);
-  }
-  return terrain;
-}
-
-function buildFourPlayerDungeon() {
-  const terrain = [];
-  for (let r = 0; r < 16; r++) {
-    const row = [];
-    for (let c = 0; c < 16; c++) {
-      if (r < 2 && c >= 5 && c <= 10) row.push('spawn-b');
-      else if (r >= 14 && c >= 5 && c <= 10) row.push('spawn-a');
-      else if (c < 2 && r >= 5 && r <= 10) row.push('spawn-b');
-      else if (c >= 14 && r >= 5 && r <= 10) row.push('spawn-a');
-      else if (r >= 6 && r <= 9 && c >= 6 && c <= 9) row.push('water');
-      else if ((r < 2 || r >= 14) && (c < 5 || c > 10)) row.push(null);
-      else if ((c < 2 || c >= 14) && (r < 5 || r > 10)) row.push(null);
-      else row.push('floor');
-    }
-    terrain.push(row);
-  }
-  return terrain;
-}

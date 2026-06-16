@@ -16,25 +16,29 @@ export const dungeon = {
   },
 
   computeLayout(opts) {
-    const ts = opts.tileSize || 20;
+    const cellSize = opts.cellSize || 19;
+    const gap = opts.cellGap || 2;
+    const step = cellSize + gap;
     const terrain = opts.terrain || [];
     const rows = terrain.length;
     const cols = rows > 0 ? terrain[0].length : 8;
     const legendH = opts.showLegend !== false ? 40 : 0;
-    return { boardW: cols * ts, boardH: rows * ts + legendH };
+    return { boardW: cols * step + gap, boardH: rows * step + gap + legendH };
   },
 
   render(ctx) {
-    const { tileSize, ox, oy, colors, opts } = ctx;
+    const { ox, oy, colors, opts } = ctx;
     const terrain = opts.terrain || [];
     const rows = terrain.length;
     const cols = rows > 0 ? terrain[0].length : 8;
-    const ts = tileSize;
+    const cellSize = opts.cellSize || 19;
+    const gap = opts.cellGap || 2;
+    const step = cellSize + gap;
     const showLegend = opts.showLegend !== false;
     const parts = [];
 
-    const boardW = cols * ts;
-    const boardH = rows * ts;
+    const boardW = cols * step + gap;
+    const boardH = rows * step + gap;
     parts.push(`<rect x="${ox}" y="${oy}" width="${boardW}" height="${boardH}" rx="6" ry="6" fill="${colors.background}"/>`);
 
     for (let r = 0; r < rows; r++) {
@@ -57,7 +61,9 @@ export const dungeon = {
           opacity = ' opacity="0.5"';
         }
 
-        parts.push(`<rect x="${ox + c * ts}" y="${oy + r * ts}" width="${ts - 1}" height="${ts - 1}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"${opacity}/>`);
+        const x = ox + gap + c * step;
+        const y = oy + gap + r * step;
+        parts.push(`<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"${opacity}/>`);
       }
     }
 
