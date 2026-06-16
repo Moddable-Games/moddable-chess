@@ -121,7 +121,7 @@ function render(opts, annotations) {
   }
 
   parts.push('</svg>');
-  return parts.join('');
+  return parts.join('\n');
 }
 
 function getPixelPos(r, c, provider, ctx) {
