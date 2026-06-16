@@ -224,14 +224,13 @@ function drawToken(piece, cx, cy, r, C) {
 }
 
 function renderLabels(ctx, colors, provider) {
-  const { rows, cols, tileSize, ox, oy } = ctx;
+  const { rows, cols, tileSize, ox, oy, boardH } = ctx;
   const labelStyle = provider.labelStyle || 'algebraic';
   const pad = 24;
   const fs = Math.min(13, pad * 0.55);
   const parts = [];
 
-  const lastRowPos = getPixelPos(rows - 1, 0, provider, ctx);
-  const bottomY = lastRowPos.y + pad * 0.9;
+  const bottomY = oy + boardH + pad * 0.65;
 
   if (labelStyle === 'go') {
     const GO_LETTERS = 'ABCDEFGHJKLMNOPQRST';
