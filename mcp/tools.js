@@ -5,6 +5,7 @@ import '../js/chess-variants.js';
 import '../js/chess-units.js';
 import '../js/chess-ai.js';
 import '../js/variants/index.js';
+import { renderSvg } from '../js/chess-svg.js';
 
 export const TOOLS = [
   {
@@ -138,6 +139,37 @@ export const TOOLS = [
       },
     },
   },
+  {
+    name: 'chess_render_svg',
+    description: 'Render a board position as a self-contained SVG string. No DOM or browser APIs required. Works in Cloudflare Workers.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        variant: {
+          type: 'string',
+          description: 'Variant key (e.g. "standard", "grand", "capablanca"). Defaults to "standard".',
+        },
+        fen: {
+          type: 'string',
+          description: 'FEN string of the position. Omit to use the variant starting position.',
+        },
+        theme: {
+          type: 'string',
+          enum: ['classic', 'cosmic', 'wood', 'marble', 'neon', 'minimal'],
+          description: 'Board colour theme. Defaults to "classic".',
+        },
+        highlights: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Squares to highlight (algebraic notation, e.g. ["e2", "e4"] for last move).',
+        },
+        size: {
+          type: 'number',
+          description: 'Board width in pixels. Height is derived from rows. Defaults to 480.',
+        },
+      },
+    },
+  },
 ];
 
 export function handleToolCall(name, args) {
@@ -149,6 +181,7 @@ export function handleToolCall(name, args) {
     case 'chess_make_moves': return makeMoves(args);
     case 'chess_get_opening_book': return getOpeningBook(args);
     case 'chess_generate_puzzle': return generatePuzzle(args);
+    case 'chess_render_svg': return renderBoard(args);
     default: return { error: `Unknown tool: ${name}` };
   }
 }
@@ -434,6 +467,30 @@ function generatePuzzle(args) {
     type,
     variant,
     error: 'Could not generate a puzzle within the attempt limit. Try again or use a different variant.',
+  };
+}
+
+function renderBoard(args) {
+  const variant = (args && args.variant) || 'standard';
+  if (!MCE.getVariantConfig(variant) && variant !== 'standard') {
+    return { error: `Unknown variant: "${variant}". Use chess_list_variants to see available options.` };
+  }
+
+  const svg = renderSvg({
+    variant,
+    fen: args && args.fen,
+    theme: args && args.theme,
+    highlights: args && args.highlights,
+    size: args && args.size,
+  });
+
+  if (!svg) return { error: 'Failed to render SVG.' };
+
+  const vc = MCE.getVariantConfig(variant);
+  return {
+    variant,
+    board: `${(vc && vc.rows) || 8}x${(vc && vc.cols) || 8}`,
+    svg,
   };
 }
 

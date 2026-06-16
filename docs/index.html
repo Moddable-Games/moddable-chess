@@ -106,7 +106,7 @@ const ctrl = createGameController(
   <p>See <a href="api.html#embedding">API: Embedding</a> for all parameters (themes, player names, accent colours, game modes).</p>
 
   <h2 id="mcp-server">MCP Server</h2>
-  <p>The engine is available as an MCP server for Claude Code, Claude Desktop, or any MCP-compatible AI client. Seven tools expose game creation, move generation, position analysis, and puzzle generation.</p>
+  <p>The engine is available as an MCP server for Claude Code, Claude Desktop, or any MCP-compatible AI client. Eight tools expose game creation, move generation, position analysis, board rendering, and puzzle generation.</p>
   <pre class="language-javascript"><code class="language-javascript"># Add to Claude Code
 claude mcp add --transport stdio moddable-chess node mcp/server.js</code></pre>
   <table class="docs-table">
@@ -118,6 +118,7 @@ claude mcp add --transport stdio moddable-chess node mcp/server.js</code></pre>
     <tr><td><code>chess_make_moves</code></td><td>Play a sequence of moves and return the final position</td></tr>
     <tr><td><code>chess_get_opening_book</code></td><td>Opening book moves for a variant (where available)</td></tr>
     <tr><td><code>chess_generate_puzzle</code></td><td>Generate tactical puzzles from random positions</td></tr>
+    <tr><td><code>chess_render_svg</code></td><td>Render any position as a self-contained SVG image (no DOM required)</td></tr>
   </table>
   <p>See <a href="api.html#mcp-server">API: MCP Server</a> for full parameter documentation and examples.</p>
 
