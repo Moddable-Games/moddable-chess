@@ -30,7 +30,7 @@ export const dungeon = {
       const swatchSize = 10;
       const swatchTextGap = 4;
       const itemGap = 8;
-      const labels = ['Floor', 'Water', 'P1 Deploy', 'P2 Deploy'];
+      const labels = ['Floor', 'Water', 'Deploy Zone', 'P2 Deploy'];
       const totalW = labels.reduce((sum, l) => sum + swatchSize + swatchTextGap + l.length * charWidth + itemGap, -itemGap);
       const numRows = Math.ceil(totalW / boardW) || 1;
       legendH = 12 + numRows * 16 + 4;
@@ -91,12 +91,16 @@ export const dungeon = {
       const charWidth = 5.8;
       const rowHeight = 16;
 
-      const legendItems = [
-        { type: 'floor', label: 'Floor' },
-        { type: 'water', label: 'Water' },
-        { type: 'spawn-a', label: 'P1 Deploy' },
-        { type: 'spawn-b', label: 'P2 Deploy' },
-      ];
+      const hasSpawnB = terrain.some(row => row.includes('spawn-b'));
+      const hasWater = terrain.some(row => row.includes('water'));
+      const legendItems = [{ type: 'floor', label: 'Floor' }];
+      if (hasWater) legendItems.push({ type: 'water', label: 'Water' });
+      if (hasSpawnB) {
+        legendItems.push({ type: 'spawn-a', label: 'P1 Deploy' });
+        legendItems.push({ type: 'spawn-b', label: 'P2 Deploy' });
+      } else {
+        legendItems.push({ type: 'spawn-a', label: 'Deploy Zone' });
+      }
 
       const itemWidths = legendItems.map(item =>
         swatchSize + swatchTextGap + item.label.length * charWidth);

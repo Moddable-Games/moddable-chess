@@ -153,22 +153,36 @@ if (existsSync(dcMapsPath)) {
 }
 
 function convertDcGrid(map) {
-  const { grid, rows, cols } = map;
+  const { grid, rows, cols, players } = map;
   const terrain = [];
-  const spawnTopRows = [];
-  const spawnBottomRows = [];
 
-  for (let r = 0; r < rows; r++) {
-    const validCols = grid[r].filter(c => c !== null);
-    if (validCols.length >= 4) {
-      if (spawnBottomRows.length < 2) spawnBottomRows.push(r);
-    }
+  const spawnRows = new Set();
+  const spawnCols = new Set();
+
+  const topRows = [];
+  for (let r = 0; r < rows && topRows.length < 2; r++) {
+    if (grid[r].filter(c => c !== null).length >= 4) topRows.push(r);
   }
-  for (let r = rows - 1; r >= 0; r--) {
-    const validCols = grid[r].filter(c => c !== null);
-    if (validCols.length >= 4) {
-      if (spawnTopRows.length < 2) spawnTopRows.push(r);
+  const bottomRows = [];
+  for (let r = rows - 1; r >= 0 && bottomRows.length < 2; r--) {
+    if (grid[r].filter(c => c !== null).length >= 4) bottomRows.push(r);
+  }
+  topRows.forEach(r => spawnRows.add(r));
+  bottomRows.forEach(r => spawnRows.add(r));
+
+  if (players >= 4) {
+    const leftCols = [];
+    for (let c = 0; c < cols && leftCols.length < 2; c++) {
+      const colCells = grid.map(row => row[c]).filter(v => v !== null);
+      if (colCells.length >= 4) leftCols.push(c);
     }
+    const rightCols = [];
+    for (let c = cols - 1; c >= 0 && rightCols.length < 2; c--) {
+      const colCells = grid.map(row => row[c]).filter(v => v !== null);
+      if (colCells.length >= 4) rightCols.push(c);
+    }
+    leftCols.forEach(c => spawnCols.add(c));
+    rightCols.forEach(c => spawnCols.add(c));
   }
 
   for (let r = 0; r < rows; r++) {
@@ -179,9 +193,11 @@ function convertDcGrid(map) {
         row.push(null);
       } else if (cell === 'w') {
         row.push('water');
-      } else if (spawnBottomRows.includes(r)) {
+      } else if (players >= 4 && (spawnRows.has(r) || spawnCols.has(c))) {
+        row.push('spawn-a');
+      } else if (players < 4 && topRows.includes(r)) {
         row.push('spawn-b');
-      } else if (spawnTopRows.includes(r)) {
+      } else if (players < 4 && bottomRows.includes(r)) {
         row.push('spawn-a');
       } else {
         row.push('floor');
