@@ -99,7 +99,7 @@ export const dungeon = {
         legendItems.push({ type: 'spawn-a', label: 'P1 Deploy' });
         legendItems.push({ type: 'spawn-b', label: 'P2 Deploy' });
       } else {
-        legendItems.push({ type: 'spawn-a', label: 'Deploy Zone' });
+        legendItems.push({ type: 'spawn-a', label: 'Deploy Zones' });
       }
 
       const itemWidths = legendItems.map(item =>
