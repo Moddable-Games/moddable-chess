@@ -1,4 +1,5 @@
 import { providers } from './svg-providers/index.js';
+import { CHESS_PIECES } from './svg-pieces.js';
 
 export const BOARD_STYLES = {
   CHECKERED: 'checkered',
@@ -23,10 +24,6 @@ export const DEFAULT_COLORS = {
   blackPieceStroke: '#888888',
 };
 
-const CHESS_UNICODE = {
-  K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙',
-  k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟',
-};
 
 const ANNOTATION_STYLES = {
   valid: { stroke: '#2aaa10', strokeWidth: 2.5 },
@@ -107,6 +104,11 @@ function render(opts, annotations) {
     parts.push(`<rect width="${W}" height="${H}" fill="${esc(colors.background)}"/>`);
   }
 
+  if (position && Object.keys(position).length > 0) {
+    const defs = collectChessDefs(position);
+    if (defs) parts.push(defs);
+  }
+
   const ctx = { rows, cols, tileSize, ox, oy, colors, opts, boardW, boardH };
   parts.push(provider.render(ctx));
 
@@ -161,7 +163,7 @@ function renderPieces(position, provider, ctx, colors) {
       const topLeft = posType === 'intersection'
         ? { x: pos.x - tileSize / 2, y: pos.y - tileSize / 2 }
         : { x: pos.x - tileSize / 2, y: pos.y - tileSize / 2 };
-      parts.push(drawChessPiece(piece, topLeft.x, topLeft.y, tileSize, colors));
+      parts.push(drawChessPiece(piece, topLeft.x, topLeft.y, tileSize));
     }
   }
   return parts.join('');
@@ -173,16 +175,24 @@ function normalisePiece(raw) {
   return { type: s, color: s === s.toUpperCase() ? 'white' : 'black' };
 }
 
-function drawChessPiece(piece, x, y, ts, C) {
-  const sym = CHESS_UNICODE[piece.type] || piece.type;
-  const isW = piece.color === 'white';
-  const fill = isW ? C.whitePieceFill : C.blackPieceFill;
-  const strk = isW ? C.whitePieceStroke : C.blackPieceStroke;
-  const fs = ts * 0.72;
-  const tx = x + ts / 2;
-  const ty = y + ts * 0.73;
-  return `<text x="${tx}" y="${ty}" text-anchor="middle" font-size="${fs}" fill="${esc(strk)}" stroke="${esc(strk)}" stroke-width="3" stroke-linejoin="round" font-family="serif">${esc(sym)}</text>` +
-    `<text x="${tx}" y="${ty}" text-anchor="middle" font-size="${fs}" fill="${esc(fill)}" font-family="serif">${esc(sym)}</text>`;
+function drawChessPiece(piece, x, y, ts) {
+  const id = `piece-${piece.type}`;
+  return `<use href="#${id}" x="${x}" y="${y}" width="${ts}" height="${ts}"/>`;
+}
+
+function collectChessDefs(position) {
+  const needed = new Set();
+  for (const raw of Object.values(position)) {
+    const piece = (raw && typeof raw === 'object') ? raw : { type: String(raw) };
+    if (CHESS_PIECES[piece.type]) needed.add(piece.type);
+  }
+  if (needed.size === 0) return '';
+  const parts = ['<defs>'];
+  for (const t of needed) {
+    parts.push(`<symbol id="piece-${t}" viewBox="0 0 45 45">${CHESS_PIECES[t]}</symbol>`);
+  }
+  parts.push('</defs>');
+  return parts.join('');
 }
 
 function drawDraughtsPiece(piece, cx, cy, r, C) {

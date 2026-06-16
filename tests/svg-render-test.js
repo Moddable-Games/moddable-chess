@@ -44,7 +44,7 @@ test('chess-standard-8x8', {
   'has 64 squares': s => (s.match(/<rect x="\d+" y="\d+" width="56" height="56"/g) || []).length === 64,
   'has light colour': s => s.includes('#f0d9b5'),
   'has dark colour': s => s.includes('#b58863'),
-  'has 32 pieces': s => (s.match(/font-family="serif"/g) || []).length === 64,
+  'has 32 pieces': s => (s.match(/<use href="#piece-/g) || []).length === 32,
   'has labels': s => s.includes('>a<') && s.includes('>8<'),
 });
 
