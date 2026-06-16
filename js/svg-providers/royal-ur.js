@@ -12,7 +12,7 @@ export const royalUr = {
   labelStyle: 'numeric',
 
   defaultColors: {
-    background: '#f5e6c8',
+    background: 'none',
     cellFill: '#d4b896',
     cellStroke: '#8b7355',
     borderStroke: '#5a4020',

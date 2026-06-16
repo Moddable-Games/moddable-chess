@@ -16,7 +16,7 @@ export const DEFAULT_COLORS = {
   monoSquare: '#d9b483',
   gridLine: '#8b6914',
   labelText: '#5c3a1e',
-  background: '#f0d9b5',
+  background: 'none',
   whitePieceFill: '#ffffff',
   whitePieceStroke: '#333333',
   blackPieceFill: '#1c1c1c',
@@ -103,7 +103,9 @@ function render(opts, annotations) {
     parts.push(`<title>${esc(title)}</title>`);
   }
 
-  parts.push(`<rect width="${W}" height="${H}" fill="${esc(colors.background)}"/>`);
+  if (colors.background && colors.background !== 'none') {
+    parts.push(`<rect width="${W}" height="${H}" fill="${esc(colors.background)}"/>`);
+  }
 
   const ctx = { rows, cols, tileSize, ox, oy, colors, opts, boardW, boardH };
   parts.push(provider.render(ctx));
