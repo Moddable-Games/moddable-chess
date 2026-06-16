@@ -23,8 +23,19 @@ export const dungeon = {
     const terrain = opts.terrain || [];
     const rows = terrain.length;
     const cols = rows > 0 ? terrain[0].length : 8;
-    const legendH = opts.showLegend !== false ? 40 : 0;
-    return { boardW: cols * step + gap, boardH: rows * step + gap + legendH };
+    const boardW = cols * step + gap;
+    let legendH = 0;
+    if (opts.showLegend !== false) {
+      const charWidth = 5.8;
+      const swatchSize = 10;
+      const swatchTextGap = 4;
+      const itemGap = 8;
+      const labels = ['Floor', 'Water', 'P1 Deploy', 'P2 Deploy'];
+      const totalW = labels.reduce((sum, l) => sum + swatchSize + swatchTextGap + l.length * charWidth + itemGap, -itemGap);
+      const numRows = Math.ceil(totalW / boardW) || 1;
+      legendH = 12 + numRows * 16 + 4;
+    }
+    return { boardW, boardH: rows * step + gap + legendH };
   },
 
   render(ctx) {
@@ -75,9 +86,10 @@ export const dungeon = {
     if (showLegend) {
       const fs = 10;
       const swatchSize = 10;
-      const itemGap = 6;
+      const itemGap = 8;
       const swatchTextGap = 4;
       const charWidth = 5.8;
+      const rowHeight = 16;
 
       const legendItems = [
         { type: 'floor', label: 'Floor' },
@@ -86,23 +98,45 @@ export const dungeon = {
         { type: 'spawn-b', label: 'P2 Deploy' },
       ];
 
-      const totalW = legendItems.reduce((sum, item) =>
-        sum + swatchSize + swatchTextGap + item.label.length * charWidth + itemGap, -itemGap);
-      const startX = ox + (boardW - totalW) / 2;
-      const ly = oy + boardH + 14;
-      let lx = startX;
+      const itemWidths = legendItems.map(item =>
+        swatchSize + swatchTextGap + item.label.length * charWidth);
 
-      for (const item of legendItems) {
-        const fill = colors[item.type] || colors.floor;
-        let extra = '';
-        if (item.type === 'water') extra = ' opacity="0.5"';
-        const stroke = item.type.startsWith('spawn') ? colors[`${item.type}-stroke`] : colors.cellStroke;
-        const sw = item.type.startsWith('spawn') ? 1 : 0.5;
+      const rows = [];
+      let currentRow = [];
+      let currentRowW = 0;
+      for (let i = 0; i < legendItems.length; i++) {
+        const w = itemWidths[i] + (currentRow.length > 0 ? itemGap : 0);
+        if (currentRow.length > 0 && currentRowW + w > boardW) {
+          rows.push(currentRow);
+          currentRow = [i];
+          currentRowW = itemWidths[i];
+        } else {
+          currentRow.push(i);
+          currentRowW += w;
+        }
+      }
+      if (currentRow.length > 0) rows.push(currentRow);
 
-        parts.push(`<rect x="${lx}" y="${ly}" width="${swatchSize}" height="${swatchSize}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${extra}/>`);
-        lx += swatchSize + swatchTextGap;
-        parts.push(`<text x="${lx}" y="${ly + 8}" font-family="sans-serif" font-size="${fs}" fill="${colors.legendText}">${item.label}</text>`);
-        lx += item.label.length * charWidth + itemGap;
+      const lyBase = oy + boardH + 12;
+      for (let ri = 0; ri < rows.length; ri++) {
+        const row = rows[ri];
+        const rowW = row.reduce((sum, i) => sum + itemWidths[i], 0) + (row.length - 1) * itemGap;
+        let lx = ox + (boardW - rowW) / 2;
+        const ly = lyBase + ri * rowHeight;
+
+        for (const i of row) {
+          const item = legendItems[i];
+          const fill = colors[item.type] || colors.floor;
+          let extra = '';
+          if (item.type === 'water') extra = ' opacity="0.5"';
+          const stroke = item.type.startsWith('spawn') ? colors[`${item.type}-stroke`] : colors.cellStroke;
+          const sw = item.type.startsWith('spawn') ? 1 : 0.5;
+
+          parts.push(`<rect x="${lx}" y="${ly}" width="${swatchSize}" height="${swatchSize}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${extra}/>`);
+          lx += swatchSize + swatchTextGap;
+          parts.push(`<text x="${lx}" y="${ly + 8}" font-family="sans-serif" font-size="${fs}" fill="${colors.legendText}">${item.label}</text>`);
+          lx += item.label.length * charWidth + itemGap;
+        }
       }
     }
 
