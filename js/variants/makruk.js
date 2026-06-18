@@ -44,4 +44,49 @@ MCE.registerVariant('makruk', {
   title: 'Makruk (Thai Chess)',
   description: 'Thai chess played since the 16th century. Pawns promote on the 6th rank to Met (a piece that moves one step diagonally). No castling, no en passant.',
   rule: 'Board: 8×8 · Win: Checkmate',
+  evaluate: function(g, defaultEval) {
+    var VALS = { p: 100, n: 300, s: 300, m: 150, r: 500, k: 0 };
+    var score = 0;
+    var myKingSq = -1, oppKingSq = -1;
+    var myPieces = 0, oppPieces = 0;
+    var myAttackers = [];
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      var color = MCE.pieceColor(p);
+      var type = MCE.pieceType(p);
+      var val = VALS[type] || 100;
+      var rank = MCE.rc(i, g)[0];
+      var bonus = 0;
+      if (type === 'p') {
+        bonus = color === MCE.WHITE ? (6 - rank) * 20 : (rank - 1) * 20;
+      }
+      if (type === 'k') {
+        if (color === g.turn) myKingSq = i;
+        else oppKingSq = i;
+      } else {
+        if (color === g.turn) { myPieces++; myAttackers.push(i); }
+        else oppPieces++;
+      }
+      score += color === g.turn ? (val + bonus) : -(val + bonus);
+    }
+    if (oppKingSq >= 0 && myPieces > oppPieces) {
+      var or = MCE.rc(oppKingSq, g);
+      var oRow = or[0], oCol = or[1];
+      var edgeBonus = (Math.max(0, 3 - oRow) + Math.max(0, oRow - 4)) * 25;
+      edgeBonus += (Math.max(0, 3 - oCol) + Math.max(0, oCol - 4)) * 25;
+      score += edgeBonus;
+      for (var a = 0; a < myAttackers.length; a++) {
+        var ar = MCE.rc(myAttackers[a], g);
+        var dist = Math.abs(ar[0] - oRow) + Math.abs(ar[1] - oCol);
+        score += (10 - dist) * 8;
+      }
+      if (myKingSq >= 0) {
+        var kr = MCE.rc(myKingSq, g);
+        var kDist = Math.abs(kr[0] - oRow) + Math.abs(kr[1] - oCol);
+        score += (14 - kDist) * 15;
+      }
+    }
+    return score;
+  },
 });

@@ -18,7 +18,9 @@ MCE.registerVariant('omnicide', {
       else oppCount++;
     }
     if (myCount === 0) return 100000;
-    return (oppCount - myCount) * 200;
+    if (oppCount === 0) return -100000;
+    var totalPieces = myCount + oppCount;
+    return (oppCount - myCount) * 500 - totalPieces * 30;
   },
   winCondition: function(g) {
     var hasPiece = false;

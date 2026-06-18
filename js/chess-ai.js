@@ -54,11 +54,11 @@ function parseBookMove(g, notation) {
 }
 
 const DIFFICULTIES = {
-  beginner: { timeMs: 200, topN: 0, blunder: 0.3 },
-  easy: { timeMs: 400, topN: 5, blunder: 0.15 },
-  medium: { timeMs: 800, topN: 3, blunder: 0 },
-  hard: { timeMs: 1500, topN: 1, blunder: 0 },
-  expert: { timeMs: 3000, topN: 1, blunder: 0 }
+  beginner: { timeMs: 200, maxDepth: 2, topN: 5, spread: 0.5 },
+  easy: { timeMs: 400, maxDepth: 3, topN: 4, spread: 1.0 },
+  medium: { timeMs: 800, maxDepth: 5, topN: 3, spread: 2.0 },
+  hard: { timeMs: 1500, maxDepth: 5, topN: 1, spread: 0 },
+  expert: { timeMs: 3000, maxDepth: 50, topN: 1, spread: 0 }
 };
 
 const TT_SIZE = 1 << 18;
@@ -270,11 +270,31 @@ function negamax(g, depth, alpha, beta, deadline) {
   return bestScore;
 }
 
+function weightedSelect(scored, topN, spread) {
+  const pool = scored.slice(0, Math.min(topN, scored.length));
+  if (pool.length <= 1 || spread <= 0) return pool[0].move;
+  const best = pool[0].score;
+  let totalWeight = 0;
+  const weights = [];
+  for (let i = 0; i < pool.length; i++) {
+    const diff = best - pool[i].score;
+    const w = Math.exp(-diff / (spread * 100));
+    weights.push(w);
+    totalWeight += w;
+  }
+  let r = Math.random() * totalWeight;
+  for (let i = 0; i < weights.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i].move;
+  }
+  return pool[pool.length - 1].move;
+}
+
 function pickMove(g, depth, opts) {
   opts = opts || {};
   const diff = opts.difficulty ? DIFFICULTIES[opts.difficulty] : null;
   const topN = diff ? diff.topN : 1;
-  const blunder = diff ? diff.blunder : 0;
+  const spread = diff ? diff.spread : 0;
   const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   const timeMult = (vc && vc.aiTimeMult) || 1;
   const timeMs = (diff ? diff.timeMs : (opts.timeMs || 1500)) * timeMult;
@@ -283,10 +303,6 @@ function pickMove(g, depth, opts) {
   if (moves.length === 0) return null;
   if (moves.length === 1) return moves[0];
 
-  if (blunder > 0 && Math.random() < blunder) {
-    return moves[Math.floor(Math.random() * moves.length)];
-  }
-
   var bookMove = probeBook(g);
   if (bookMove) return bookMove;
 
@@ -294,11 +310,13 @@ function pickMove(g, depth, opts) {
   const deadline = Date.now() + timeMs;
 
   const total = g.rows * g.cols;
-  const maxDepth = total > 80 ? 4 : total > 64 ? 6 : 50;
+  const boardMaxDepth = total > 80 ? 4 : total > 64 ? 6 : 50;
+  const maxDepth = diff ? Math.min(diff.maxDepth, boardMaxDepth) : boardMaxDepth;
 
   let bestMove = moves[0];
   let bestScore = -Infinity;
   let completedDepth = 0;
+  let lastScored = [];
 
   for (let d = 1; d <= maxDepth; d++) {
     if (Date.now() > deadline) break;
@@ -323,6 +341,7 @@ function pickMove(g, depth, opts) {
       bestMove = depthBest;
       bestScore = depthScore;
       completedDepth = d;
+      lastScored = scored;
 
       scored.sort((a, b) => b.score - a.score);
       for (let i = 0; i < scored.length; i++) moves[i] = scored[i].move;
@@ -331,18 +350,10 @@ function pickMove(g, depth, opts) {
     if (bestScore >= 90000) break;
   }
 
-  if (topN <= 1) return bestMove;
+  if (topN <= 1 || spread <= 0) return bestMove;
 
-  const finalScored = [];
-  for (let i = 0; i < moves.length; i++) {
-    const undo = makeMove(g, moves[i]);
-    const score = -negamax(g, completedDepth - 1, -Infinity, Infinity, Date.now() + 100);
-    unmakeMove(g, undo);
-    finalScored.push({ move: moves[i], score });
-  }
-  finalScored.sort((a, b) => b.score - a.score);
-  const pool = finalScored.slice(0, topN);
-  return pool[Math.floor(Math.random() * pool.length)].move;
+  lastScored.sort((a, b) => b.score - a.score);
+  return weightedSelect(lastScored, topN, spread);
 }
 
 function pickDuckSquare(g) {

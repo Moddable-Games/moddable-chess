@@ -45,4 +45,42 @@ MCE.registerVariant('monsterChess', {
   aiMoveCount: function(g) {
     return g.maxMovesPerTurn[g.turn] || 1;
   },
+  evaluate: function(g, defaultEval) {
+    var VALS = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+    var whiteScore = 0, blackScore = 0;
+    var whiteKingSq = -1, blackKingSq = -1;
+    var whitePawns = 0;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      var color = MCE.pieceColor(p);
+      var type = MCE.pieceType(p);
+      if (type === 'k') {
+        if (color === MCE.WHITE) whiteKingSq = i;
+        else blackKingSq = i;
+        continue;
+      }
+      var val = VALS[type] || 100;
+      if (color === MCE.WHITE) {
+        var rank = MCE.rc(i, g)[0];
+        var advance = 7 - rank;
+        if (type === 'p') {
+          whitePawns++;
+          whiteScore += val + advance * advance * 15;
+        } else {
+          whiteScore += val + advance * 20;
+        }
+      } else {
+        blackScore += val;
+      }
+    }
+    if (whiteKingSq >= 0 && blackKingSq >= 0) {
+      var wr = MCE.rc(whiteKingSq, g), br = MCE.rc(blackKingSq, g);
+      var kDist = Math.abs(wr[0] - br[0]) + Math.abs(wr[1] - br[1]);
+      whiteScore += (14 - kDist) * 15;
+    }
+    whiteScore += whitePawns * 50;
+    if (g.turn === MCE.WHITE) return whiteScore - blackScore * 0.25;
+    return blackScore - whiteScore * 0.6;
+  },
 });
