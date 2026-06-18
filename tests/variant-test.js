@@ -6,6 +6,8 @@ import '../js/chess-units.js';
 import '../js/chess-ai.js';
 import '../js/variants/index.js';
 
+import { writeFileSync } from 'fs';
+
 const args = process.argv.slice(2);
 const flags = {};
 for (let i = 0; i < args.length; i++) {
@@ -13,6 +15,7 @@ for (let i = 0; i < args.length; i++) {
   else if (args[i] === '--repeat' && args[i+1]) { flags.repeat = parseInt(args[++i]); }
   else if (args[i] === '--moves' && args[i+1]) { flags.moves = parseInt(args[++i]); }
   else if (args[i] === '--difficulty' && args[i+1]) { flags.difficulty = args[++i]; }
+  else if (args[i] === '--output' && args[i+1]) { flags.output = args[++i]; }
   else if (args[i] === '--ai-vs-ai') { flags.aiVsAi = true; }
   else if (args[i] === '--all') { flags.all = true; }
   else if (args[i] === '--help') { flags.help = true; }
@@ -116,10 +119,16 @@ for (const key of variants) {
   for (const g of games) {
     results[g.result] = (results[g.result] || 0) + 1;
   }
-  summary.results[key] = { games: games.length, crashes, results };
+  summary.results[key] = { games: games.length, crashes, results, avgMoves: 0, avgMs: 0 };
 
   const avgMs = games.length ? Math.round(games.reduce((s, g) => s + g.ms, 0) / games.length) : 0;
   const avgMoves = games.length ? Math.round(games.reduce((s, g) => s + g.moves, 0) / games.length) : 0;
+  summary.results[key].avgMoves = avgMoves;
+  summary.results[key].avgMs = avgMs;
+
+  if (flags.output) {
+    writeFileSync(flags.output, JSON.stringify(summary, null, 2));
+  }
   const resultStr = Object.entries(results).map(([k,v]) => `${k}:${v}`).join(' ');
   const crashStr = crashes ? ` CRASHES:${crashes}` : '';
   const icon = crashes ? '✗' : '✓';
