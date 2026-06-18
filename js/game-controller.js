@@ -660,34 +660,15 @@ function render() {
   if (vc && vc.visibility) {
     const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
     opts.fogMask = vc.visibility(game, viewSide);
-  } else if (currentVariant === 'fogOfWar') {
-    const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
-    opts.fogMask = computeVisibility(game, viewSide);
   }
 
   MCE.renderBoard(container, game, opts);
   updateStatus();
 }
 
-function computeVisibility(g, side) {
-  const visible = new Set();
-  const total = g.rows * g.cols;
-  for (let i = 0; i < total; i++) {
-    const p = g.board[i];
-    if (!p || MCE.pieceColor(p) !== side) continue;
-    visible.add(i);
-    const moves = MCE.pseudoLegalMoves({ ...g, turn: side });
-    moves.filter(m => m.from === i).forEach(m => visible.add(m.to));
-  }
-  return visible;
-}
-
 function getMovesForVariant() {
   const vc = MCE.getVariantConfig(currentVariant);
   if (vc && vc.moveFilter) return MCE.variantLegalMoves(game);
-  if (currentVariant === 'antichess' || currentVariant === 'racingKings' || currentVariant === 'giveaway' || currentVariant === 'suicideChess' || currentVariant === 'makpong') {
-    return MCE.variantLegalMoves(game);
-  }
   return MCE.legalMoves(game);
 }
 
@@ -740,7 +721,7 @@ function updateStatus() {
   } else if (status === 'stalemate') {
     gameOver = true;
     trackGameComplete('stalemate');
-    const sm = game.stalemateMeaning || (currentVariant === 'giveaway' ? 'loss' : currentVariant === 'stalemateWins' ? 'win' : 'draw');
+    const sm = game.stalemateMeaning || 'draw';
     if (sm === 'loss') {
       statusEl.textContent = nameForOpp(game.turn) + ' wins — opponent stalemated!';
     } else if (sm === 'win') {
@@ -762,7 +743,7 @@ function updateStatus() {
     statusEl.textContent = 'Draw — 50-move rule';
   } else if (status === 'check') {
     statusEl.textContent = turn + ' to move (check!)';
-    const threshold = game.checkThreshold || (currentVariant === 'singleCheck' ? 1 : currentVariant === 'fiveCheck' ? 5 : currentVariant === 'threeCheck' ? 3 : 0);
+    const threshold = game.checkThreshold || 0;
     if (threshold > 0) {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= threshold) {
@@ -771,13 +752,6 @@ function updateStatus() {
         statusEl.textContent = nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!');
       }
     }
-  } else if (currentVariant === 'marseillais' && game.movesThisTurn === 1) {
-    statusEl.textContent = turn + ' — second move';
-  } else if (currentVariant === 'monsterChess' && game.movesThisTurn > 0) {
-    const max = game.maxMovesPerTurn[game.turn] || 1;
-    statusEl.textContent = turn + ' — move ' + (game.movesThisTurn + 1) + ' of ' + max;
-  } else if (currentVariant === 'progressive' && game.movesThisTurn > 0) {
-    statusEl.textContent = turn + ' — move ' + (game.movesThisTurn + 1) + ' of ' + game.progressiveMove;
   } else {
     statusEl.textContent = turn + ' to move';
   }
