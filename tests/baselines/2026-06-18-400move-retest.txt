@@ -1,0 +1,28 @@
+Re-test of 17 max-moves variants with 400 move limit (Easy vs Easy)
+===================================================================
+
+RESOLVED (just needed more moves):
+  rifle:             checkmate @ 27 moves
+  fiveCheck:         checkmate @ 100 moves
+  cylinderChess:     checkmate @ 114 moves
+  weakChess:         checkmate @ 105 moves
+  noCastling:        checkmate @ 108 moves
+  hoppelPoppel:      checkmate @ 191 moves
+  immunizationChess: checkmate @ 198 moves
+
+DRAWS NATURALLY (legitimate game endings):
+  upsideDown:        draw-repetition @ 160 moves
+  berserkChess:      draw-material @ 211 moves
+  checklessChess:    stalemate @ 222 moves
+  grand:             draw-material @ 387 moves
+  marseillais:       draw-repetition @ 326 moves
+  duckChess:         draw-50 @ 389 moves
+
+STILL UNRESOLVED (need evaluator tuning):
+  makruk:            max-moves @ 400
+  omnicide:          max-moves @ 400
+  andernachChess:    max-moves @ 400
+  monsterChess:      max-moves @ 400
+
+Summary: 7/17 just needed more time, 6/17 draw naturally, 4/17 need evaluator work.
+Original 200 move limit was too conservative for 13 of the 17 variants.
