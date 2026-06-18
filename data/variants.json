@@ -363,7 +363,7 @@
     "key": "toroidalChess",
     "name": "Toroidal Chess",
     "board": "8×8",
-    "desc": "Board wraps in both directions forming a torus. No edge exists."
+    "desc": "Board wraps horizontally — a-file and h-file are adjacent, forming a cylinder."
   },
   {
     "key": "torpedo",
