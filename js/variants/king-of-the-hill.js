@@ -54,4 +54,12 @@ MCE.registerVariant('kingOfTheHill', {
     }
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('koth-')) {
+      return helpers.nameFor(status === 'koth-w' ? 'w' : 'b') + ' wins — King of the Hill!';
+    }
+    return null;
+  },
 });

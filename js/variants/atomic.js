@@ -89,8 +89,18 @@ MCE.registerVariant('atomic', {
         else blackKing = true;
       }
     }
-    if (!whiteKing) return 'checkmate';
-    if (!blackKing) return 'checkmate';
+    if (!whiteKing && !blackKing) return 'atomic-draw';
+    if (!whiteKing) return 'atomic-b';
+    if (!blackKing) return 'atomic-w';
+    return null;
+  },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status === 'atomic-draw') return 'Draw — both kings destroyed!';
+    if (status && status.startsWith('atomic-')) {
+      return helpers.nameFor(status === 'atomic-w' ? 'w' : 'b') + ' wins — king exploded!';
+    }
     return null;
   },
 });

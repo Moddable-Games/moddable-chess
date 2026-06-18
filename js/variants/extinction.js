@@ -64,4 +64,12 @@ MCE.registerVariant('extinction', {
     }
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('extinction-')) {
+      return helpers.nameFor(status === 'extinction-w' ? 'w' : 'b') + ' wins — piece type extinct!';
+    }
+    return null;
+  },
 });

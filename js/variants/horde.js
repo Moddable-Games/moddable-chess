@@ -48,4 +48,11 @@ MCE.registerVariant('horde', {
     }
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    if (helpers.variantStatus === 'horde-b') {
+      return helpers.nameFor('b') + ' wins — horde eliminated!';
+    }
+    return null;
+  },
 });

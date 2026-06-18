@@ -47,4 +47,12 @@ MCE.registerVariant('knightmate', {
     if (!royalB) return 'knightmate-w';
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('knightmate-')) {
+      return helpers.nameFor(status === 'knightmate-w' ? 'w' : 'b') + ' wins — royal knight captured!';
+    }
+    return null;
+  },
 });

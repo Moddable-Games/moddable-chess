@@ -63,19 +63,7 @@ MCE.registerVariant('poisonChess', {
     }
   },
   moveFilter: function(g, moves) {
-    // Filter out moves where own non-king piece would land on a poisoned square
-    // if the player wants to avoid self-destruction.
-    // Actually, let the player choose — landing on poison is legal but costly.
-    // Just filter out king moves to poisoned squares for safety.
-    return moves.filter(function(m) {
-      var piece = g.board[m.from];
-      if (!piece) return true;
-      // Kings can't move to poisoned squares (for their safety — treat as illegal)
-      if (MCE.pieceType(piece) === 'k' && MCE.hasEffect(g, m.to, 'poison')) {
-        return false;
-      }
-      return true;
-    });
+    return moves;
   },
   evaluate: function(g, defaultEval) {
     var material = defaultEval(g);

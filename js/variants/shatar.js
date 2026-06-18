@@ -30,4 +30,12 @@ MCE.registerVariant('shatar', {
     if (bCount === 1) return 'shatar-w';
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('shatar-')) {
+      return helpers.nameFor(status === 'shatar-w' ? 'w' : 'b') + ' wins — bare king!';
+    }
+    return null;
+  },
 });

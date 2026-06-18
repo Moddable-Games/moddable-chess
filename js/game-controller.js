@@ -265,7 +265,8 @@ function serializeGame(g) {
     'pawnDirection', 'pawnStartRow', 'royalPiece', 'pieceRoles',
     'maxMovesPerTurn', 'progressiveMove', 'checkThreshold', 'stalemateMeaning',
     'promotionPieces', 'promotionRank', 'pawnMoveStyle', 'divergentPieces',
-    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode', 'effects'];
+    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode', 'effects',
+    'rookStartCols'];
   for (let i = 0; i < keys.length; i++) {
     if (g[keys[i]] !== undefined && typeof g[keys[i]] !== 'function') snap[keys[i]] = g[keys[i]];
   }
@@ -703,52 +704,31 @@ function updateStatus() {
     return;
   }
 
-  const vcStatus = MCE.getVariantConfig(currentVariant);
-  if (vcStatus && vcStatus.statusText) {
-    const custom = vcStatus.statusText(game, { nameFor, nameForOpp, gameOver });
-    if (custom) { statusEl.textContent = custom; return; }
-  }
-
+  const vc = MCE.getVariantConfig(currentVariant);
   const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
   if (variantStatus) {
     gameOver = true;
     trackGameComplete(variantStatus);
-    if (variantStatus.startsWith('koth-')) {
-      statusEl.textContent = (variantStatus === 'koth-w' ? playerNames.w : playerNames.b) + ' wins — King of the Hill!';
-      return;
+  }
+
+  if (vc && vc.statusText) {
+    const custom = vc.statusText(game, { nameFor, nameForOpp, gameOver, variantStatus });
+    if (custom) { statusEl.textContent = custom; return; }
+  }
+
+  if (variantStatus) {
+    if (variantStatus === 'checkmate') {
+      statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
+    } else if (variantStatus === 'stalemate') {
+      statusEl.textContent = 'Stalemate — draw';
+    } else if (variantStatus.endsWith('-w')) {
+      statusEl.textContent = playerNames.w + ' wins!';
+    } else if (variantStatus.endsWith('-b')) {
+      statusEl.textContent = playerNames.b + ' wins!';
+    } else {
+      statusEl.textContent = nameForOpp(game.turn) + ' wins!';
     }
-    if (variantStatus.startsWith('race-')) {
-      statusEl.textContent = (variantStatus === 'race-w' ? playerNames.w : playerNames.b) + ' wins — reached rank 8!';
-      return;
-    }
-    if (variantStatus.startsWith('antichess-')) {
-      statusEl.textContent = (variantStatus === 'antichess-w' ? playerNames.w : playerNames.b) + ' wins — lost all pieces!';
-      return;
-    }
-    if (variantStatus === 'horde-b') {
-      statusEl.textContent = playerNames.b + ' wins — horde eliminated!';
-      return;
-    }
-    if (variantStatus.startsWith('extinction-')) {
-      statusEl.textContent = (variantStatus === 'extinction-w' ? playerNames.w : playerNames.b) + ' wins — piece type extinct!';
-      return;
-    }
-    if (variantStatus.startsWith('breakthrough-')) {
-      statusEl.textContent = (variantStatus === 'breakthrough-w' ? playerNames.w : playerNames.b) + ' wins — reached the far rank!';
-      return;
-    }
-    if (variantStatus === 'maharaja-b') {
-      statusEl.textContent = playerNames.b + ' wins — Maharaja captured!';
-      return;
-    }
-    if (variantStatus.startsWith('knightmate-')) {
-      statusEl.textContent = (variantStatus === 'knightmate-w' ? playerNames.w : playerNames.b) + ' wins — royal knight captured!';
-      return;
-    }
-    if (variantStatus.startsWith('codrus-')) {
-      statusEl.textContent = (variantStatus === 'codrus-w' ? playerNames.w : playerNames.b) + ' wins — sacrificed their king!';
-      return;
-    }
+    return;
   }
 
   const status = MCE.getStatus(game);

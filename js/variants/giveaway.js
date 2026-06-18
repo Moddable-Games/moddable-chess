@@ -48,4 +48,12 @@ MCE.registerVariant('giveaway', {
     if (!hasPiece) return 'antichess-' + g.turn;
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('antichess-')) {
+      return helpers.nameFor(status === 'antichess-w' ? 'w' : 'b') + ' wins — lost all pieces!';
+    }
+    return null;
+  },
 });

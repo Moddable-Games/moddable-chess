@@ -8,6 +8,19 @@ MCE.registerVariant('berserkChess', {
   title: 'Berserk Chess',
   description: 'If your move delivers check, you get an immediate bonus move. Only one bonus move per turn — the second move ends your turn regardless.',
   rule: 'Board: 8×8 · Win: Checkmate',
+  winCondition: function(g) {
+    if (g.movesThisTurn > 0) {
+      var opp = g.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
+      if (MCE.inCheck(g, opp)) {
+        var saved = g.turn;
+        g.turn = opp;
+        var moves = MCE.legalMoves(g);
+        g.turn = saved;
+        if (moves.length === 0) return 'checkmate';
+      }
+    }
+    return null;
+  },
   turnLogic: function(g, undo) {
     undo.movesThisTurn = g.movesThisTurn || 0;
     undo.fullmove = g.fullmove;

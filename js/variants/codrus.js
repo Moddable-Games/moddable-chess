@@ -41,4 +41,12 @@ MCE.registerVariant('codrus', {
     if (!hasBlackK) return 'codrus-b';
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('codrus-')) {
+      return helpers.nameFor(status === 'codrus-w' ? 'w' : 'b') + ' wins — sacrificed their king!';
+    }
+    return null;
+  },
 });

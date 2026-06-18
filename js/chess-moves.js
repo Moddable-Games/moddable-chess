@@ -165,34 +165,51 @@ function genJumps(g, from, r, c, side, offsets, moves, opts) {
   }
 }
 
+function castlingClear(g, row, from, to, rookFrom, rookTo, side) {
+  const minK = Math.min(from, to), maxK = Math.max(from, to);
+  const minR = Math.min(rookFrom, rookTo), maxR = Math.max(rookFrom, rookTo);
+  const minAll = Math.min(minK, minR), maxAll = Math.max(maxK, maxR);
+  for (let cc = minAll; cc <= maxAll; cc++) {
+    const sq = MCE.sq(row, cc, g);
+    if (sq === from || sq === rookFrom) continue;
+    if (g.board[sq]) return false;
+  }
+  for (let cc = minK; cc <= maxK; cc++) {
+    if (isAttacked(g, MCE.sq(row, cc, g), side)) return false;
+  }
+  return true;
+}
+
 function genCastling(g, from, r, c, side, moves) {
   if (isAttacked(g, from, side)) return;
   const row = side === WHITE ? g.rows - 1 : 0;
-  const kingCol = Math.floor(g.cols / 2);
   if (r !== row) return;
   const ks = side === WHITE ? 'K' : 'k';
   const qs = side === WHITE ? 'Q' : 'q';
+  const rsc = g.rookStartCols;
+  const sideKey = side === WHITE ? 'w' : 'b';
+
   if (g.castling[ks]) {
-    let clear = true;
-    for (let cc = c + 1; cc < g.cols - 1; cc++) {
-      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
-    }
-    if (clear) {
-      const f = MCE.sq(row, c + 1, g);
-      if (!isAttacked(g, f, side)) {
-        moves.push({ from, to: MCE.sq(row, c + 2, g), flag: 'castle-k' });
+    const rookCol = rsc ? rsc[sideKey].k : g.cols - 1;
+    if (rookCol < 0) { /* no kingside rook */ }
+    else {
+      const kingDest = 6;
+      const rookDest = 5;
+      const rookFrom = MCE.sq(row, rookCol, g);
+      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, side)) {
+        moves.push({ from, to: MCE.sq(row, kingDest, g), flag: 'castle-k' });
       }
     }
   }
   if (g.castling[qs]) {
-    let clear = true;
-    for (let cc = 1; cc < c; cc++) {
-      if (g.board[MCE.sq(row, cc, g)]) { clear = false; break; }
-    }
-    if (clear) {
-      const d = MCE.sq(row, c - 1, g);
-      if (!isAttacked(g, d, side)) {
-        moves.push({ from, to: MCE.sq(row, c - 2, g), flag: 'castle-q' });
+    const rookCol = rsc ? rsc[sideKey].q : 0;
+    if (rookCol < 0) { /* no queenside rook */ }
+    else {
+      const kingDest = 2;
+      const rookDest = 3;
+      const rookFrom = MCE.sq(row, rookCol, g);
+      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, side)) {
+        moves.push({ from, to: MCE.sq(row, kingDest, g), flag: 'castle-q' });
       }
     }
   }

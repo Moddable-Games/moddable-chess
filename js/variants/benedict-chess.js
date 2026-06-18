@@ -70,8 +70,16 @@ MCE.registerVariant('benedictChess', {
         else blackKing = true;
       }
     }
-    if (!whiteKing) return 'checkmate';
-    if (!blackKing) return 'checkmate';
+    if (!whiteKing) return 'benedict-b';
+    if (!blackKing) return 'benedict-w';
+    return null;
+  },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    var status = helpers.variantStatus;
+    if (status && status.startsWith('benedict-')) {
+      return helpers.nameFor(status === 'benedict-w' ? 'w' : 'b') + ' wins — king converted!';
+    }
     return null;
   },
 });

@@ -41,4 +41,11 @@ MCE.registerVariant('maharaja', {
     if (!hasM) return 'maharaja-b';
     return null;
   },
+  statusText: function(g, helpers) {
+    if (!helpers.gameOver) return null;
+    if (helpers.variantStatus === 'maharaja-b') {
+      return helpers.nameFor('b') + ' wins — Maharaja captured!';
+    }
+    return null;
+  },
 });
