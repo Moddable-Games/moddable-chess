@@ -177,8 +177,9 @@ function orderMoves(moves, g, ttBestMove) {
       s = 100000;
     } else if (m.flag === 'capture' || m.flag === 'ep') {
       const victim = g.board[m.to];
+      const attacker = g.board[m.from];
       const victimVal = victim ? (PIECE_VALUES[pieceType(victim)] || 100) : 100;
-      const attackerVal = PIECE_VALUES[pieceType(g.board[m.from])] || 100;
+      const attackerVal = attacker ? (PIECE_VALUES[pieceType(attacker)] || 100) : 100;
       s = 10000 + victimVal - (attackerVal >> 3);
     } else if (m.promo) {
       s = 9000 + (PIECE_VALUES[m.promo] || 0);
@@ -210,6 +211,7 @@ function quiesce(g, alpha, beta, deadline) {
   orderMoves(captures, g, null);
 
   for (let i = 0; i < captures.length; i++) {
+    if (!g.board[captures[i].from]) continue;
     const undo = makeMove(g, captures[i]);
     const score = -quiesce(g, -beta, -alpha, deadline);
     unmakeMove(g, undo);
@@ -248,6 +250,7 @@ function negamax(g, depth, alpha, beta, deadline) {
   let ttFlag = TT_UPPER;
 
   for (let i = 0; i < moves.length; i++) {
+    if (!g.board[moves[i].from] && moves[i].flag !== 'action') continue;
     const undo = makeMove(g, moves[i]);
     const score = -negamax(g, depth - 1, -beta, -alpha, deadline);
     unmakeMove(g, undo);
