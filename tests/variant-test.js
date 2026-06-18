@@ -15,6 +15,8 @@ for (let i = 0; i < args.length; i++) {
   else if (args[i] === '--repeat' && args[i+1]) { flags.repeat = parseInt(args[++i]); }
   else if (args[i] === '--moves' && args[i+1]) { flags.moves = parseInt(args[++i]); }
   else if (args[i] === '--difficulty' && args[i+1]) { flags.difficulty = args[++i]; }
+  else if (args[i] === '--white' && args[i+1]) { flags.white = args[++i]; }
+  else if (args[i] === '--black' && args[i+1]) { flags.black = args[++i]; }
   else if (args[i] === '--output' && args[i+1]) { flags.output = args[++i]; }
   else if (args[i] === '--ai-vs-ai') { flags.aiVsAi = true; }
   else if (args[i] === '--all') { flags.all = true; }
@@ -42,6 +44,9 @@ Examples:
 
 const maxMoves = flags.moves || 200;
 const difficulty = flags.difficulty || 'easy';
+const whiteDiff = flags.white || difficulty;
+const blackDiff = flags.black || difficulty;
+const asymmetric = flags.white || flags.black;
 const variants = flags.variant ? [flags.variant] : Object.keys(MCE.variantRegistry);
 const repeat = flags.repeat || (flags.variant && !flags.all ? 10 : 1);
 
@@ -56,6 +61,16 @@ function getVariantStatus(g) {
   return null;
 }
 
+function detectWinner(result, lastTurn) {
+  if (result === 'checkmate' || result === 'no-moves') {
+    return lastTurn === 'w' ? 'black' : 'white';
+  }
+  if (result.endsWith('-w')) return 'white';
+  if (result.endsWith('-b')) return 'black';
+  if (result.startsWith('draw') || result === 'stalemate' || result === 'max-moves') return 'draw';
+  return 'unknown';
+}
+
 function playGame(key) {
   const game = MCE.createGame(key);
   let moves = 0;
@@ -64,15 +79,18 @@ function playGame(key) {
   while (moves < maxMoves) {
     const terminal = getVariantStatus(game);
     if (terminal) {
-      return { key, moves, result: terminal, ms: Date.now() - start };
+      const winner = detectWinner(terminal, game.turn);
+      return { key, moves, result: terminal, winner, ms: Date.now() - start };
     }
 
     const legal = MCE.variantLegalMoves ? MCE.variantLegalMoves(game) : MCE.legalMoves(game);
     if (legal.length === 0) {
-      return { key, moves, result: 'no-moves', ms: Date.now() - start };
+      const winner = detectWinner('no-moves', game.turn);
+      return { key, moves, result: 'no-moves', winner, ms: Date.now() - start };
     }
 
-    const move = MCE.aiPickMove(game, null, { difficulty, timeMs: 100 });
+    const sideDiff = game.turn === 'w' ? whiteDiff : blackDiff;
+    const move = MCE.aiPickMove(game, null, { difficulty: sideDiff, timeMs: 100 });
     if (move) {
       MCE.makeMove(game, move);
     } else {
@@ -81,7 +99,7 @@ function playGame(key) {
     moves++;
   }
 
-  return { key, moves, result: 'max-moves', ms: Date.now() - start };
+  return { key, moves, result: 'max-moves', winner: 'draw', ms: Date.now() - start };
 }
 
 if (!flags.variant && !MCE.variantRegistry[flags.variant] && flags.variant) {
