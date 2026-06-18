@@ -1,0 +1,95 @@
+Testing: all 70 variants
+Repeat: 1 | Max moves: 200 | Difficulty: easy
+
+✓ almostChess               checkmate:1                              avg:146m 47947ms
+✓ amazonChess               checkmate:1                              avg:101m 31961ms
+✓ andernachChess            max-moves:1                              avg:200m 68672ms
+✓ antichess                 stalemate:1                              avg:100m 24185ms
+✓ atomic                    atomic-w:1                               avg:17m 4426ms
+✓ benedictChess             benedict-w:1                             avg:21m 8048ms
+✓ berolinaChess             checkmate:1                              avg:11m 4029ms
+✓ berserkChess              max-moves:1                              avg:200m 71346ms
+✓ breakthrough              breakthrough-w:1                         avg:23m 8421ms
+✓ capablanca                checkmate:1                              avg:65m 29632ms
+✓ checklessChess            max-moves:1                              avg:200m 128160ms
+✓ chess960                  checkmate:1                              avg:105m 46022ms
+✓ chigorin                  checkmate:1                              avg:132m 46271ms
+✓ codrus                    codrus-b:1                               avg:59m 20064ms
+✓ courier                   checkmate:1                              avg:119m 86078ms
+✓ crazyhouse                checkmate:1                              avg:117m 93431ms
+✓ cylinderChess             max-moves:1                              avg:200m 84617ms
+✓ darkChess                 checkmate:1                              avg:61m 20068ms
+✓ dianaChess                checkmate:1                              avg:122m 39191ms
+✓ diceChess                 checkmate:1                              avg:132m 40050ms
+✓ displacementChess         stalemate:1                              avg:122m 46886ms
+✓ duckChess                 max-moves:1                              avg:200m 100316ms
+✓ einsteinChess             checkmate:1                              avg:138m 47620ms
+✓ endgameChess              stalemate:1                              avg:117m 37549ms
+✓ extinction                extinction-b:1                           avg:68m 19174ms
+✓ fiveCheck                 max-moves:1                              avg:200m 82698ms
+✓ fogOfWar                  checkmate:1                              avg:65m 22868ms
+✓ giveaway                  stalemate:1                              avg:51m 11630ms
+✓ grand                     max-moves:1                              avg:200m 98103ms
+✓ gridChess                 no-moves:1                               avg:97m 34732ms
+✓ halfChess                 checkmate:1                              avg:4m 3584ms
+✓ hoppelPoppel              max-moves:1                              avg:200m 72873ms
+✓ horde                     stalemate:1                              avg:157m 48190ms
+✓ immunizationChess         max-moves:1                              avg:200m 70091ms
+✓ kingOfTheHill             koth-w:1                                 avg:97m 35524ms
+✓ knightmate                checkmate:1                              avg:66m 21346ms
+✓ leganChess                checkmate:1                              avg:89m 32629ms
+✓ losAlamos                 checkmate:1                              avg:94m 23763ms
+✓ madrasiChess              no-moves:1                               avg:104m 52838ms
+✓ maharaja                  maharaja-b:1                             avg:18m 5608ms
+✓ makpong                   no-moves:1                               avg:45m 14931ms
+✓ makruk                    max-moves:1                              avg:200m 69109ms
+✓ marseillais               max-moves:1                              avg:200m 92888ms
+✓ medusaChess               checkmate:1                              avg:103m 49251ms
+✓ minichess                 checkmate:1                              avg:31m 10340ms
+✓ monsterChess              max-moves:1                              avg:200m 66684ms
+✓ noCastling                max-moves:1                              avg:200m 71475ms
+✓ noRetreat                 no-moves:1                               avg:50m 20757ms
+✓ omnicide                  max-moves:1                              avg:200m 72585ms
+✓ ordaChess                 checkmate:1                              avg:88m 31280ms
+✓ patrolChess               checkmate:1                              avg:63m 23291ms
+✓ pawnsOnly                 draw-repetition:1                        avg:158m 49566ms
+✓ peasantsRevolt            checkmate:1                              avg:130m 41735ms
+✓ pettyChess                checkmate:1                              avg:26m 8272ms
+✓ poisonChess               checkmate:1                              avg:175m 55588ms
+✓ progressive               draw-repetition:1                        avg:166m 71162ms
+✓ racingKings               race-w:1                                 avg:129m 41698ms
+✓ recruitmentChess          checkmate:1                              avg:103m 147808ms
+✓ rifle                     max-moves:1                              avg:200m 69091ms
+✓ shatar                    shatar-w:1                               avg:123m 42197ms
+✓ singleCheck               checkmate:1                              avg:66m 26230ms
+✓ stalemateWins             checkmate:1                              avg:88m 96882ms
+✓ standard                  checkmate:1                              avg:191m 58691ms
+✓ suicideChess              antichess-w:1                            avg:84m 17611ms
+✓ teleportChess             checkmate:1                              avg:89m 82033ms
+✓ threeCheck                checkmate:1                              avg:192m 65292ms
+✓ toroidalChess             checkmate:1                              avg:0m 2ms
+✓ torpedo                   checkmate:1                              avg:109m 49891ms
+✓ upsideDown                max-moves:1                              avg:200m 78602ms
+✓ weakChess                 max-moves:1                              avg:200m 61103ms
+
+--- Summary ---
+70/70 games completed without crash
+
+Variants that never reached terminal state (200 move limit):
+  - andernachChess
+  - berserkChess
+  - checklessChess
+  - cylinderChess
+  - duckChess
+  - fiveCheck
+  - grand
+  - hoppelPoppel
+  - immunizationChess
+  - makruk
+  - marseillais
+  - monsterChess
+  - noCastling
+  - omnicide
+  - rifle
+  - upsideDown
+  - weakChess
