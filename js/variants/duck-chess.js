@@ -14,6 +14,7 @@ MCE.registerVariant('duckChess', {
   cols: 8,
   fen: null,
   noCheck: true,
+  noRepetitionDraw: true,
   title: 'Duck Chess',
   description: 'After each move, place the duck (yellow blocker) on any empty square. The duck blocks all movement. Win by capturing the opponent\'s king — no check warnings.',
   rule: 'Board: 8×8 · Win: Capture king',

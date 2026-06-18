@@ -110,6 +110,7 @@ function createVariantGame(variant) {
     if (vc.noEnPassant) g.noEnPassant = true;
     if (vc.noPromotion) g.noPromotion = true;
     if (vc.noCheck) g.noCheck = true;
+    if (vc.noRepetitionDraw) g.noRepetitionDraw = true;
     if (vc.torpedo) g.torpedo = true;
     if (vc.pawnDirection) g.pawnDirection = vc.pawnDirection;
     if (vc.pawnStartRow) g.pawnStartRow = vc.pawnStartRow;

@@ -326,7 +326,7 @@ function createGameController(boardContainer, game, opts) {
       return;
     }
 
-    if (game.variant === 'duckChess' && game.duckPhase) {
+    if (game.duckPhase) {
       if (aiWorker && aiWorkerReady) {
         aiWorker.postMessage({
           type: 'pickDuck',

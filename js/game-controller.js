@@ -834,14 +834,10 @@ function afterExecuteMove(move, side) {
   }
 
   if (gameMode === 'solo' && !isGameOver()) {
-    if (currentVariant === 'duckChess' && game.duckPhase) {
+    if (game.duckPhase) {
       // Human places duck, then AI goes
-    } else if (currentVariant === 'marseillais' && game.turn !== aiColor) {
-      // Human still has second move
-    } else if (currentVariant === 'monsterChess' && game.turn !== aiColor) {
-      // Human still has moves this turn
-    } else if (currentVariant === 'progressive' && game.turn !== aiColor) {
-      // Human still has moves this turn
+    } else if (game.turn !== aiColor) {
+      // Human still has moves this turn (multi-move variants)
     } else {
       scheduleAIMove();
     }
@@ -852,9 +848,6 @@ function getPromotionPieces() {
   if (game.promotionPieces) return game.promotionPieces;
   const vc = MCE.getVariantConfig(currentVariant);
   if (vc && vc.promotionPieces) return vc.promotionPieces;
-  if (currentVariant === 'capablanca' || currentVariant === 'grand') {
-    return ['q', 'r', 'b', 'n', 'a', 'c'];
-  }
   return ['q', 'r', 'b', 'n'];
 }
 
@@ -968,15 +961,6 @@ function doAIMove() {
     if (count > 1) { doAIMoveMultiPlugin(count); return; }
   }
 
-  if (currentVariant === 'marseillais') {
-    doAIMoveMarseillais();
-    return;
-  }
-  if (currentVariant === 'monsterChess' || currentVariant === 'progressive') {
-    doAIMoveMulti();
-    return;
-  }
-
   if (aiWorker && aiWorkerReady) {
     aiMoveId++;
     aiWorker.postMessage({
@@ -1007,7 +991,7 @@ function handleAIResult(move) {
     return;
   }
 
-  if (currentVariant === 'duckChess' && game.duckPhase) {
+  if (game.duckPhase) {
     if (aiWorker && aiWorkerReady) {
       aiWorker.postMessage({
         type: 'pickDuck',
@@ -1026,56 +1010,6 @@ function handleAIResult(move) {
   render();
 }
 
-function doAIMoveMarseillais() {
-  const move1 = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
-  if (!move1) { aiThinking = false; render(); return; }
-
-  const side = game.turn;
-  trackCaptures(move1, side);
-  const undo1 = MCE.makeMove(game, move1);
-  undoStack.push(undo1);
-  lastMove = { from: move1.from, to: move1.to };
-  addMoveToList(move1, side);
-
-  if (game.turn === side && game.movesThisTurn === 1) {
-    const move2 = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
-    if (move2) {
-      trackCaptures(move2, side);
-      const undo2 = MCE.makeMove(game, move2);
-      undoStack.push(undo2);
-      lastMove = { from: move2.from, to: move2.to };
-      addMoveToList(move2, side);
-    }
-  }
-
-  aiThinking = false;
-  renderControls();
-  renderCaptured();
-  render();
-}
-
-function doAIMoveMulti() {
-  const side = game.turn;
-  let maxMoves = currentVariant === 'monsterChess'
-    ? (game.maxMovesPerTurn[side] || 1)
-    : game.progressiveMove;
-
-  for (let i = 0; i < maxMoves; i++) {
-    if (isGameOver() || game.turn !== side) break;
-    const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
-    if (!move) break;
-    trackCaptures(move, side);
-    const undo = MCE.makeMove(game, move);
-    undoStack.push(undo);
-    lastMove = { from: move.from, to: move.to };
-    addMoveToList(move, side);
-  }
-
-  aiThinking = false;
-  renderControls();
-  renderCaptured();
-  render();
-}
 
 function doAIMoveMultiPlugin(count) {
   const side = game.turn;
@@ -1108,27 +1042,13 @@ function trackCaptures(move, movingSide) {
     if (game.board[epCapSq]) capturedPieces[movingSide].push(game.board[epCapSq]);
   }
 
-  if (currentVariant === 'atomic' && (capturedPiece || move.flag === 'ep')) {
-    const [tr, tc] = MCE.rc(move.to, game);
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const nr = tr + dr, nc = tc + dc;
-        if (!MCE.onBoard(nr, nc, game)) continue;
-        const adjSq = MCE.sq(nr, nc, game);
-        const adjP = game.board[adjSq];
-        if (adjP && MCE.pieceType(adjP) !== 'p') {
-          const pColor = MCE.pieceColor(adjP);
-          const capSide = pColor === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
-          capturedPieces[capSide].push(adjP);
-        }
+  const vc = MCE.getVariantConfig(currentVariant);
+  if (vc && vc.explosionCaptures && (capturedPiece || move.flag === 'ep')) {
+    const extras = vc.explosionCaptures(game, move);
+    if (extras) {
+      for (let i = 0; i < extras.length; i++) {
+        capturedPieces[extras[i].capturedBy].push(extras[i].piece);
       }
-    }
-    const mover = game.board[move.from];
-    if (mover && MCE.pieceType(mover) !== 'p') {
-      const moverColor = MCE.pieceColor(mover);
-      const capSide = moverColor === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
-      capturedPieces[capSide].push(mover);
     }
   }
 }

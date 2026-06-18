@@ -212,12 +212,8 @@ function updateCastlingRights(g, from, to, piece) {
   if (from === bRookQ || to === bRookQ) g.castling.q = false;
 }
 
-const REPETITION_SKIP_VARIANTS = new Set([
-  'duckChess', 'fogOfWar', 'atomic'
-]);
-
 function threefoldRepetition(g) {
-  if (REPETITION_SKIP_VARIANTS.has(g.variant)) return false;
+  if (g.noRepetitionDraw) return false;
   const current = g.positionHistory[g.positionHistory.length - 1];
   let count = 0;
   for (let i = 0; i < g.positionHistory.length; i++) {
@@ -230,7 +226,7 @@ function threefoldRepetition(g) {
 }
 
 function insufficientMaterial(g) {
-  if (REPETITION_SKIP_VARIANTS.has(g.variant)) return false;
+  if (g.noRepetitionDraw) return false;
   if (g.rows !== 8 || g.cols !== 8) return false;
 
   const pieces = { w: [], b: [] };

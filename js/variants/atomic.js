@@ -15,6 +15,7 @@ MCE.registerVariant('atomic', {
   cols: 8,
   fen: null,
   noCheck: true,
+  noRepetitionDraw: true,
   title: 'Atomic Chess',
   description: 'Captures cause explosions that destroy all non-pawn pieces on adjacent squares, including the capturer. If a king is caught in the blast, that side loses.',
   rule: 'Board: 8×8 · Win: Explode opponent\'s king',
@@ -102,5 +103,28 @@ MCE.registerVariant('atomic', {
       return helpers.nameFor(status === 'atomic-w' ? 'w' : 'b') + ' wins — king exploded!';
     }
     return null;
+  },
+  explosionCaptures: function(g, move) {
+    var results = [];
+    var rc = MCE.rc(move.to, g);
+    for (var dr = -1; dr <= 1; dr++) {
+      for (var dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        var nr = rc[0] + dr, nc = rc[1] + dc;
+        if (!MCE.onBoard(nr, nc, g)) continue;
+        var sq = MCE.sq(nr, nc, g);
+        var p = g.board[sq];
+        if (p && MCE.pieceType(p) !== 'p') {
+          var color = MCE.pieceColor(p);
+          results.push({ piece: p, capturedBy: color === MCE.WHITE ? MCE.BLACK : MCE.WHITE });
+        }
+      }
+    }
+    var mover = g.board[move.from];
+    if (mover && MCE.pieceType(mover) !== 'p') {
+      var mColor = MCE.pieceColor(mover);
+      results.push({ piece: mover, capturedBy: mColor === MCE.WHITE ? MCE.BLACK : MCE.WHITE });
+    }
+    return results;
   },
 });

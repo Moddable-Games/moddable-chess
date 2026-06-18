@@ -619,9 +619,18 @@ prevBtn.onclick = function() { replay.stepBack(); renderReplay(); };</code></pre
   evaluate: function(g, defaultEval) { return defaultEval(g); },
   visibility: function(g, side) { return new Set(); },
   statusText: function(g, helpers) { return null; },
+  explosionCaptures: function(g, move) { return []; },
   positionKey: function(g) { return customHash(g); },
   openingBook: { "posKey": ["e2e4", "d2d4"] },
+
+  // Config flags
+  noCheck: true,
+  noRepetitionDraw: true,
+  promotionPieces: ['q', 'r', 'b', 'n'],
 });</code></pre>
+  <p><strong>statusText</strong> receives <code>helpers</code>: <code>{ nameFor, nameForOpp, gameOver, variantStatus }</code>. When <code>gameOver</code> is true, <code>variantStatus</code> contains the value returned by <code>winCondition</code>. Return a string to display as the game status.</p>
+  <p><strong>explosionCaptures</strong> returns an array of <code>{ piece, capturedBy }</code> objects for pieces destroyed as collateral (e.g. Atomic explosions). Used by the UI to track captured pieces.</p>
+  <p><strong>noRepetitionDraw</strong> disables threefold repetition and insufficient material detection for variants where position repetition is normal (fog, duck, atomic).</p>
   <p>See the <a href="variants.html">Plugin Guide</a> for full documentation of all config flags and hooks.</p>
 
   <h3>MCE.getVariantConfig(key)</h3>
