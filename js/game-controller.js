@@ -127,6 +127,7 @@ function getVariantGroups() {
 
 const params = new URLSearchParams(location.search);
 const paramVariant = params.get('variant');
+const paramFen = params.get('fen');
 const embedMode = params.get('embed') === '1';
 let fullscreenMode = params.get('mode') === 'fullscreen';
 const paramP1 = params.get('p1') || 'White';
@@ -287,6 +288,11 @@ fetch(basePath + 'assets/pieces.svg')
     if (!embedMode && !fullscreenMode) renderPicker();
     const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
     startGame(initVariant);
+    if (paramFen) {
+      MCE.loadFEN(game, paramFen);
+      game.positionHistory = [MCE.positionKey(game)];
+      render();
+    }
   });
 
 let game, selected, moveNum, currentVariant;

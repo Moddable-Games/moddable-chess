@@ -51,8 +51,14 @@ const GAMES_PER_VARIANT = flags.games || 500;
 const TARGET_PER_VARIANT = flags.target || 15;
 const MAX_MOVES = flags.maxMoves || 150;
 
-// Variants where the win condition requires losing pieces (unreachable via depth-1 random play)
-const SKIP_VARIANTS = new Set(['antichess', 'suicideChess', 'giveaway']);
+// Variants to skip:
+// - antichess/suicideChess/giveaway: win condition requires losing pieces (unreachable via depth-1 random play)
+// - fogOfWar/darkChess: hidden information — showing the full board removes the defining mechanic
+// - diceChess/einsteinChess: random mechanics — puzzles assume free piece choice
+const SKIP_VARIANTS = new Set([
+  'antichess', 'suicideChess', 'giveaway',
+  'fogOfWar', 'darkChess', 'diceChess', 'einsteinChess'
+]);
 
 function getPuzzleType(variantKey) {
   const vc = MCE.getVariantConfig(variantKey);

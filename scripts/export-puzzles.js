@@ -50,11 +50,14 @@ if (existsSync(standardPath)) {
   console.log('No standard puzzles found (run download-lichess-puzzles.js first)');
 }
 
+const PUZZLE_EXCLUDED_VARIANTS = new Set(['fogOfWar', 'darkChess', 'diceChess', 'einsteinChess']);
+
 if (existsSync(variantPath)) {
   const variants = JSON.parse(readFileSync(variantPath, 'utf-8'));
-  console.log(`Variant puzzles: ${variants.puzzles.length}`);
+  const filtered = variants.puzzles.filter(p => !PUZZLE_EXCLUDED_VARIANTS.has(p.variant));
+  console.log(`Variant puzzles: ${filtered.length} (${variants.puzzles.length - filtered.length} excluded)`);
 
-  for (const p of variants.puzzles) {
+  for (const p of filtered) {
     const type = p.puzzleType || 'tactic';
     const key = `${p.variant}:${slugify(type)}`;
     if (!keyed[key]) keyed[key] = [];
