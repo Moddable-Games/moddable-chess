@@ -20,7 +20,10 @@
   "scripts": {
     "test": "node --experimental-vm-modules tests/smoke-all-variants.js",
     "test:variant": "node --experimental-vm-modules tests/variant-test.js",
-    "test:visual": "node --experimental-vm-modules tests/visual-all-variants.js"
+    "test:visual": "node --experimental-vm-modules tests/visual-all-variants.js",
+    "puzzles:download": "node --experimental-vm-modules scripts/download-lichess-puzzles.js",
+    "puzzles:generate": "node --experimental-vm-modules scripts/generate-variant-puzzles.js",
+    "puzzles:export": "node --experimental-vm-modules scripts/export-puzzles.js"
   },
   "license": "MIT",
   "devDependencies": {
