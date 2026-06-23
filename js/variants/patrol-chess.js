@@ -18,4 +18,12 @@ MCE.registerVariant('patrolChess', {
       return patrolled;
     });
   },
+  winCondition: function(g) {
+    var moves = MCE.variantLegalMoves(g);
+    if (moves.length === 0) {
+      if (MCE.inCheck(g, g.turn)) return 'checkmate';
+      return 'stalemate';
+    }
+    return null;
+  },
 });

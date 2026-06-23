@@ -6,9 +6,19 @@ MCE.registerVariant('immunizationChess', {
   cols: 8,
   fen: null,
   title: 'Immunization Chess',
-  description: 'When a piece survives being attacked (opponent moves away or fails to capture), that piece becomes immune to capture for 2 turns. Build up an invincible army.',
+  description: 'When a capture occurs, adjacent enemy pieces become immune to capture for 2 full rounds. Build up an invincible army.',
   rule: 'Board: 8x8 - Win: Checkmate',
   afterMove: function(g, move, undo) {
+    // Move immunity with the piece
+    if (g.effects && move.from !== move.to && move.flag !== 'action') {
+      for (var i = 0; i < g.effects.length; i++) {
+        if (g.effects[i].type === 'immune' && g.effects[i].sq === move.from && g.effects[i].owner === undo.turn) {
+          if (!undo._effectsSnapshot) undo._effectsSnapshot = g.effects.map(function(e) { return Object.assign({}, e); });
+          g.effects[i].sq = move.to;
+          break;
+        }
+      }
+    }
     if (!undo.captured && move.flag !== 'ep') return;
     var capSq = move.to;
     var rc = MCE.rc(capSq, g);
@@ -21,7 +31,7 @@ MCE.registerVariant('immunizationChess', {
         if (!p) continue;
         if (MCE.pieceColor(p) !== undo.turn && MCE.pieceType(p) !== 'k') {
           if (!MCE.hasEffect(g, sq, 'immune')) {
-            MCE.addEffect(g, undo, { sq: sq, type: 'immune', duration: 2, owner: MCE.pieceColor(p) });
+            MCE.addEffect(g, undo, { sq: sq, type: 'immune', duration: 4, owner: MCE.pieceColor(p) });
           }
         }
       }
@@ -32,6 +42,14 @@ MCE.registerVariant('immunizationChess', {
       if (m.flag !== 'capture' && m.flag !== 'ep') return true;
       return !MCE.hasEffect(g, m.to, 'immune');
     });
+  },
+  winCondition: function(g) {
+    var moves = MCE.variantLegalMoves(g);
+    if (moves.length === 0) {
+      if (MCE.inCheck(g, g.turn)) return 'checkmate';
+      return 'stalemate';
+    }
+    return null;
   },
   evaluate: function(g, defaultEval) {
     var score = defaultEval(g);

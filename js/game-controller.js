@@ -266,7 +266,7 @@ function renderPicker() {
   const soloBtn = document.createElement('button');
   soloBtn.className = 'mode-btn' + (gameMode === 'solo' ? ' mode-btn--active' : '');
   soloBtn.textContent = 'Solo';
-  soloBtn.addEventListener('click', () => { gameMode = 'solo'; aiColor = MCE.BLACK; renderPicker(); startGame(currentVariant || 'standard'); });
+  soloBtn.addEventListener('click', () => { gameMode = 'solo'; renderPicker(); startGame(currentVariant || 'standard'); });
 
   const passBtn = document.createElement('button');
   passBtn.className = 'mode-btn' + (gameMode === 'pass' ? ' mode-btn--active' : '');
@@ -275,6 +275,23 @@ function renderPicker() {
 
   modeBar.appendChild(soloBtn);
   modeBar.appendChild(passBtn);
+
+  if (gameMode === 'solo') {
+    const colorBar = document.createElement('div');
+    colorBar.className = 'color-bar';
+    const whiteBtn = document.createElement('button');
+    whiteBtn.className = 'color-btn' + (aiColor === MCE.BLACK ? ' color-btn--active' : '');
+    whiteBtn.textContent = 'Play White';
+    whiteBtn.addEventListener('click', () => { aiColor = MCE.BLACK; flipped = false; renderPicker(); startGame(currentVariant || 'standard'); });
+    const blackBtn = document.createElement('button');
+    blackBtn.className = 'color-btn' + (aiColor === MCE.WHITE ? ' color-btn--active' : '');
+    blackBtn.textContent = 'Play Black';
+    blackBtn.addEventListener('click', () => { aiColor = MCE.WHITE; flipped = true; renderPicker(); startGame(currentVariant || 'standard'); });
+    colorBar.appendChild(whiteBtn);
+    colorBar.appendChild(blackBtn);
+    modeBar.appendChild(colorBar);
+  }
+
   pickerEl.appendChild(modeBar);
 
   const search = document.createElement('input');
@@ -550,6 +567,7 @@ function startGame(variant) {
       animEasing: 'ease-out',
       animCaptureBurst: animDuration > 0,
       duckSq: game.duckSq >= 0 ? game.duckSq : null,
+      effectOverlay: renderEffectOverlay,
     },
     onSquareClick: handleSquareClick,
     onPromotionNeeded: showPromotionDialog,
@@ -568,6 +586,42 @@ function startGame(variant) {
   renderDescription();
   renderControls();
   renderCaptured();
+}
+
+function renderEffectOverlay(svg, effect, x, y, tileSize, game) {
+  const SVGns = 'http://www.w3.org/2000/svg';
+  if (effect.type === 'immune') {
+    const shield = document.createElementNS(SVGns, 'rect');
+    shield.setAttribute('x', x + 2);
+    shield.setAttribute('y', y + 2);
+    shield.setAttribute('width', tileSize - 4);
+    shield.setAttribute('height', tileSize - 4);
+    shield.setAttribute('rx', 4);
+    shield.setAttribute('fill', 'none');
+    shield.setAttribute('stroke', '#00e676');
+    shield.setAttribute('stroke-width', 2.5);
+    shield.setAttribute('opacity', 0.7);
+    return shield;
+  }
+  if (effect.type === 'poison') {
+    const dot = document.createElementNS(SVGns, 'circle');
+    dot.setAttribute('cx', x + tileSize - 8);
+    dot.setAttribute('cy', y + 8);
+    dot.setAttribute('r', 4);
+    dot.setAttribute('fill', '#ab47bc');
+    dot.setAttribute('opacity', 0.8);
+    return dot;
+  }
+  if (effect.type === 'petrify') {
+    const dot = document.createElementNS(SVGns, 'circle');
+    dot.setAttribute('cx', x + tileSize - 8);
+    dot.setAttribute('cy', y + 8);
+    dot.setAttribute('r', 4);
+    dot.setAttribute('fill', '#78909c');
+    dot.setAttribute('opacity', 0.8);
+    return dot;
+  }
+  return null;
 }
 
 function render() {

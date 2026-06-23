@@ -470,6 +470,10 @@ function createGameController(boardContainer, game, opts) {
   initWorker();
   render();
 
+  if (isAI(game.turn)) {
+    scheduleAIMove();
+  }
+
   return {
     undo,
     redo,
