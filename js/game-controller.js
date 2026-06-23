@@ -579,6 +579,8 @@ function startGame(variant) {
     getLegalMovesOverride: getLegalMovesOverride,
   });
 
+  if (flipped) ctrl.setFlipped(true);
+
   if (!fullscreenMode && !embedMode) {
     renderPicker();
     renderToolbar();
