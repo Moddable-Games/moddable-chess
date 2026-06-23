@@ -4,7 +4,7 @@ function createGameController(boardContainer, game, opts) {
   opts = opts || {};
   const players = opts.players || { w: 'human', b: 'ai' };
   let aiDifficulty = opts.aiDifficulty || 'medium';
-  const renderOpts = opts.renderOpts || {};
+  let renderOpts = opts.renderOpts || {};
   const onMove = opts.onMove || null;
   const onGameEnd = opts.onGameEnd || null;
   const onTurnChange = opts.onTurnChange || null;
@@ -14,6 +14,8 @@ function createGameController(boardContainer, game, opts) {
   const onRender = opts.onRender || null;
   const onAnimateMove = opts.onAnimateMove || null;
   const onCaptureEffect = opts.onCaptureEffect || null;
+  const onUndo = opts.onUndo || null;
+  const getLegalMovesOverride = opts.getLegalMovesOverride || null;
 
   function getAnimDelay() {
     return (renderOpts.animate && renderOpts.animDuration) ? renderOpts.animDuration + 50 : 0;
@@ -35,7 +37,7 @@ function createGameController(boardContainer, game, opts) {
   function initWorker() {
     if (opts.workerPath) {
       try {
-        aiWorker = new Worker(opts.workerPath);
+        aiWorker = new Worker(opts.workerPath, opts.workerType ? { type: opts.workerType } : undefined);
         aiWorker.addEventListener('message', onWorkerMessage);
         if (opts.variantPaths) {
           aiWorker.postMessage({ type: 'init', variantPaths: opts.variantPaths });
@@ -57,7 +59,9 @@ function createGameController(boardContainer, game, opts) {
     if (msg.type === 'duck') {
       if (msg.sq >= 0) placeDuck(msg.sq);
       aiThinking = false;
+      if (onTurnChange) onTurnChange(game.turn, game.turnIndex);
       render();
+      checkGameEnd();
       return;
     }
   }
@@ -66,7 +70,7 @@ function createGameController(boardContainer, game, opts) {
     const snap = {};
     const keys = ['rows', 'cols', 'board', 'terrain', 'pieceData', 'turn', 'players',
       'turnIndex', 'castling', 'enPassant', 'halfmove', 'fullmove', 'variant',
-      'checkCount', 'movesThisTurn', 'duckSq', 'duckPhase', 'status',
+      'checkCount', 'movesThisTurn', 'duckSq', 'duckPhase', 'hand', 'status',
       'noCastling', 'noEnPassant', 'noPromotion', 'noCheck', 'torpedo',
       'pawnDirection', 'pawnStartRow', 'royalPiece', 'pieceRoles',
       'maxMovesPerTurn', 'progressiveMove', 'checkThreshold', 'stalemateMeaning',
@@ -127,9 +131,15 @@ function createGameController(boardContainer, game, opts) {
       duckSq: game.duckSq >= 0 ? game.duckSq : null,
     });
 
-    if (!game.duckPhase && !aiThinking) {
-      const allMoves = getLegalMoves();
-      mergedOpts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
+    if (getLegalMovesOverride) {
+      const override = getLegalMovesOverride(game, { selected, aiThinking, duckPhase: game.duckPhase });
+      if (override !== null) {
+        mergedOpts.legalMoves = override;
+      } else {
+        computeDefaultLegalMoves(mergedOpts);
+      }
+    } else {
+      computeDefaultLegalMoves(mergedOpts);
     }
 
     const vc = MCE.getVariantConfig ? MCE.getVariantConfig(game.variant) : null;
@@ -142,10 +152,24 @@ function createGameController(boardContainer, game, opts) {
     if (onRender) onRender(game, mergedOpts);
   }
 
+  function computeDefaultLegalMoves(mergedOpts) {
+    if (game.duckPhase) {
+      const total = game.rows * game.cols;
+      const duckMoves = [];
+      for (let i = 0; i < total; i++) {
+        if (!game.board[i] && i !== game.duckSq) duckMoves.push({ from: i, to: i, flag: null });
+      }
+      mergedOpts.legalMoves = duckMoves;
+    } else if (!aiThinking) {
+      const allMoves = getLegalMoves();
+      mergedOpts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
+    }
+  }
+
   function handleClick(sq) {
     if (destroyed || gameOver) return;
     if (opts.onSquareClick) {
-      const handled = opts.onSquareClick(sq, game, { selected, executeMove, getLegalMoves, render });
+      const handled = opts.onSquareClick(sq, game, { selected, setSelected, executeMove, getLegalMoves, render });
       if (handled) return;
     }
     if (!isHuman(game.turn) && !game.duckPhase) return;
@@ -209,7 +233,7 @@ function createGameController(boardContainer, game, opts) {
     lastMove = { from: move.from, to: move.to };
     selected = null;
 
-    if (onMove) onMove(move, undo, captured);
+    if (onMove) onMove(move, undo, captured, side);
     if (captured && onCaptureEffect) onCaptureEffect(move.to, captured);
 
     if (game._pendingAction) {
@@ -257,6 +281,8 @@ function createGameController(boardContainer, game, opts) {
   }
 
   function placeDuck(sq) {
+    if (game.duckSq >= 0) game.board[game.duckSq] = null;
+    game.board[sq] = 'D';
     game.duckSq = sq;
     game.duckPhase = false;
     if (game.turn === MCE.BLACK) game.fullmove++;
@@ -318,7 +344,7 @@ function createGameController(boardContainer, game, opts) {
     redoStack = [];
     lastMove = { from: move.from, to: move.to };
 
-    if (onMove) onMove(move, undo, captured);
+    if (onMove) onMove(move, undo, captured, side);
 
     if (game._pendingAction) {
       if (onPendingAction) onPendingAction(game._pendingAction);
@@ -361,7 +387,7 @@ function createGameController(boardContainer, game, opts) {
       const undo = MCE.makeMove(game, move);
       undoStack.push(undo);
       lastMove = { from: move.from, to: move.to };
-      if (onMove) onMove(move, undo, captured);
+      if (onMove) onMove(move, undo, captured, side);
     }
     aiThinking = false;
     if (onTurnChange) onTurnChange(game.turn, game.turnIndex);
@@ -371,17 +397,21 @@ function createGameController(boardContainer, game, opts) {
 
   function undo() {
     if (undoStack.length === 0 || aiThinking) return;
+    let count = 0;
     const u = undoStack.pop();
     MCE.unmakeMove(game, u);
     redoStack.push(u);
+    count++;
     if (isAI(game.turn) && undoStack.length > 0) {
       const u2 = undoStack.pop();
       MCE.unmakeMove(game, u2);
       redoStack.push(u2);
+      count++;
     }
     selected = null;
     gameOver = false;
     lastMove = undoStack.length > 0 ? { from: undoStack[undoStack.length - 1].from, to: undoStack[undoStack.length - 1].to } : null;
+    if (onUndo) onUndo(count);
     render();
   }
 
@@ -409,8 +439,20 @@ function createGameController(boardContainer, game, opts) {
     render();
   }
 
+  function setSelected(sq) {
+    selected = sq;
+  }
+
+  function setRenderOpts(newOpts) {
+    renderOpts = Object.assign(renderOpts, newOpts);
+  }
+
   function getGame() {
     return game;
+  }
+
+  function getState() {
+    return { aiThinking, gameOver, selected, lastMove, flipped, undoStackLength: undoStack.length };
   }
 
   function isThinking() {
@@ -434,7 +476,10 @@ function createGameController(boardContainer, game, opts) {
     forfeit,
     setDifficulty,
     setFlipped,
+    setSelected,
+    setRenderOpts,
     getGame,
+    getState,
     isThinking,
     render,
     destroy,

@@ -186,8 +186,10 @@ function renderBoard(container, game, opts) {
   const excludeSet = opts.excludePieces || null;
   const currentPositions = new Map();
   const total = rows * cols;
+  const duckSqVal = (opts.duckSq !== null && opts.duckSq !== undefined && opts.duckSq >= 0) ? opts.duckSq : -1;
   for (let i = 0; i < total; i++) {
     if (i === excludeSq) continue;
+    if (i === duckSqVal) continue;
     if (excludeSet && excludeSet.indexOf(i) >= 0) continue;
     const p = game.board[i];
     if (!p) continue;

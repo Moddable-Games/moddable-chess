@@ -9,7 +9,6 @@ MCE.registerVariant('duckChess', {
     "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6": ["e4d5", "e4e5", "b1c3"],
   },
   label: 'Duck Chess',
-  group: 'Alternate Rules',
   rows: 8,
   cols: 8,
   fen: null,
@@ -18,6 +17,33 @@ MCE.registerVariant('duckChess', {
   title: 'Duck Chess',
   description: 'After each move, place the duck (yellow blocker) on any empty square. The duck blocks all movement. Win by capturing the opponent\'s king — no check warnings.',
   rule: 'Board: 8×8 · Win: Capture king',
+  init: function(g) {
+    g.duckSq = -1;
+    g.duckPhase = false;
+  },
+  moveFilter: function(g, moves) {
+    if (g.duckSq >= 0) {
+      return moves.filter(function(m) { return m.to !== g.duckSq; });
+    }
+    return moves;
+  },
+  winCondition: function(g) {
+    var whiteKing = false;
+    var blackKing = false;
+    for (var i = 0; i < g.board.length; i++) {
+      var p = g.board[i];
+      if (!p) continue;
+      if (MCE.pieceType(p) === 'k') {
+        if (MCE.pieceColor(p) === MCE.WHITE) whiteKing = true;
+        else blackKing = true;
+      }
+    }
+    if (!whiteKing) return 'checkmate';
+    if (!blackKing) return 'checkmate';
+    var moves = MCE.variantLegalMoves(g);
+    if (moves.length === 0) return 'stalemate';
+    return null;
+  },
   turnLogic: function(g, undo) {
     if (!g.duckPhase) {
       g.duckPhase = true;

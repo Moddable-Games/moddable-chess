@@ -1,6 +1,6 @@
 {
   "name": "@moddable/chess-engine",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "type": "module",
   "description": "Moddable Chess Engine — 70 variants, zero dependencies, pure JavaScript",
   "main": "js/chess-engine.js",

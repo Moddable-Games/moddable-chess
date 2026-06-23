@@ -88,6 +88,70 @@ h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-ser
   opacity: 0.85;
 }
 
+/* Hand/pocket panel (Crazyhouse) */
+#hand-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+#hand-panel:empty {
+  display: none;
+}
+.hand-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.hand-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--play-text-faint);
+  margin-right: 4px;
+  min-width: 40px;
+}
+.hand-piece {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--play-surface-alt, #2a2a3a);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 3px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.hand-piece:hover:not(:disabled) {
+  border-color: var(--play-accent, #5ba3d9);
+  transform: scale(1.1);
+}
+.hand-piece--active {
+  border-color: var(--play-accent, #5ba3d9);
+  background: var(--play-accent-bg, #1e3a5f);
+  box-shadow: 0 0 8px var(--play-accent, #5ba3d9);
+}
+.hand-piece:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.hand-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--play-accent, #5ba3d9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 8px;
+  padding: 0 3px;
+}
+
 /* Promotion dialog */
 .promo-backdrop {
   position: fixed;

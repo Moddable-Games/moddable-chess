@@ -207,10 +207,6 @@ const ANIM_SPEEDS = { slow: { label: 'Slow', ms: 400 }, normal: { label: 'Normal
 let animStyle = params.get('animStyle') || 'slide';
 let animSpeed = params.get('animSpeed') || 'normal';
 
-let aiWorker = null;
-let aiWorkerReady = false;
-let aiMoveId = 0;
-
 const VARIANT_FILES = [
   'standard.js','chess960.js','torpedo.js','no-castling.js','single-check.js',
   'los-alamos.js','knightmate.js','progressive.js','marseillais.js','monster-chess.js',
@@ -229,55 +225,7 @@ const VARIANT_FILES = [
   'teleport-chess.js','poison-chess.js','medusa-chess.js','immunization-chess.js',
 ];
 
-function initWorker() {
-  try {
-    aiWorker = new Worker(basePath + 'js/ai-worker.js', { type: 'module' });
-    aiWorker.addEventListener('message', onWorkerMessage);
-    const variantPaths = VARIANT_FILES.map(f => basePath + 'js/variants/' + f);
-    aiWorker.postMessage({ type: 'init', variantPaths: variantPaths });
-  } catch (e) {
-    aiWorker = null;
-  }
-}
-
-function onWorkerMessage(e) {
-  const msg = e.data;
-  if (msg.type === 'ready') { aiWorkerReady = true; return; }
-  if (msg.type === 'move') {
-    handleAIResult(msg.move);
-    return;
-  }
-  if (msg.type === 'duck') {
-    if (msg.sq >= 0) placeDuck(msg.sq);
-    aiThinking = false;
-    renderControls();
-    renderCaptured();
-    render();
-    return;
-  }
-}
-
-function serializeGame(g) {
-  const snap = {};
-  const keys = ['rows', 'cols', 'board', 'terrain', 'pieceData', 'turn', 'players',
-    'turnIndex', 'castling', 'enPassant', 'halfmove', 'fullmove', 'variant',
-    'checkCount', 'movesThisTurn', 'duckSq', 'duckPhase', 'status',
-    'noCastling', 'noEnPassant', 'noPromotion', 'noCheck', 'torpedo',
-    'pawnDirection', 'pawnStartRow', 'royalPiece', 'pieceRoles',
-    'maxMovesPerTurn', 'progressiveMove', 'checkThreshold', 'stalemateMeaning',
-    'promotionPieces', 'promotionRank', 'pawnMoveStyle', 'divergentPieces',
-    'wrapFiles', 'wrapRanks', 'lastMovedSq', 'ownershipMode', 'effects',
-    'rookStartCols'];
-  for (let i = 0; i < keys.length; i++) {
-    if (g[keys[i]] !== undefined && typeof g[keys[i]] !== 'function') snap[keys[i]] = g[keys[i]];
-  }
-  snap._eliminated = Array.from(g.eliminated || []);
-  snap.positionHistory = g.positionHistory ? g.positionHistory.slice() : [];
-  snap.history = [];
-  return snap;
-}
-
-initWorker();
+let ctrl = null;
 
 fetch(basePath + 'assets/pieces.svg')
   .then(r => r.text())
@@ -295,18 +243,16 @@ fetch(basePath + 'assets/pieces.svg')
     }
   });
 
-let game, selected, moveNum, currentVariant;
+let game, moveNum, currentVariant;
 let gameMode = paramMode === 'pass' ? 'pass' : 'solo';
 let aiDifficulty = params.get('difficulty') || 'medium';
 let aiColor = MCE.BLACK;
 const playerNames = { w: paramP1, b: paramP2 };
-let aiThinking = false;
 let gameOver = false;
-let undoStack = [];
 let flipped = false;
-let lastMove = null;
 let capturedPieces = { w: [], b: [] };
 let pendingPromotion = null;
+let dropMode = null;
 
 let openGroup = 'Classic';
 let filterText = '';
@@ -378,6 +324,7 @@ function renderDescription() {
   descEl.innerHTML = `<h3>${d.title}</h3><p>${d.text}</p><div class="desc-rule">${d.rule}</div>`;
 }
 
+
 function renderControls() {
   controlsEl.innerHTML = '';
 
@@ -389,36 +336,16 @@ function renderControls() {
   flipBtn.textContent = 'Flip';
   flipBtn.addEventListener('click', () => {
     flipped = !flipped;
-    render();
+    if (ctrl) ctrl.setFlipped(flipped);
   });
 
   const undoBtn = document.createElement('button');
   undoBtn.className = 'ctrl-btn';
   undoBtn.textContent = 'Undo';
-  undoBtn.disabled = undoStack.length === 0;
+  undoBtn.disabled = !ctrl || ctrl.getState().undoStackLength === 0;
   undoBtn.addEventListener('click', () => {
-    if (undoStack.length === 0 || aiThinking) return;
-    if (gameMode === 'solo') {
-      if (undoStack.length >= 2) {
-        MCE.unmakeMove(game, undoStack.pop());
-        removeMoveFromList();
-        MCE.unmakeMove(game, undoStack.pop());
-        removeMoveFromList();
-      } else if (undoStack.length === 1) {
-        MCE.unmakeMove(game, undoStack.pop());
-        removeMoveFromList();
-      }
-    } else {
-      MCE.unmakeMove(game, undoStack.pop());
-      removeMoveFromList();
-    }
-    selected = null;
-    gameOver = false;
-    lastMove = null;
-    capturedPieces = { w: [], b: [] };
-    renderCaptured();
-    renderControls();
-    render();
+    if (!ctrl) return;
+    ctrl.undo();
   });
 
   const newBtn = document.createElement('button');
@@ -455,6 +382,7 @@ function renderControls() {
     });
     diffSelect.addEventListener('change', () => {
       aiDifficulty = diffSelect.value;
+      if (ctrl) ctrl.setDifficulty(aiDifficulty);
       track('difficulty_change', { difficulty: aiDifficulty, variant_name: currentVariant });
     });
     rightGroup.appendChild(diffSelect);
@@ -578,17 +506,14 @@ function startGame(variant) {
     history.replaceState(null, '', url);
   }
   if (g) openGroup = g.label;
+  if (ctrl) ctrl.destroy();
   game = MCE.createGame(variant);
-  selected = null;
   moveNum = 1;
   gameOver = false;
-  aiThinking = false;
-  undoStack = [];
-  lastMove = null;
   capturedPieces = { w: [], b: [] };
+  dropMode = null;
   movesEl.innerHTML = '';
 
-  // Lock container dimensions to prevent layout shift when innerHTML is cleared between renders
   const isBoardOnly = embedMode && params.get('boardonly') === '1';
   let boardWidth;
   if (isBoardOnly) {
@@ -606,6 +531,36 @@ function startGame(variant) {
   container.style.width = boardWidth + 'px';
   container.style.height = boardHeight + 'px';
 
+  const animDuration = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
+  const players = gameMode === 'solo'
+    ? { w: aiColor === MCE.WHITE ? 'ai' : 'human', b: aiColor === MCE.BLACK ? 'ai' : 'human' }
+    : { w: 'human', b: 'human' };
+
+  ctrl = MCE.createGameController(container, game, {
+    players,
+    aiDifficulty,
+    workerPath: basePath + 'js/ai-worker.js',
+    workerType: 'module',
+    variantPaths: VARIANT_FILES.map(f => basePath + 'js/variants/' + f),
+    renderOpts: {
+      size: boardWidth,
+      animate: animDuration > 0,
+      animStyle: animStyle,
+      animDuration: animDuration,
+      animEasing: 'ease-out',
+      animCaptureBurst: animDuration > 0,
+      duckSq: game.duckSq >= 0 ? game.duckSq : null,
+    },
+    onSquareClick: handleSquareClick,
+    onPromotionNeeded: showPromotionDialog,
+    onMove: handleMoveCallback,
+    onGameEnd: handleGameEnd,
+    onTurnChange: handleTurnChange,
+    onRender: handleRender,
+    onUndo: handleUndoCallback,
+    getLegalMovesOverride: getLegalMovesOverride,
+  });
+
   if (!fullscreenMode && !embedMode) {
     renderPicker();
     renderToolbar();
@@ -613,76 +568,76 @@ function startGame(variant) {
   renderDescription();
   renderControls();
   renderCaptured();
-  render();
-}
-
-function isGameOver() {
-  if (gameOver) return true;
-  const variantStatus = MCE.getVariantStatus ? MCE.getVariantStatus(game) : null;
-  if (variantStatus) return true;
-  const status = MCE.getStatus(game);
-  return status === 'checkmate' || status === 'stalemate' ||
-    status === 'draw-50' || status === 'draw-repetition' || status === 'draw-material';
 }
 
 function render() {
-  const isBoardOnly = embedMode && params.get('boardonly') === '1';
-  let renderSize;
-  if (isBoardOnly) {
-    renderSize = container.offsetWidth;
-  } else if (fullscreenMode) {
-    renderSize = parseInt(container.style.width) || 480;
-  } else {
-    renderSize = 480;
-  }
-  const animDuration = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
-  const opts = {
-    size: renderSize,
-    selected: selected,
-    lastMove: lastMove,
-    flipped: flipped,
-    animate: animDuration > 0,
-    animStyle: animStyle,
-    animDuration: animDuration,
-    animEasing: 'ease-out',
-    animCaptureBurst: animDuration > 0,
-    legalMoves: [],
-    onSquareClick: handleClick,
-    fogMask: null,
-    duckSq: game.duckSq >= 0 ? game.duckSq : null,
-  };
-
-  if (game.duckPhase) {
-    opts.legalMoves = [];
-  } else if (game._pendingAction) {
-    opts.legalMoves = getMovesForVariant();
-    opts.selected = game._pendingAction.from;
-  } else if (!aiThinking || game.turn !== aiColor) {
-    const allMoves = getMovesForVariant();
-    opts.legalMoves = selected !== null ? allMoves.filter(m => m.from === selected) : [];
-  }
-
-  const vc = MCE.getVariantConfig(currentVariant);
-  if (vc && vc.visibility) {
-    const viewSide = gameMode === 'solo' ? (aiColor === MCE.BLACK ? MCE.WHITE : MCE.BLACK) : game.turn;
-    opts.fogMask = vc.visibility(game, viewSide);
-  }
-
-  MCE.renderBoard(container, game, opts);
-  updateStatus();
+  if (ctrl) ctrl.render();
 }
 
-function getMovesForVariant() {
-  const vc = MCE.getVariantConfig(currentVariant);
-  if (vc && vc.moveFilter) return MCE.variantLegalMoves(game);
-  return MCE.legalMoves(game);
+function getLegalMovesOverride(g, state) {
+  if (dropMode && !state.duckPhase) {
+    const moves = ctrl.getLegalMoves();
+    return moves.filter(m => m.flag === 'action' && m.action === 'drop' && m.dropPiece === dropMode);
+  }
+  return null;
+}
+
+function handleSquareClick(sq, g, api) {
+  if (pendingPromotion) return true;
+  if (gameOver) return true;
+  if (dropMode) {
+    const allMoves = api.getLegalMoves();
+    const dropMove = allMoves.find(m => m.flag === 'action' && m.action === 'drop' && m.dropPiece === dropMode && m.to === sq);
+    if (dropMove) {
+      dropMode = null;
+      api.executeMove(dropMove);
+    } else {
+      dropMode = null;
+      api.setSelected(null);
+      api.render();
+    }
+    return true;
+  }
+  return false;
+}
+
+function handleMoveCallback(move, undo, captured, side) {
+  trackCaptures(move, side);
+  addMoveToList(move, side);
+  dropMode = null;
+  renderControls();
+  renderCaptured();
+}
+
+function handleGameEnd(result) {
+  gameOver = true;
+  trackGameComplete(result);
+  renderControls();
+}
+
+function handleTurnChange(turn, turnIndex) {
+  renderControls();
+}
+
+function handleRender(g, renderOpts) {
+  updateStatus();
+  renderHand();
+}
+
+function handleUndoCallback(count) {
+  for (let i = 0; i < count; i++) removeMoveFromList();
+  dropMode = null;
+  capturedPieces = { w: [], b: [] };
+  gameOver = false;
+  renderCaptured();
+  renderControls();
 }
 
 function nameFor(color) { return color === MCE.WHITE ? playerNames.w : playerNames.b; }
 function nameForOpp(color) { return color === MCE.WHITE ? playerNames.b : playerNames.w; }
 
 function trackGameComplete(result) {
-  track('game_complete', { variant_name: currentVariant, result: result, move_count: undoStack.length });
+  track('game_complete', { variant_name: currentVariant, result: result, move_count: ctrl ? ctrl.getState().undoStackLength : 0 });
 }
 
 function updateStatus() {
@@ -763,93 +718,6 @@ function updateStatus() {
   }
 }
 
-function handleClick(sq) {
-  if (gameOver) return;
-  if (pendingPromotion) return;
-  if (gameMode === 'solo' && game.turn === aiColor && !game.duckPhase) return;
-
-  if (game.duckPhase) {
-    if (gameMode === 'solo' && game.turn !== aiColor) {
-      if (!game.board[sq] && sq !== game.duckSq) {
-        placeDuck(sq);
-        if (!isGameOver() && game.turn === aiColor) {
-          scheduleAIMove();
-        }
-      }
-    } else if (gameMode === 'pass') {
-      if (!game.board[sq] && sq !== game.duckSq) {
-        placeDuck(sq);
-      }
-    }
-    return;
-  }
-
-  if (game._pendingAction) {
-    const allMoves = getMovesForVariant();
-    const candidates = allMoves.filter(m => m.to === sq);
-    if (candidates.length > 0) {
-      executeMove(candidates[0]);
-    }
-    return;
-  }
-
-  const piece = game.board[sq];
-  const allMoves = getMovesForVariant();
-
-  if (selected !== null) {
-    let candidates = allMoves.filter(m => m.from === selected && m.to === sq);
-    if (candidates.length > 1 && candidates[0].promo) {
-      showPromotionDialog(candidates, game.turn);
-      return;
-    }
-    if (candidates.length > 0) {
-      executeMove(candidates[0]);
-      return;
-    }
-  }
-
-  if (piece && MCE.pieceColor(piece) === game.turn) {
-    selected = sq;
-  } else {
-    selected = null;
-  }
-  render();
-}
-
-function executeMove(move) {
-  const side = game.turn;
-  trackCaptures(move, side);
-  const undo = MCE.makeMove(game, move);
-  undoStack.push(undo);
-  lastMove = { from: move.from, to: move.to };
-  addMoveToList(move, side);
-  selected = null;
-  renderControls();
-  renderCaptured();
-  render();
-  afterExecuteMove(move, side);
-
-}
-
-function afterExecuteMove(move, side) {
-  if (game._pendingAction) {
-    if (gameMode === 'solo' && game.turn === aiColor) {
-      scheduleAIMove();
-    }
-    return;
-  }
-
-  if (gameMode === 'solo' && !isGameOver()) {
-    if (game.duckPhase) {
-      // Human places duck, then AI goes
-    } else if (game.turn !== aiColor) {
-      // Human still has moves this turn (multi-move variants)
-    } else {
-      scheduleAIMove();
-    }
-  }
-}
-
 function getPromotionPieces() {
   if (game.promotionPieces) return game.promotionPieces;
   const vc = MCE.getVariantConfig(currentVariant);
@@ -857,71 +725,54 @@ function getPromotionPieces() {
   return ['q', 'r', 'b', 'n'];
 }
 
-const PROMO_NAMES = {
-  q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight', a: 'Archbishop', c: 'Chancellor'
-};
+const PROMO_NAMES = { q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight', a: 'Archbishop', c: 'Chancellor' };
 
-function showPromotionDialog(candidates, side) {
-  pendingPromotion = { candidates: candidates, side: side };
+function showPromotionDialog(candidates, side, callback) {
+  pendingPromotion = { candidates, side, callback };
   var pieces = getPromotionPieces();
   var isWhite = side === MCE.WHITE;
-
   var backdrop = document.createElement('div');
   backdrop.className = 'promo-backdrop';
   backdrop.id = 'promo-dialog';
-
   var panel = document.createElement('div');
   panel.className = 'promo-panel';
-
   var title = document.createElement('div');
   title.className = 'promo-panel__title';
   title.textContent = 'Promote to';
   panel.appendChild(title);
-
   var row = document.createElement('div');
   row.className = 'promo-panel__pieces';
-
   var firstBtn = null;
   pieces.forEach(function(p) {
     var matching = candidates.find(function(m) { return m.promo === p; });
     if (!matching) return;
-
     var btn = document.createElement('button');
     btn.className = 'promo-piece-btn';
     btn.setAttribute('aria-label', 'Promote to ' + PROMO_NAMES[p]);
-    btn.setAttribute('tabindex', '0');
-
     var svgId = isWhite ? p.toUpperCase() : p.toLowerCase();
     btn.innerHTML = '<svg viewBox="0 0 45 45"><use href="#piece-' + svgId + '"/></svg>';
-
     btn.addEventListener('click', function() { completePromotion(p); });
     row.appendChild(btn);
-
     if (!firstBtn) firstBtn = btn;
   });
-
   panel.appendChild(row);
   backdrop.appendChild(panel);
-
-  backdrop.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') cancelPromotion();
-  });
-
+  backdrop.addEventListener('keydown', function(e) { if (e.key === 'Escape') cancelPromotion(); });
   document.body.appendChild(backdrop);
   if (firstBtn) setTimeout(function() { firstBtn.focus(); }, 0);
 }
 
 function completePromotion(promoType) {
   if (!pendingPromotion) return;
-  var move = pendingPromotion.candidates.find(function(m) { return m.promo === promoType; });
+  var cb = pendingPromotion.callback;
   pendingPromotion = null;
   dismissPromotionDialog();
-  if (move) executeMove(move);
+  if (cb) cb(promoType);
 }
 
 function cancelPromotion() {
   pendingPromotion = null;
-  selected = null;
+  if (ctrl) ctrl.setSelected(null);
   dismissPromotionDialog();
   render();
 }
@@ -930,111 +781,6 @@ function dismissPromotionDialog() {
   var el = document.getElementById('promo-dialog');
   if (el) el.remove();
 }
-
-function placeDuck(sq) {
-  game.duckSq = sq;
-  game.duckPhase = false;
-  if (game.turn === MCE.BLACK) game.fullmove++;
-  game.turn = game.turn === MCE.WHITE ? MCE.BLACK : MCE.WHITE;
-  selected = null;
-  render();
-}
-
-function scheduleAIMove() {
-  aiThinking = true;
-  const dur = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
-  setTimeout(doAIMove, dur + 100);
-}
-
-function doAIMove() {
-  if (isGameOver()) { aiThinking = false; render(); return; }
-
-  if (game._pendingAction) {
-    const moves = getMovesForVariant();
-    if (moves.length > 0) {
-      const pick = moves[Math.floor(Math.random() * moves.length)];
-      handleAIResult(pick);
-    } else {
-      aiThinking = false;
-      render();
-    }
-    return;
-  }
-
-  const vcAI = MCE.getVariantConfig(currentVariant);
-  if (vcAI && vcAI.aiMoveCount) {
-    const count = vcAI.aiMoveCount(game);
-    if (count > 1) { doAIMoveMultiPlugin(count); return; }
-  }
-
-  if (aiWorker && aiWorkerReady) {
-    aiMoveId++;
-    aiWorker.postMessage({
-      type: 'pickMove',
-      game: serializeGame(game),
-      difficulty: aiDifficulty,
-      id: aiMoveId
-    });
-    return;
-  }
-
-  const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
-  handleAIResult(move);
-}
-
-function handleAIResult(move) {
-  if (!move) { aiThinking = false; render(); return; }
-
-  const side = game.turn;
-  trackCaptures(move, side);
-  const undo = MCE.makeMove(game, move);
-  undoStack.push(undo);
-  lastMove = { from: move.from, to: move.to };
-  addMoveToList(move, side);
-
-  if (game._pendingAction) {
-    setTimeout(doAIMove, 100);
-    return;
-  }
-
-  if (game.duckPhase) {
-    if (aiWorker && aiWorkerReady) {
-      aiWorker.postMessage({
-        type: 'pickDuck',
-        game: serializeGame(game),
-        id: ++aiMoveId
-      });
-      return;
-    }
-    const duckSq = MCE.aiPickDuckSquare(game);
-    if (duckSq >= 0) placeDuck(duckSq);
-  }
-
-  aiThinking = false;
-  renderControls();
-  renderCaptured();
-  render();
-}
-
-
-function doAIMoveMultiPlugin(count) {
-  const side = game.turn;
-  for (let i = 0; i < count; i++) {
-    if (isGameOver() || game.turn !== side) break;
-    const move = MCE.aiPickMove(game, null, { difficulty: aiDifficulty });
-    if (!move) break;
-    trackCaptures(move, side);
-    const undo = MCE.makeMove(game, move);
-    undoStack.push(undo);
-    lastMove = { from: move.from, to: move.to };
-    addMoveToList(move, side);
-  }
-  aiThinking = false;
-  renderControls();
-  renderCaptured();
-  render();
-}
-
 
 function trackCaptures(move, movingSide) {
   const capturedPiece = game.board[move.to];
@@ -1111,6 +857,67 @@ function sortCaptured(pieces) {
     const tb = MCE.pieceType(b);
     return (order[ta] || 9) - (order[tb] || 9);
   });
+}
+
+function renderHand() {
+  const handEl = document.getElementById('hand-panel');
+  if (!handEl) return;
+  if (!game.hand) { handEl.innerHTML = ''; return; }
+
+  const SVGns = 'http://www.w3.org/2000/svg';
+  handEl.innerHTML = '';
+
+  const sides = flipped ? [MCE.WHITE, MCE.BLACK] : [MCE.BLACK, MCE.WHITE];
+  for (const side of sides) {
+    const hand = game.hand[side];
+    if (!hand || hand.length === 0) continue;
+    const row = document.createElement('div');
+    row.className = 'hand-row';
+    const label = document.createElement('span');
+    label.className = 'hand-label';
+    label.textContent = (side === MCE.WHITE ? 'White' : 'Black') + ':';
+    row.appendChild(label);
+
+    const counted = {};
+    for (const p of hand) { counted[p] = (counted[p] || 0) + 1; }
+    const order = ['q', 'r', 'b', 'n', 'p'];
+    for (const pt of order) {
+      if (!counted[pt]) continue;
+      const pieceChar = side === MCE.WHITE ? pt.toUpperCase() : pt;
+      const btn = document.createElement('button');
+      btn.className = 'hand-piece';
+      if (dropMode === pt && side === game.turn) btn.classList.add('hand-piece--active');
+      const svg = document.createElementNS(SVGns, 'svg');
+      svg.setAttribute('width', '32');
+      svg.setAttribute('height', '32');
+      svg.setAttribute('viewBox', '0 0 45 45');
+      const use = document.createElementNS(SVGns, 'use');
+      use.setAttribute('href', '#piece-' + pieceChar);
+      use.setAttribute('width', '45');
+      use.setAttribute('height', '45');
+      svg.appendChild(use);
+      btn.appendChild(svg);
+      if (counted[pt] > 1) {
+        const badge = document.createElement('span');
+        badge.className = 'hand-count';
+        badge.textContent = counted[pt];
+        btn.appendChild(badge);
+      }
+      const isMyTurn = side === game.turn && (!ctrl || !ctrl.getState().aiThinking) && !gameOver;
+      const isHuman = gameMode === 'pass' || (gameMode === 'solo' && side !== aiColor);
+      if (isMyTurn && isHuman) {
+        btn.addEventListener('click', function() {
+          if (dropMode === pt) { dropMode = null; } else { dropMode = pt; if (ctrl) ctrl.setSelected(null); }
+          render();
+          renderHand();
+        });
+      } else {
+        btn.disabled = true;
+      }
+      row.appendChild(btn);
+    }
+    handEl.appendChild(row);
+  }
 }
 
 function addMoveToList(move, side) {
@@ -1207,6 +1014,7 @@ function setupEmbedBridge() {
         const d = e.data.difficulty;
         if (d && MCE.AI_DIFFICULTIES && MCE.AI_DIFFICULTIES[d]) {
           aiDifficulty = d;
+          if (ctrl) ctrl.setDifficulty(d);
         }
         break;
       }

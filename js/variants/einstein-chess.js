@@ -18,7 +18,7 @@ MCE.registerVariant('einsteinChess', {
     var hierarchy = ['p', 'n', 'b', 'r', 'q'];
     var idx = hierarchy.indexOf(type);
     if (idx < 0) return;
-    var isCapture = move.flag === 'capture' || move.flag === 'ep';
+    var isCapture = !!undo.captured || move.flag === 'ep';
     var newIdx;
     if (isCapture) {
       newIdx = Math.min(idx + 1, hierarchy.length - 1);

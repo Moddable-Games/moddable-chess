@@ -122,6 +122,14 @@ function renderPieces(game, rows, cols, tileSize) {
       const piece = game.board[sq];
       if (!piece) continue;
 
+      if (piece === 'D') {
+        const cx = c * tileSize + tileSize / 2;
+        const cy = r * tileSize + tileSize / 2;
+        out += `<circle cx="${cx}" cy="${cy}" r="${tileSize * 0.35}" fill="#f5c542" stroke="#b8860b" stroke-width="2"/>\n`;
+        out += `<text x="${cx}" y="${cy + tileSize * 0.08}" text-anchor="middle" font-size="${tileSize * 0.3}" fill="#6b4c00">D</text>\n`;
+        continue;
+      }
+
       const x = c * tileSize + offset;
       const y = r * tileSize + offset;
 

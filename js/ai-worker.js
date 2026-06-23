@@ -46,7 +46,11 @@ function rebuildGame(snapshot) {
     if (vc.pawnStartRow) g.pawnStartRow = vc.pawnStartRow;
     if (vc.pawnDirection) g.pawnDirection = vc.pawnDirection;
     if (vc.promotionRank) g.promotionRank = vc.promotionRank;
-    if (vc.init && !g._initDone) vc.init(g);
+    if (vc.init && !g._initDone) {
+      var savedHand = g.hand;
+      vc.init(g);
+      if (savedHand) g.hand = savedHand;
+    }
     g._initDone = true;
   }
   return g;
