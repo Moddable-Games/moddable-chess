@@ -8,6 +8,6 @@ MCE.registerVariant('dianaChess', {
   noCastling: true,
   noEnPassant: true,
   title: 'Diana Chess',
-  description: 'A 6×6 board with no queens or knights. Each side fields a king, two rooks, two bishops, and six pawns. Bishops dominate the diagonals.',
+  description: 'A 6×6 board with no queens or knights. Each side fields a king, two rooks, three bishops, and six pawns. Bishops dominate the diagonals.',
   rule: 'Board: 6×6 · Win: Checkmate',
 });

@@ -1,13 +1,13 @@
 import MCE from '../chess-engine.js';
 var makrukOpeningBook = {
-  "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSMKSNR w - -": ["e3e4", "d3d4", "f3f4", "c3c4"],
-  "rnsmksnr/8/pppppppp/8/4P3/PPPP1PPP/8/RNSMKSNR b - -": ["e6e5", "d6d5", "f6f5"],
-  "rnsmksnr/8/pppppppp/8/3P4/PPP1PPPP/8/RNSMKSNR b - -": ["d6d5", "e6e5", "c6c5"],
-  "rnsmksnr/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNSMKSNR w - -": ["d3d4", "f3f4", "b1c3"],
-  "rnsmksnr/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNSMKSNR w - -": ["e3e4", "c3c4", "b1c3"],
+  "rngfkgnr/8/pppppppp/8/8/PPPPPPPP/8/RNGFKGNR w - -": ["e3e4", "d3d4", "f3f4", "c3c4"],
+  "rngfkgnr/8/pppppppp/8/4P3/PPPP1PPP/8/RNGFKGNR b - -": ["e6e5", "d6d5", "f6f5"],
+  "rngfkgnr/8/pppppppp/8/3P4/PPP1PPPP/8/RNGFKGNR b - -": ["d6d5", "e6e5", "c6c5"],
+  "rngfkgnr/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNGFKGNR w - -": ["d3d4", "f3f4", "b1c3"],
+  "rngfkgnr/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNGFKGNR w - -": ["e3e4", "c3c4", "b1c3"],
 };
 
-MCE.registerPiece('m', {
+var diagOnlyHandler = {
   genMoves: function(g, from, side) {
     var moves = [];
     var dirs = [[-1,-1],[-1,1],[1,-1],[1,1]];
@@ -28,7 +28,9 @@ MCE.registerPiece('m', {
     var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];
     return Math.abs(tr - fr) === 1 && Math.abs(tc - fc) === 1;
   }
-});
+};
+MCE.registerPiece('f', diagOnlyHandler);
+MCE.registerPiece('g', diagOnlyHandler);
 
 MCE.registerVariant('makruk', {
   openingBook: makrukOpeningBook,
@@ -36,16 +38,16 @@ MCE.registerVariant('makruk', {
   group: 'Alternate Rules',
   rows: 8,
   cols: 8,
-  fen: 'rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSMKSNR w - - 0 1',
+  fen: 'rngfkgnr/8/pppppppp/8/8/PPPPPPPP/8/RNGFKGNR w - - 0 1',
   noCastling: true,
   noEnPassant: true,
   promotionRank: function(side) { return side === MCE.WHITE ? 2 : 5; },
-  promotionPieces: ['m'],
+  promotionPieces: ['f'],
   title: 'Makruk (Thai Chess)',
-  description: 'Thai chess played since the 16th century. Pawns promote on the 6th rank to Met (a piece that moves one step diagonally). No castling, no en passant.',
+  description: 'Thai chess played since the 16th century. The Met (F) moves one step diagonally; the Khon (G) also moves one step diagonally. Pawns promote on the 6th rank to Met. No castling, no en passant.',
   rule: 'Board: 8×8 · Win: Checkmate',
   evaluate: function(g, defaultEval) {
-    var VALS = { p: 100, n: 300, s: 300, m: 150, r: 500, k: 0 };
+    var VALS = { p: 100, n: 300, g: 300, f: 150, r: 500, k: 0 };
     var score = 0;
     var myKingSq = -1, oppKingSq = -1;
     var myPieces = 0, oppPieces = 0;

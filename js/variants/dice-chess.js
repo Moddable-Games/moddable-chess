@@ -33,6 +33,7 @@ MCE.registerVariant('diceChess', {
     return moves;
   },
   statusText: function(g, helpers) {
+    if (helpers.gameOver) return null;
     var diceNames = ['Pawn', 'Knight', 'Bishop', 'Rook', 'Queen', 'King'];
     var roll = g.diceRoll || 1;
     var name = diceNames[roll - 1];

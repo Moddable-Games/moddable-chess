@@ -216,11 +216,16 @@ function genCastling(g, from, r, c, side, moves) {
 }
 
 function isAttacked(g, target, bySide) {
+  const vc = g && g.variant ? MCE.getVariantConfig(g.variant) : null;
+  const af = vc && vc.attackFilter;
   const total = g.rows * g.cols;
   for (let i = 0; i < total; i++) {
     const p = g.board[i];
     if (!p || isFriendly(i, bySide, g)) continue;
-    if (attacks(g, i, target, p)) return true;
+    if (attacks(g, i, target, p)) {
+      if (af && !af(g, i, target)) continue;
+      return true;
+    }
   }
   return false;
 }

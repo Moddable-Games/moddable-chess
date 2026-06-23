@@ -1,4 +1,5 @@
 import MCE from '../chess-engine.js';
+import { legalMoves, inCheck } from '../chess-moves.js';
 MCE.registerVariant('noRetreat', {
   label: 'No Retreat',
   group: 'Alternate Rules',
@@ -8,6 +9,15 @@ MCE.registerVariant('noRetreat', {
   title: 'No Retreat Chess',
   description: 'Pieces cannot move backward toward their own starting rank. White pieces must move to equal or lower row indices (toward rank 8). Black pieces must move to equal or higher row indices (toward rank 1).',
   rule: 'Board: 8×8 · Win: Checkmate',
+  winCondition: function(g) {
+    var moves = legalMoves(g);
+    var vc = MCE.getVariantConfig('noRetreat');
+    if (vc && vc.moveFilter) moves = vc.moveFilter(g, moves);
+    if (moves.length === 0) {
+      return inCheck(g, g.turn) ? 'checkmate' : 'stalemate';
+    }
+    return null;
+  },
   moveFilter: function(g, moves) {
     return moves.filter(function(m) {
       var fromRC = MCE.rc(m.from, g);

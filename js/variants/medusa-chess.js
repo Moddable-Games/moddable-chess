@@ -6,7 +6,7 @@ MCE.registerVariant('medusaChess', {
   cols: 8,
   fen: null,
   title: 'Medusa Chess',
-  description: 'After the queen moves, all enemy pieces she attacks become petrified for 2 turns. Petrified pieces cannot move. Strategy shifts from capturing to freezing.',
+  description: 'After the queen moves, all enemy pieces she attacks become petrified for 2 turns (kings are immune). Petrified pieces cannot move. Strategy shifts from capturing to freezing.',
   rule: 'Board: 8x8 - Win: Checkmate',
   afterMove: function(g, move, undo) {
     var piece = g.board[move.to];
