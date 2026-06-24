@@ -344,12 +344,8 @@ function renderBoard(container, game, opts) {
     const ddc = flipped ? cols - 1 - dc2 : dc2;
     const cx = ddc * tileSize + tileSize / 2;
     const cy = ddr * tileSize + tileSize / 2;
-    svg.appendChild(svgEl('circle', {
-      cx, cy, r: tileSize * 0.35,
-      fill: '#f5c542', stroke: '#b8860b', 'stroke-width': 2,
-    }));
     const txt = svgEl('text', {
-      x: cx, y: cy + 5, 'text-anchor': 'middle', 'font-size': tileSize * 0.3, fill: '#6b4c00',
+      x: cx, y: cy + tileSize * 0.3, 'text-anchor': 'middle', 'font-size': tileSize * 0.85,
     });
     txt.textContent = '🦆';
     svg.appendChild(txt);

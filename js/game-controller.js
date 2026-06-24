@@ -77,6 +77,7 @@ import './variants/teleport-chess.js';
 import './variants/poison-chess.js';
 import './variants/medusa-chess.js';
 import './variants/immunization-chess.js';
+import './variants/piece-test.js';
 
 function track(event, params) {
   if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
@@ -227,7 +228,7 @@ const VARIANT_FILES = [
 
 let ctrl = null;
 
-fetch(basePath + 'assets/pieces.svg')
+fetch(basePath + 'assets/pieces.svg?v=0.9.18')
   .then(r => r.text())
   .then(svg => {
     const div = document.createElement('div');
