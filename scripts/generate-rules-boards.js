@@ -9,6 +9,7 @@ const MORRIS_DIAGRAMS = `${RULES_ROOT}/morris/diagrams/svg`;
 const DUNGEON_DIAGRAMS = `${RULES_ROOT}/dungeon-chess/diagrams/svg`;
 const UR_DIAGRAMS = `${RULES_ROOT}/royal-ur/diagrams/svg`;
 const XIANGQI_DIAGRAMS = `${RULES_ROOT}/xiangqi/diagrams/svg`;
+const SHOGI_DIAGRAMS = `${RULES_ROOT}/shogi/diagrams/svg`;
 
 let generated = 0;
 let failed = 0;
@@ -270,6 +271,53 @@ const xiangqiWestSvg = renderBoardSVG({
   title: 'Xiangqi — starting position (Western)',
 });
 write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board-west.svg`, xiangqiWestSvg, 'xiangqi-start-west');
+
+// --- Shogi ---
+
+console.log('\nGenerating Shogi boards...');
+
+import { SHOGI_PIECES } from '../js/shogi-pieces.js';
+
+const SHOGI_VARIANTS = [
+  { key: 'standard', name: 'Standard Shogi', rows: 9, cols: 9, fen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' },
+  { key: 'hasami', name: 'Hasami Shogi', rows: 9, cols: 9, fen: 'ppppppppp/9/9/9/9/9/9/9/PPPPPPPPP' },
+  { key: 'kyoto', name: 'Kyoto Shogi', rows: 5, cols: 5, fen: 'lbkgs/5/5/5/SGKBL' },
+  { key: 'minishogi', name: 'Minishogi', rows: 5, cols: 5, fen: 'rbsgk/4p/5/P4/KGSBR' },
+];
+
+function shogiFenToPos(fen, rows, cols) {
+  const pos = {};
+  const ranks = fen.split('/');
+  for (let r = 0; r < ranks.length; r++) {
+    let c = 0;
+    let promoted = false;
+    for (const ch of ranks[r]) {
+      if (ch === '+') { promoted = true; continue; }
+      if (/\d/.test(ch)) { c += parseInt(ch, 10); promoted = false; continue; }
+      const file = String.fromCharCode(97 + c);
+      const rank = rows - r;
+      pos[`${file}${rank}`] = promoted ? `+${ch}` : ch;
+      c++;
+      promoted = false;
+    }
+  }
+  return pos;
+}
+
+for (const v of SHOGI_VARIANTS) {
+  const pos = shogiFenToPos(v.fen, v.rows, v.cols);
+  const svg = renderBoardSVG({
+    boardStyle: 'shogi',
+    rows: v.rows,
+    cols: v.cols,
+    tileSize: 40,
+    showLabels: false,
+    position: pos,
+    pieceDefs: SHOGI_PIECES,
+    title: `${v.name} — starting position`,
+  });
+  write(`${SHOGI_DIAGRAMS}/${v.key}-board.svg`, svg, `shogi-${v.key}`);
+}
 
 // --- Report ---
 

@@ -6,6 +6,7 @@ import { morris } from './morris.js';
 import { dungeon } from './dungeon.js';
 import { royalUr } from './royal-ur.js';
 import { xiangqi } from './xiangqi.js';
+import { shogi } from './shogi.js';
 
 export const providers = {
   'checkered': checkered,
@@ -16,4 +17,5 @@ export const providers = {
   'dungeon': dungeon,
   'royal-ur': royalUr,
   'xiangqi': xiangqi,
+  'shogi': shogi,
 };
