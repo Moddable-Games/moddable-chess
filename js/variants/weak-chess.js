@@ -8,6 +8,7 @@ MCE.registerVariant('weakChess', {
   title: 'Weak! Chess',
   description: 'The weakest piece type that has a legal move MUST move. Piece strength: Pawn=1, Knight=2, Bishop=3, Rook=4, Queen=5, King=6.',
   rule: 'Board: 8×8 · Win: Checkmate',
+  promotionPieces: ['q', 'r', 'b', 'n'],
   moveFilter: function(g, moves) {
     var strength = { p: 1, n: 2, b: 3, r: 4, q: 5, k: 6 };
     var minStrength = 7;

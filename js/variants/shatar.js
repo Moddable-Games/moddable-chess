@@ -20,14 +20,18 @@ MCE.registerVariant('shatar', {
     return material + (16 - oppCount) * 60;
   },
   winCondition: function(g) {
-    var wCount = 0, bCount = 0;
+    var wCount = 0, bCount = 0, wKing = false, bKing = false;
     for (var i = 0; i < g.board.length; i++) {
       if (!g.board[i]) continue;
-      if (MCE.pieceColor(g.board[i]) === MCE.WHITE) wCount++;
-      else bCount++;
+      var color = MCE.pieceColor(g.board[i]);
+      var type = MCE.pieceType(g.board[i]);
+      if (color === MCE.WHITE) { wCount++; if (type === 'k') wKing = true; }
+      else { bCount++; if (type === 'k') bKing = true; }
     }
-    if (wCount === 1) return 'shatar-b';
-    if (bCount === 1) return 'shatar-w';
+    if (!wKing) return 'shatar-b';
+    if (!bKing) return 'shatar-w';
+    if (wCount === 1 && wKing) return 'shatar-b';
+    if (bCount === 1 && bKing) return 'shatar-w';
     return null;
   },
   statusText: function(g, helpers) {

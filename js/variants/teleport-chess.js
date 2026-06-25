@@ -16,25 +16,29 @@ MCE.registerVariant('teleportChess', {
     if (!g.teleportsLeft || g.teleportsLeft[side] <= 0) return moves;
 
     var total = g.rows * g.cols;
-
-    // Find all empty squares
     var emptySquares = [];
     for (var sq = 0; sq < total; sq++) {
       if (!g.board[sq]) emptySquares.push(sq);
     }
 
-    // For each own piece, add teleport action to each empty square
+    var existingTargets = {};
+    for (var m = 0; m < moves.length; m++) {
+      existingTargets[moves[m].from + ':' + moves[m].to] = true;
+    }
+
     for (var i = 0; i < total; i++) {
       var p = g.board[i];
       if (!p || MCE.pieceColor(p) !== side) continue;
 
       for (var e = 0; e < emptySquares.length; e++) {
-        moves.push({
-          from: i,
-          to: emptySquares[e],
-          flag: 'action',
-          action: 'teleport'
-        });
+        var key = i + ':' + emptySquares[e];
+        if (existingTargets[key]) continue;
+
+        var teleMove = { from: i, to: emptySquares[e], flag: 'action', action: 'teleport' };
+        var undo = MCE.makeMove(g, teleMove);
+        var legal = !MCE.inCheck(g, side);
+        MCE.unmakeMove(g, undo);
+        if (legal) moves.push(teleMove);
       }
     }
 

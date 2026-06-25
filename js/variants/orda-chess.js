@@ -97,22 +97,48 @@ MCE.registerPiece('h', {
   }
 });
 
+var KING_DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+var KNIGHT_JUMPS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+
+MCE.registerPiece('w', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];
+    var allDirs = KING_DIRS.concat(KNIGHT_JUMPS);
+    for (var i = 0; i < allDirs.length; i++) {
+      var nr = r + allDirs[i][0], nc = c + allDirs[i][1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target] && MCE.isFriendly(target, side, g)) continue;
+      moves.push({ from: from, to: target, flag: g.board[target] ? 'capture' : null });
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    var fr = MCE.rc(from, g)[0], fc = MCE.rc(from, g)[1];
+    var tr = MCE.rc(target, g)[0], tc = MCE.rc(target, g)[1];
+    var dr = Math.abs(tr - fr), dc = Math.abs(tc - fc);
+    if (dr <= 1 && dc <= 1 && (dr + dc > 0)) return true;
+    return (dr * dc === 2 && dr + dc === 3);
+  }
+});
+
 MCE.registerVariant('ordaChess', {
   openingBook: {
-    "lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ -": ["e2e4", "d2d4", "g1f3", "c2c4"],
-    "lhaykahl/8/pppppppp/8/4P3/PPPP1PPP/8/RNBQKBNR b KQ -": ["e6e5", "d6d5", "c6c5"],
-    "lhaykahl/8/pppppppp/8/3P4/PPP1PPPP/8/RNBQKBNR b KQ -": ["d6d5", "e6e5", "f6f5"],
-    "lhaykahl/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNBQKBNR w KQ -": ["g1f3", "d2d4", "f1c4"],
-    "lhaykahl/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNBQKBNR w KQ -": ["c2c4", "e2e4", "g1f3"],
+    "lhwykwhl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ -": ["e2e4", "d2d4", "g1f3", "c2c4"],
+    "lhwykwhl/8/pppppppp/8/4P3/PPPP1PPP/8/RNBQKBNR b KQ -": ["e6e5", "d6d5", "c6c5"],
+    "lhwykwhl/8/pppppppp/8/3P4/PPP1PPPP/8/RNBQKBNR b KQ -": ["d6d5", "e6e5", "f6f5"],
+    "lhwykwhl/8/pppp1ppp/4p3/4P3/PPPP1PPP/8/RNBQKBNR w KQ -": ["g1f3", "d2d4", "f1c4"],
+    "lhwykwhl/8/ppp1pppp/3p4/3P4/PPP1PPPP/8/RNBQKBNR w KQ -": ["c2c4", "e2e4", "g1f3"],
   },
   label: 'Orda Chess',
   group: 'Asymmetric',
   rows: 8,
   cols: 8,
-  fen: 'lhaykahl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',
+  fen: 'lhwykwhl/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQ - 0 1',
   noCastling: false,
   title: 'Orda Chess',
-  description: 'Asymmetric: White plays standard chess. Black commands the Horde — Yurt (moves diagonal, captures orthogonal), Lancer and Archer (move like rook/bishop, capture like knight). Khan replaces king.',
+  description: 'Asymmetric: White plays standard chess. Black commands the Horde — Yurt (moves diagonal, captures orthogonal), Lancer (moves like rook, captures like knight), Archer (moves like bishop, captures like knight), Kheshig (moves as king or knight).',
   rule: 'Board: 8×8 · Win: Checkmate',
-  pieceRoles: { y: 'y', l: 'l', h: 'h' },
+  pieceRoles: { y: 'y', l: 'l', h: 'h', w: 'w' },
 });
