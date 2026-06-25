@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<!-- Shogi pieces: pentagon tiles with kanji (Ryoko-inspired style) -->
+<!-- Sente (attacking player) pieces point UP, Gote pieces point DOWN -->
+<!-- viewBox 0 0 100 100 for each symbol -->
+
+<!-- Sente (black/uppercase) pieces - pointing UP -->
+<symbol id="piece-K" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">王</text></g></symbol>
+<symbol id="piece-R" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">飛</text></g></symbol>
+<symbol id="piece-B" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">角</text></g></symbol>
+<symbol id="piece-G" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">金</text></g></symbol>
+<symbol id="piece-S" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">銀</text></g></symbol>
+<symbol id="piece-N" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">桂</text></g></symbol>
+<symbol id="piece-L" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">香</text></g></symbol>
+<symbol id="piece-P" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">歩</text></g></symbol>
+
+<!-- Sente promoted pieces (red kanji) -->
+<symbol id="piece-+R" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">龍</text></g></symbol>
+<symbol id="piece-+B" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">馬</text></g></symbol>
+<symbol id="piece-+S" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">全</text></g></symbol>
+<symbol id="piece-+N" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">金</text></g></symbol>
+<symbol id="piece-+L" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">と</text></g></symbol>
+<symbol id="piece-+P" viewBox="0 0 100 100"><g><polygon points="50,8 85,35 75,90 25,90 15,35" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">と</text></g></symbol>
+
+<!-- Gote (white/lowercase) pieces - pointing DOWN (polygon inverted) -->
+<symbol id="piece-k" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">玉</text></g></symbol>
+<symbol id="piece-r" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">飛</text></g></symbol>
+<symbol id="piece-b" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">角</text></g></symbol>
+<symbol id="piece-g" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">金</text></g></symbol>
+<symbol id="piece-s" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">銀</text></g></symbol>
+<symbol id="piece-n" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">桂</text></g></symbol>
+<symbol id="piece-l" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">香</text></g></symbol>
+<symbol id="piece-p" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#1a1a1a">歩</text></g></symbol>
+
+<!-- Gote promoted pieces (red kanji, pointing down) -->
+<symbol id="piece-+r" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">龍</text></g></symbol>
+<symbol id="piece-+b" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">馬</text></g></symbol>
+<symbol id="piece-+s" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">全</text></g></symbol>
+<symbol id="piece-+n" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">金</text></g></symbol>
+<symbol id="piece-+l" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">と</text></g></symbol>
+<symbol id="piece-+p" viewBox="0 0 100 100"><g><polygon points="50,92 85,65 75,10 25,10 15,65" fill="#f5deb3" stroke="#4a3520" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="32" font-family="serif" font-weight="bold" fill="#c03030">と</text></g></symbol>
+</svg>

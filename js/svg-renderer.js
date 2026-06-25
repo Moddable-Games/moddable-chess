@@ -9,6 +9,7 @@ export const BOARD_STYLES = {
   MORRIS: 'morris',
   DUNGEON: 'dungeon',
   ROYAL_UR: 'royal-ur',
+  XIANGQI: 'xiangqi',
 };
 
 export const DEFAULT_COLORS = {
@@ -105,7 +106,7 @@ function render(opts, annotations) {
   }
 
   if (position && Object.keys(position).length > 0) {
-    const defs = collectChessDefs(position);
+    const defs = collectChessDefs(position, opts.pieceDefs);
     if (defs) parts.push(defs);
   }
 
@@ -180,16 +181,18 @@ function drawChessPiece(piece, x, y, ts) {
   return `<use href="#${id}" x="${x}" y="${y}" width="${ts}" height="${ts}"/>`;
 }
 
-function collectChessDefs(position) {
+function collectChessDefs(position, customDefs) {
+  const pieceMap = customDefs || CHESS_PIECES;
+  const viewBox = customDefs ? '0 0 100 100' : '0 0 45 45';
   const needed = new Set();
   for (const raw of Object.values(position)) {
     const piece = (raw && typeof raw === 'object') ? raw : { type: String(raw) };
-    if (CHESS_PIECES[piece.type]) needed.add(piece.type);
+    if (pieceMap[piece.type]) needed.add(piece.type);
   }
   if (needed.size === 0) return '';
   const parts = ['<defs>'];
   for (const t of needed) {
-    parts.push(`<symbol id="piece-${t}" viewBox="0 0 45 45">${CHESS_PIECES[t]}</symbol>`);
+    parts.push(`<symbol id="piece-${t}" viewBox="${viewBox}">${pieceMap[t]}</symbol>`);
   }
   parts.push('</defs>');
   return parts.join('');

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<!-- Xiangqi Western/Pictographic piece sprite sheet -->
+<!-- Red pieces (uppercase) from translate(-50,0) groups; Black pieces (lowercase) from translate(150,0) groups -->
+
+<!-- K = General (Red) -->
+<symbol id="piece-K" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M-24,-47Q0,-44 24,-47L24,-90 56,-85Q58,-109 56,-135L24,-130 25,-163Q0,-166 -25,-163L-24,-130 -56,-135Q-58,-109 -56,-85L-24,-90zM23,119 23,-42C100,-70 142,-60 142,13C142,60 117,110 92,160L-92,160C-117,110 -142,60 -142,13C-142,-60 -100,-70 -23,-42L-23,119M110,122 -110,122"/></g>
+</symbol>
+
+<!-- k = General (Black) -->
+<symbol id="piece-k" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M-24,-47Q0,-44 24,-47L24,-90 56,-85Q58,-109 56,-135L24,-130 25,-163Q0,-166 -25,-163L-24,-130 -56,-135Q-58,-109 -56,-85L-24,-90zM23,119 23,-42C100,-70 142,-60 142,13C142,60 117,110 92,160L-92,160C-117,110 -142,60 -142,13C-142,-60 -100,-70 -23,-42L-23,119M110,122 -110,122"/></g>
+</symbol>
+
+<!-- A = Advisor (Red) -->
+<symbol id="piece-A" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M0,-136 31,-96 107,-105 69,-35Q98,11 62,65Q102,94 112,150L-112,150Q-102,94 -62,65Q-98,11 -69,-35L-107,-105 -31,-96zM69,-35 -69,-35M40,0 20,18M-40,0 -20,18"/></g>
+</symbol>
+
+<!-- a = Advisor (Black) -->
+<symbol id="piece-a" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M0,-136 31,-96 107,-105 69,-35Q98,11 62,65Q102,94 112,150L-112,150Q-102,94 -62,65Q-98,11 -69,-35L-107,-105 -31,-96zM69,-35 -69,-35M40,0 20,18M-40,0 -20,18"/></g>
+</symbol>
+
+<!-- E = Elephant (Red) -->
+<symbol id="piece-E" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M135,-50 160,-50Q125,135 60,40Q12,60 -18,-7Q-50,70 -140,10L-90,-100Q-70,-130 -25,-110Q70,-170 100,0L118,8zM28,48Q40,75 40,108L-138,108Q-138,60 -120,30M35,-10 35,30 180,10zM50,-60A5,5 180 0 0 50,-50A5,5 180 0 0 50,-60"/></g>
+</symbol>
+
+<!-- e = Elephant (Black) -->
+<symbol id="piece-e" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M135,-50 160,-50Q125,135 60,40Q12,60 -18,-7Q-50,70 -140,10L-90,-100Q-70,-130 -25,-110Q70,-170 100,0L118,8zM28,48Q40,75 40,108L-138,108Q-138,60 -120,30M35,-10 35,30 180,10zM50,-60A5,5 180 0 0 50,-50A5,5 180 0 0 50,-60"/></g>
+</symbol>
+
+<!-- R = Chariot (Red) -->
+<symbol id="piece-R" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M20,-120 20,-95 55,-95 55,-120 95,-120 95,-55 -95,-55 -95,-120 -55,-120 -55,-95 -20,-95 -20,-120zM60,-45 60,50 -60,50 -60,-45zM95,60 95,90 -95,90 -95,60zM110,100 110,130 -110,130 -110,100z"/></g>
+</symbol>
+
+<!-- r = Chariot (Black) -->
+<symbol id="piece-r" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M20,-120 20,-95 55,-95 55,-120 95,-120 95,-55 -95,-55 -95,-120 -55,-120 -55,-95 -20,-95 -20,-120zM60,-45 60,50 -60,50 -60,-45zM95,60 95,90 -95,90 -95,60zM110,100 110,130 -110,130 -110,100z"/></g>
+</symbol>
+
+<!-- C = Cannon (Red) -->
+<symbol id="piece-C" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M-75,35 -125,70 -170,70 -170,40 -130,40 -97,18C-130,-60 -75,-106 30,-69L164,-20L164,22 70,30M-5,-40A65,65 180 0 0 -5,90A65,65 180 0 0 -5,-40M-5,-10A35,35 180 0 0 -5,60A35,35 180 0 0 -5,-10"/></g>
+</symbol>
+
+<!-- c = Cannon (Black) -->
+<symbol id="piece-c" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M-75,35 -125,70 -170,70 -170,40 -130,40 -97,18C-130,-60 -75,-106 30,-69L164,-20L164,22 70,30M-5,-40A65,65 180 0 0 -5,90A65,65 180 0 0 -5,-40M-5,-10A35,35 180 0 0 -5,60A35,35 180 0 0 -5,-10"/></g>
+</symbol>
+
+<!-- N = Horse (Red) -->
+<symbol id="piece-N" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M27,-116Q52,-116 85,-105L73,-70 145,0C168,25 151,53 115,45L40,28Q70,75 78,120L-127,120Q-140,-80 -30,-110M18,-68 22,-158Q-35,-125 -39,-75M70,-35A5,5 180 0 0 70,-25A5,5 180 0 0 70,-35"/></g>
+</symbol>
+
+<!-- n = Horse (Black) -->
+<symbol id="piece-n" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M27,-116Q52,-116 85,-105L73,-70 145,0C168,25 151,53 115,45L40,28Q70,75 78,120L-127,120Q-140,-80 -30,-110M18,-68 22,-158Q-35,-125 -39,-75M70,-35A5,5 180 0 0 70,-25A5,5 180 0 0 70,-35"/></g>
+</symbol>
+
+<!-- P = Soldier (Red) -->
+<symbol id="piece-P" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#c00" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#c00" fill="none" d="M-120,125Q-110,70 -65,43Q-135,-55 -34,-120L-35,-130A35,35 180 0 1 35,-130L34,-120Q135,-55 65,43Q110,70 120,125z"/></g>
+</symbol>
+
+<!-- p = Soldier (Black) -->
+<symbol id="piece-p" viewBox="0 0 100 100">
+<g transform="translate(50,50)"><circle r="48.5" stroke-width="3" stroke="#000" fill="#fda"/><circle r="43.5" stroke-width="3" stroke="#000" fill="none"/><path transform="scale(0.2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="20" stroke="#000" fill="none" d="M-120,125Q-110,70 -65,43Q-135,-55 -34,-120L-35,-130A35,35 180 0 1 35,-130L34,-120Q135,-55 65,43Q110,70 120,125z"/></g>
+</symbol>
+
+</svg>
