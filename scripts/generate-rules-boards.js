@@ -8,6 +8,7 @@ const GO_DIAGRAMS = `${RULES_ROOT}/go/diagrams/svg`;
 const MORRIS_DIAGRAMS = `${RULES_ROOT}/morris/diagrams/svg`;
 const DUNGEON_DIAGRAMS = `${RULES_ROOT}/dungeon-chess/diagrams/svg`;
 const UR_DIAGRAMS = `${RULES_ROOT}/royal-ur/diagrams/svg`;
+const XIANGQI_DIAGRAMS = `${RULES_ROOT}/xiangqi/diagrams/svg`;
 
 let generated = 0;
 let failed = 0;
@@ -219,6 +220,56 @@ const urSvg = renderBoardSVG({
   title: 'Royal Game of Ur — board layout',
 });
 write(`${UR_DIAGRAMS}/royal-ur-board.svg`, urSvg, 'royal-ur');
+
+// --- Xiangqi ---
+
+console.log('\nGenerating Xiangqi boards...');
+
+import { XIANGQI_PIECES_TRAD } from '../js/xiangqi-pieces.js';
+
+const XIANGQI_START_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
+
+function xiangqiFenToPos(fen) {
+  const pos = {};
+  const ranks = fen.split('/');
+  for (let r = 0; r < ranks.length; r++) {
+    let c = 0;
+    for (const ch of ranks[r]) {
+      if (/\d/.test(ch)) { c += parseInt(ch, 10); continue; }
+      const file = String.fromCharCode(97 + c);
+      const rank = ranks.length - r;
+      pos[`${file}${rank}`] = ch;
+      c++;
+    }
+  }
+  return pos;
+}
+
+const xiangqiSvg = renderBoardSVG({
+  boardStyle: 'xiangqi',
+  rows: 10,
+  cols: 9,
+  tileSize: 40,
+  showLabels: false,
+  position: xiangqiFenToPos(XIANGQI_START_FEN),
+  pieceDefs: XIANGQI_PIECES_TRAD,
+  title: 'Xiangqi — starting position (Chinese)',
+});
+write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board.svg`, xiangqiSvg, 'xiangqi-start');
+
+import { XIANGQI_PIECES_WEST } from '../js/xiangqi-pieces.js';
+
+const xiangqiWestSvg = renderBoardSVG({
+  boardStyle: 'xiangqi',
+  rows: 10,
+  cols: 9,
+  tileSize: 40,
+  showLabels: false,
+  position: xiangqiFenToPos(XIANGQI_START_FEN),
+  pieceDefs: XIANGQI_PIECES_WEST,
+  title: 'Xiangqi — starting position (Western)',
+});
+write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board-west.svg`, xiangqiWestSvg, 'xiangqi-start-west');
 
 // --- Report ---
 
