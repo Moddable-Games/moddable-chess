@@ -36,6 +36,9 @@ const CHESS_VARIANTS = await loadChessVariants();
 
 const MANUAL_CHESS_VARIANTS = [
   { slug: 'chaturanga', name: 'Chaturanga', fen: 'rnefkenr/pppppppp/8/8/8/8/PPPPPPPP/RNEFKENR', rows: 8, cols: 8 },
+  { slug: 'shatranj', name: 'Shatranj', fen: 'rnekfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKFENR', rows: 8, cols: 8 },
+  { slug: 'diana', name: 'Diana Chess', fen: 'rbbkr1/pppppp/6/6/PPPPPP/RBBKR1', rows: 6, cols: 6 },
+  { slug: 'petty', name: 'Petty Chess', fen: 'rnbqk/ppppp/5/5/PPPPP/RNBQK', rows: 6, cols: 5 },
 ];
 
 for (const manual of MANUAL_CHESS_VARIANTS) {
