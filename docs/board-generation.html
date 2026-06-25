@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board Generation — Moddable Chess</title>
+<link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Moddable Chess">
+<meta property="og:title" content="Board Generation — Moddable Chess">
+<meta property="og:description" content="SVG board diagram generator supporting 9 board styles across chess, draughts, Go, Morris, and more.">
+<meta property="og:url" content="https://chess.moddable.games/docs/board-generation.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Board Generation — Moddable Chess">
+<meta name="twitter:description" content="SVG board diagram generator supporting 9 board styles across chess, draughts, Go, Morris, and more.">
+<meta name="twitter:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.18">
+<meta property="og:image" content="https://chess.moddable.games/assets/og-image.png?v=0.9.18">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="stylesheet" href="../css/shared.css?v=0.9.18">
+<link rel="stylesheet" href="../css/docs.css?v=0.9.18">
+<link rel="stylesheet" href="../css/prism-custom.css?v=0.9.18">
+<script src="../js/analytics.js" defer></script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="../" class="site-nav__brand">
+    <img src="../assets/cube.svg" class="site-nav__cube" alt="">
+    <span class="site-nav__wordmark">Moddable Chess</span>
+  </a>
+  <div class="site-nav__links">
+    <a href="../play/">Play</a>
+    <a href="./" class="active">Docs</a>
+    <a href="api.html">API</a>
+    <a href="variants.html">Variants</a>
+    <a href="guide.html">Guides</a>
+    <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+<nav class="docs-toc" id="docs-toc"></nav>
+<div class="docs-body">
+  <h1>Board Generation</h1>
+  <p class="docs-lede">The SVG board generation pipeline produces static diagram images for all game families in <code>moddable-rules</code>. Nine board style providers cover chess, draughts, Go, Morris, Dungeon Chess, Royal Ur, Xiangqi, and Shogi.</p>
+
+  <h2 id="overview">Overview</h2>
+  <p>The generator reads variant data from engine plugins, applies the correct board style, places pieces, and writes self-contained SVG files. These diagrams illustrate rulebook pages across multiple game families.</p>
+  <pre class="language-javascript"><code class="language-javascript">node scripts/generate-rules-boards.js</code></pre>
+
+  <h2 id="board-styles">Board Styles</h2>
+  <p>Each style is a provider module in <code>js/svg-providers/</code> that defines geometry, rendering, and coordinate mapping.</p>
+
+  <div class="board-examples" id="board-examples"></div>
+
+  <h2 id="provider-api">Provider API</h2>
+  <p>Every provider exports an object with these properties:</p>
+  <pre class="language-javascript"><code class="language-javascript">export const myProvider = {
+  name: 'my-style',
+  positionType: 'square',  // 'square' | 'intersection' | 'node'
+  labelStyle: 'algebraic', // 'algebraic' | 'none'
+
+  computeLayout({ rows, cols, tileSize, ...opts }) {
+    // Return { boardW, boardH } — the inner dimensions
+    return { boardW: cols * tileSize, boardH: rows * tileSize };
+  },
+
+  render(ctx) {
+    // Return SVG markup string for the empty board
+    // ctx: { rows, cols, tileSize, ox, oy, colors, boardW, boardH }
+    return '&lt;rect .../&gt;';
+  },
+
+  // Optional: custom intersection coordinates
+  getIntersection(row, col, ctx) {
+    return { x: ctx.ox + col * ctx.tileSize,
+             y: ctx.oy + row * ctx.tileSize };
+  },
+};</code></pre>
+
+  <h3>Position Types</h3>
+  <table class="docs-table">
+    <tr><th>Type</th><th>Description</th><th>Used By</th></tr>
+    <tr><td><code>square</code></td><td>Pieces placed at tile centres</td><td>Checkered, Mono-grid, Dungeon, Royal Ur, Shogi</td></tr>
+    <tr><td><code>intersection</code></td><td>Pieces placed at line crossings</td><td>Go, Xiangqi, Alquerque</td></tr>
+    <tr><td><code>node</code></td><td>Pieces placed at graph vertices</td><td>Morris</td></tr>
+  </table>
+
+  <h2 id="piece-systems">Piece Rendering</h2>
+  <p>The renderer supports multiple piece systems. Chess pieces come from a central sprite sheet; other families use inline SVG shapes.</p>
+  <table class="docs-table">
+    <tr><th>System</th><th>Source</th><th>Families</th></tr>
+    <tr><td>Chess (standard + 10 fairy types)</td><td><code>assets/pieces.svg</code> &rarr; <code>js/svg-pieces.js</code></td><td>All 74 chess variants</td></tr>
+    <tr><td>Draughts (men + kings)</td><td>Inline circles + crowns</td><td>8 draughts variants</td></tr>
+    <tr><td>Go (stones)</td><td>Inline filled circles</td><td>Go (9x9, 13x13, 19x19)</td></tr>
+    <tr><td>Xiangqi (traditional)</td><td><code>assets/pieces-xiangqi-trad.svg</code></td><td>Xiangqi</td></tr>
+    <tr><td>Xiangqi (western)</td><td><code>assets/pieces-xiangqi-west.svg</code></td><td>Xiangqi (alt)</td></tr>
+    <tr><td>Shogi (kanji)</td><td><code>assets/pieces-shogi.svg</code></td><td>Shogi family</td></tr>
+  </table>
+
+  <h3>Chess Piece Characters</h3>
+  <p>Uppercase = White, lowercase = Black. The sprite sheet covers:</p>
+  <p><code>K Q R B N P</code> (standard) &middot; <code>A C M S F G Y L H E</code> (fairy)</p>
+  <p>A = Archbishop (B+N), C = Chancellor (R+N), M = Maharaja (Q+N), S = Sage, F = Fers, G = Guard, Y = Yurt, L = Lancer, H = Archer, E = Elephant (Alfil)</p>
+
+  <h2 id="adding-styles">Adding a Board Style</h2>
+  <ol>
+    <li>Create <code>js/svg-providers/my-style.js</code> exporting a provider object</li>
+    <li>Register in <code>js/svg-providers/index.js</code></li>
+    <li>Add a generation section in <code>scripts/generate-rules-boards.js</code></li>
+  </ol>
+  <p>See the <a href="https://github.com/Moddable-Games/moddable-chess/blob/main/scripts/README.md" target="_blank" rel="noopener">scripts README</a> for a full code template.</p>
+
+  <h2 id="adding-pieces">Adding a Piece Set</h2>
+  <ol>
+    <li>Create an SVG sprite sheet with <code>&lt;symbol id="piece-X"&gt;</code> elements on a 45x45 viewBox</li>
+    <li>Export piece characters to SVG markup in a JS module</li>
+    <li>Pass pieces via the <code>position</code> object when calling <code>renderBoardSVG()</code></li>
+  </ol>
+
+  <h2 id="architecture">Architecture</h2>
+  <pre class="language-javascript"><code class="language-javascript">scripts/generate-rules-boards.js  ← orchestration (variant discovery, output)
+js/svg-renderer.js                ← core (layout, labels, piece overlay)
+js/svg-providers/*.js             ← board geometry (9 providers)
+js/svg-pieces.js                  ← chess glyph registry
+assets/pieces.svg                 ← single source of truth for chess pieces</code></pre>
+
+  <h3>Data Flow</h3>
+  <ol>
+    <li>Generator reads variant plugins to extract FEN, dimensions, slug</li>
+    <li>Calls <code>renderBoardSVG({ boardStyle, rows, cols, position })</code></li>
+    <li>Renderer delegates geometry to the matching provider</li>
+    <li>Provider draws tiles/lines/decorations</li>
+    <li>Renderer overlays pieces from position data</li>
+    <li>Self-contained SVG string written to <code>moddable-rules/games/&lt;family&gt;/diagrams/svg/</code></li>
+  </ol>
+
+  <h2 id="relationship">Relationship to moddable-rules</h2>
+  <p><strong>moddable-chess</strong> owns the rendering code. <strong>moddable-rules</strong> consumes the SVG output. The generator is a build-time dependency only: moddable-rules has no runtime dependency on moddable-chess. Rulebooks reference diagrams via <code>{{svg:filename.svg "caption"}}</code> in markdown.</p>
+</div>
+</div>
+
+<footer class="site-footer">
+  <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+  <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.9.18</p>
+</footer>
+
+<script type="module">
+import { renderBoardSVG } from '../js/svg-renderer.js';
+
+const examples = [
+  {
+    style: 'checkered',
+    title: 'Checkered',
+    desc: 'Alternating light/dark squares. Used by all 74 chess variants.',
+    opts: { boardStyle: 'checkered', rows: 8, cols: 8, tileSize: 32, responsive: true,
+      position: { e1: 'K', d1: 'Q', a1: 'R', h1: 'R', c1: 'B', f1: 'B', b1: 'N', g1: 'N',
+        a2: 'P', b2: 'P', c2: 'P', d2: 'P', e2: 'P', f2: 'P', g2: 'P', h2: 'P',
+        e8: 'k', d8: 'q', a8: 'r', h8: 'r', c8: 'b', f8: 'b', b8: 'n', g8: 'n',
+        a7: 'p', b7: 'p', c7: 'p', d7: 'p', e7: 'p', f7: 'p', g7: 'p', h7: 'p' }
+    }
+  },
+  {
+    style: 'mono-grid',
+    title: 'Mono Grid',
+    desc: 'Single-colour squares with grid lines. Used by Turkish Draughts.',
+    opts: { boardStyle: 'mono-grid', rows: 8, cols: 8, tileSize: 32, responsive: true }
+  },
+  {
+    style: 'go',
+    title: 'Go',
+    desc: 'Intersection-based wooden board with star points. Supports 9x9, 13x13, 19x19.',
+    opts: { boardStyle: 'go', rows: 9, cols: 9, tileSize: 28, responsive: true }
+  },
+  {
+    style: 'morris',
+    title: 'Morris',
+    desc: 'Concentric rings with connecting lines. Configurable ring count and diagonals.',
+    opts: { boardStyle: 'morris', rings: 3, diagonals: false, boardSize: 260, showLabels: false, responsive: true }
+  },
+  {
+    style: 'alquerque',
+    title: 'Alquerque',
+    desc: 'Intersection grid with diagonal connecting lines. Used by Fanorona and Alquerque.',
+    opts: { boardStyle: 'alquerque', rows: 5, cols: 5, tileSize: 48, responsive: true }
+  },
+  {
+    style: 'royal-ur',
+    title: 'Royal Ur',
+    desc: 'Fixed asymmetric layout with rosette markings. Single board configuration.',
+    opts: { boardStyle: 'royal-ur', tileSize: 36, showLabels: false, responsive: true }
+  },
+  {
+    style: 'xiangqi',
+    title: 'Xiangqi',
+    desc: '9x10 intersection grid with river division and palace diagonals.',
+    opts: { boardStyle: 'xiangqi', rows: 10, cols: 9, tileSize: 28, responsive: true }
+  },
+  {
+    style: 'shogi',
+    title: 'Shogi',
+    desc: '9x9 grid with promotion zone shading. Pieces rendered as kanji on pentagonal tiles.',
+    opts: { boardStyle: 'shogi', rows: 9, cols: 9, tileSize: 32, responsive: true }
+  },
+];
+
+const container = document.getElementById('board-examples');
+for (const ex of examples) {
+  const card = document.createElement('div');
+  card.className = 'board-example-card';
+
+  const svgWrap = document.createElement('div');
+  svgWrap.className = 'board-example-svg';
+  try {
+    svgWrap.innerHTML = renderBoardSVG(ex.opts);
+  } catch (e) {
+    svgWrap.innerHTML = '<p class="board-example-error">Provider not available in browser</p>';
+  }
+
+  const info = document.createElement('div');
+  info.className = 'board-example-info';
+  info.innerHTML = '<h3>' + ex.title + '</h3><p>' + ex.desc + '</p><code>' + ex.style + '</code>';
+
+  card.appendChild(svgWrap);
+  card.appendChild(info);
+  container.appendChild(card);
+}
+</script>
+<script type="module" src="../js/docs-toc.js?v=0.9.18"></script>
+<script type="module" src="../js/prism.js?v=0.9.18"></script>
+<script type="module" src="../js/prism-javascript.js?v=0.9.18"></script>
+<script type="module" src="../js/prism-copy.js?v=0.9.18"></script>
+</body>
+</html>
