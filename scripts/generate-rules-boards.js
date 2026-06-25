@@ -34,6 +34,16 @@ const STANDARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
 const CHESS_VARIANTS = await loadChessVariants();
 
+const MANUAL_CHESS_VARIANTS = [
+  { slug: 'chaturanga', name: 'Chaturanga', fen: 'rnefkenr/pppppppp/8/8/8/8/PPPPPPPP/RNEFKENR', rows: 8, cols: 8 },
+];
+
+for (const manual of MANUAL_CHESS_VARIANTS) {
+  const existing = CHESS_VARIANTS.findIndex(v => v.slug === manual.slug);
+  if (existing >= 0) CHESS_VARIANTS[existing] = { ...CHESS_VARIANTS[existing], ...manual };
+  else CHESS_VARIANTS.push(manual);
+}
+
 console.log(`\nGenerating chess boards (${CHESS_VARIANTS.length} variants)...`);
 for (const v of CHESS_VARIANTS) {
   const pos = fenToPosition(v.fen || STANDARD_FEN, v.rows || 8, v.cols || 8);
