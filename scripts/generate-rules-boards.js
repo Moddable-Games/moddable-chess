@@ -281,7 +281,7 @@ import { SHOGI_PIECES } from '../js/shogi-pieces.js';
 const SHOGI_VARIANTS = [
   { key: 'standard', name: 'Standard Shogi', rows: 9, cols: 9, fen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' },
   { key: 'hasami', name: 'Hasami Shogi', rows: 9, cols: 9, fen: 'ppppppppp/9/9/9/9/9/9/9/PPPPPPPPP' },
-  { key: 'kyoto', name: 'Kyoto Shogi', rows: 5, cols: 5, fen: 'lbkgs/5/5/5/SGKBL' },
+  { key: 'kyoto', name: 'Kyoto Shogi', rows: 5, cols: 5, fen: 'p+nks+l/5/5/5/+LSK+NP' },
   { key: 'minishogi', name: 'Minishogi', rows: 5, cols: 5, fen: 'rbsgk/4p/5/P4/KGSBR' },
 ];
 
