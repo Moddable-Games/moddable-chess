@@ -14,11 +14,15 @@ const BLACK_COLORS = new Set(['b', 'black', 'gote', 'dark']);
 
 const setRegex = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*path:\s*'([^']+)',\s*author:\s*'([^']*)',\s*license:\s*'([^']*)',\s*recolorable:\s*(true|false),\s*notes:\s*'[^']*',\s*pieces:\s*\[([\s\S]*?)\]\s*\}/g;
 
+const SKIP_SETS = new Set(['wikimedia-standard']);
+
 let match;
 let generated = 0;
 
 while ((match = setRegex.exec(gallerySrc)) !== null) {
   const [, id, name, path, author, license, recolorable, piecesStr] = match;
+
+  if (SKIP_SETS.has(id)) { console.log(`SKIP ${id}: excluded (duplicate/license)`); continue; }
 
   const pieceRegex = /\{\s*file:\s*'([^']+)',\s*char:\s*'([^']+)',\s*color:\s*'([^']+)',\s*name:\s*'[^']*'\s*\}/g;
   const pieces = {};
