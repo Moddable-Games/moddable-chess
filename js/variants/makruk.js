@@ -30,7 +30,36 @@ var diagOnlyHandler = {
   }
 };
 MCE.registerPiece('f', diagOnlyHandler);
-MCE.registerPiece('g', diagOnlyHandler);
+
+MCE.registerPiece('g', {
+  genMoves: function(g, from, side) {
+    var moves = [];
+    var r = MCE.rc(from, g)[0], c = MCE.rc(from, g)[1];
+    var fwd = side === MCE.WHITE ? -1 : 1;
+    var dirs = [[-1,-1],[-1,1],[1,-1],[1,1],[fwd,0]];
+    for (var i = 0; i < dirs.length; i++) {
+      var nr = r + dirs[i][0], nc = c + dirs[i][1];
+      var coords = MCE.wrapCoords(nr, nc, g);
+      nr = coords[0]; nc = coords[1];
+      if (!MCE.onBoard(nr, nc, g)) continue;
+      var target = MCE.sq(nr, nc, g);
+      if (g.board[target] && MCE.isFriendly(target, side, g)) continue;
+      moves.push({ from: from, to: target, flag: g.board[target] ? 'capture' : null });
+    }
+    return moves;
+  },
+  attacks: function(g, from, target) {
+    var fr = MCE.rc(from, g), tr = MCE.rc(target, g);
+    var dr = tr[0] - fr[0], dc = tr[1] - fr[1];
+    if (Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0)) {
+      if (Math.abs(dc) === 1) return true;
+      var side = MCE.pieceColor(g.board[from]);
+      var fwd = side === MCE.WHITE ? -1 : 1;
+      return dr === fwd && dc === 0;
+    }
+    return false;
+  }
+});
 
 MCE.registerVariant('makruk', {
   openingBook: makrukOpeningBook,
@@ -44,7 +73,7 @@ MCE.registerVariant('makruk', {
   promotionRank: function(side) { return side === MCE.WHITE ? 2 : 5; },
   promotionPieces: ['f'],
   title: 'Makruk (Thai Chess)',
-  description: 'Thai chess played since the 16th century. The Met (F) moves one step diagonally; the Khon (G) also moves one step diagonally. Pawns promote on the 6th rank to Met. No castling, no en passant.',
+  description: 'Thai chess played since the 16th century. The Met (F) moves one step diagonally; the Khon (G) moves one step diagonally or one step forward. Pawns promote on the 6th rank to Met. No castling, no en passant.',
   rule: 'Board: 8×8 · Win: Checkmate',
   evaluate: function(g, defaultEval) {
     var VALS = { p: 100, n: 300, g: 300, f: 150, r: 500, k: 0 };
