@@ -72,3 +72,4 @@ import './toroidal-chess.js';
 import './torpedo.js';
 import './upside-down.js';
 import './weak-chess.js';
+import './piece-test.js';
