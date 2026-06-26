@@ -9,6 +9,7 @@ import './game-controller-core.js';
 import './replay.js';
 import './variants/index.js';
 import { PIECES, PIECE_NAMES, getPieceInfo } from './pieces/index.js';
+import PieceSetResolver from './piece-set-resolver.js';
 
 function track(event, params) {
   if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
@@ -163,12 +164,17 @@ let ctrl = null;
 
 fetch(basePath + 'assets/pieces.svg?v=0.9.18')
   .then(r => r.text())
-  .then(svg => {
+  .then(async svg => {
     const div = document.createElement('div');
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
-    if (!embedMode && !fullscreenMode) renderPicker();
+
+    const savedSet = localStorage.getItem('mce-piece-set') || 'mce-chess';
+    PieceSetResolver.setConfig({ set: savedSet, fallback: 'mce-chess' });
     const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
+    await PieceSetResolver.loadForVariant(initVariant);
+
+    if (!embedMode && !fullscreenMode) renderPicker();
     startGame(initVariant);
     if (paramFen) {
       MCE.loadFEN(game, paramFen);
@@ -446,6 +452,7 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
+  PieceSetResolver.loadForVariant(variant).then(() => { if (ctrl) render(); });
   const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   const groupLabel = g ? g.label : '';
   track('variant_select', { variant_name: variant, variant_group: groupLabel });
