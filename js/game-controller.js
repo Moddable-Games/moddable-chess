@@ -367,6 +367,11 @@ function populateSetSelect(select) {
   });
   if (sets.length <= 1) select.style.display = 'none';
   else select.style.display = '';
+  const colorSel = document.getElementById('piece-color-select');
+  if (colorSel) {
+    const activeSet = sets.find(s => s.id === (currentCovers ? currentSet : (sets[0] && sets[0].id)));
+    colorSel.style.display = (activeSet && activeSet.recolorable) ? '' : 'none';
+  }
 }
 
 function renderToolbar() {
@@ -405,6 +410,7 @@ function renderToolbar() {
     if (key === currentPS) opt.selected = true;
     pieceSelect.appendChild(opt);
   });
+  pieceSelect.id = 'piece-color-select';
   pieceSelect.addEventListener('change', () => {
     MCE.setPieceStyle(pieceSelect.value);
     const url = new URL(location);
@@ -443,7 +449,12 @@ function renderToolbar() {
     url.searchParams.set('animStyle', animStyle);
     history.replaceState(null, '', url);
   });
-  leftGroup.appendChild(styleSelect);
+  toolbarEl.appendChild(leftGroup);
+
+  const rightGroup = document.createElement('div');
+  rightGroup.className = 'toolbar-group';
+
+  rightGroup.appendChild(styleSelect);
 
   const speedSelect = document.createElement('select');
   speedSelect.className = 'toolbar-select';
@@ -460,9 +471,7 @@ function renderToolbar() {
     url.searchParams.set('animSpeed', animSpeed);
     history.replaceState(null, '', url);
   });
-  leftGroup.appendChild(speedSelect);
-
-  toolbarEl.appendChild(leftGroup);
+  rightGroup.appendChild(speedSelect);
 
   const fsBtn = document.createElement('button');
   fsBtn.className = 'toolbar-btn';
@@ -475,7 +484,8 @@ function renderToolbar() {
     applyFullscreenMode();
     startGame(currentVariant || 'standard');
   });
-  toolbarEl.appendChild(fsBtn);
+  rightGroup.appendChild(fsBtn);
+  toolbarEl.appendChild(rightGroup);
 }
 
 function removeMoveFromList() {
