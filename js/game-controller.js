@@ -77,6 +77,10 @@ import './variants/teleport-chess.js';
 import './variants/poison-chess.js';
 import './variants/medusa-chess.js';
 import './variants/immunization-chess.js';
+import './variants/chaturanga.js';
+import './variants/shatranj.js';
+import './variants/absorption-chess.js';
+import './variants/sittuyin.js';
 import './variants/piece-test.js';
 
 function track(event, params) {
