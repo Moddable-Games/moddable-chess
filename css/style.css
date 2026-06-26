@@ -21,7 +21,7 @@ h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-ser
 
 #app { display: flex; gap: 24px; align-items: flex-start; padding: 24px; flex: 1; align-self: center; }
 #sidebar { max-width: 180px; display: flex; flex-direction: column; gap: 12px; }
-#center { display: flex; flex-direction: column; align-items: stretch; }
+#center { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
 #board-container { border-radius: 4px; overflow: hidden; }
 #right-panel { max-width: 220px; display: flex; flex-direction: column; gap: 12px; }
 #variant-picker { display: flex; flex-direction: column; gap: 8px; }
@@ -48,7 +48,7 @@ h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-ser
 #status { font-size: 14px; font-weight: 600; padding: 8px 12px; border-radius: 8px; background: var(--play-surface); }
 #moves { font-family: monospace; font-size: 12px; color: var(--play-text-dim); max-height: 300px; overflow-y: auto; }
 #moves div { padding: 2px 0; }
-#board-toolbar { display: flex; gap: 6px; justify-content: space-between; align-items: center; padding: 4px 0; flex-wrap: wrap; }
+#board-toolbar { display: flex; gap: 4px; justify-content: space-between; align-items: center; padding: 4px 0; flex-wrap: wrap; max-width: 100%; overflow: hidden; }
 .toolbar-group { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 .toolbar-select { padding: 4px 8px; border: 1px solid var(--play-border); border-radius: 4px; background: var(--play-surface); color: var(--play-text-muted); font-size: 11px; font-family: inherit; cursor: pointer; }
 #piece-set-select { max-width: 120px; }
