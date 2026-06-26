@@ -54,7 +54,7 @@ async function fetchSVG(url) {
   return resp.text();
 }
 
-function parseSVGContent(svgText) {
+function parseSVGContent(svgText, pieceId) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svgText, 'image/svg+xml');
   const svg = doc.querySelector('svg');
@@ -65,7 +65,20 @@ function parseSVGContent(svgText) {
     const h = parseFloat(svg.getAttribute('height')) || 45;
     viewBox = '0 0 ' + w + ' ' + h;
   }
-  return { viewBox, innerHTML: svg.innerHTML };
+  let html = svg.innerHTML;
+  const internalSymbols = svg.querySelectorAll('symbol');
+  if (internalSymbols.length > 0) {
+    const prefix = 'ps-' + pieceId + '-';
+    internalSymbols.forEach((sym, i) => {
+      const oldId = sym.getAttribute('id');
+      if (oldId) {
+        const newId = prefix + oldId;
+        html = html.replace(new RegExp('id="' + oldId + '"', 'g'), 'id="' + newId + '"');
+        html = html.replace(new RegExp('#' + oldId + '"', 'g'), '#' + newId + '"');
+      }
+    });
+  }
+  return { viewBox, innerHTML: html };
 }
 
 function ensureSpriteContainer() {
@@ -106,7 +119,7 @@ async function loadPieceFromManifest(char, manifest) {
   const url = basePath + SETS_BASE + manifest.path + file;
   const svgText = await fetchSVG(url);
   if (!svgText) return false;
-  const parsed = parseSVGContent(svgText);
+  const parsed = parseSVGContent(svgText, symbolId(char));
   if (!parsed) return false;
   injectSymbol(char, parsed.viewBox, parsed.innerHTML);
   return true;
