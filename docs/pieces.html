@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piece Gallery — Moddable Chess Engine</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/docs.css">
+  <link rel="stylesheet" href="pieces-gallery.css">
+  <link rel="icon" href="../assets/cube.svg" type="image/svg+xml">
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="../" class="site-nav__brand">
+      <img src="../assets/cube.svg" class="site-nav__cube" alt="">
+      <span class="site-nav__wordmark">Moddable Chess</span>
+    </a>
+    <div class="site-nav__links">
+      <a href="../play/">Play</a>
+      <a href="./" class="active">Docs</a>
+      <a href="api.html">API</a>
+      <a href="variants.html">Variants</a>
+      <a href="guide.html">Guides</a>
+      <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+  <nav class="docs-toc" id="docs-toc"></nav>
+  <div class="docs-body">
+    <h1>Piece Gallery</h1>
+    <p class="intro">Visual catalogue of all piece sets available to the engine — 1,145 SVGs across 22 sets covering chess, fairy chess, draughts, go, shogi, xiangqi, makruk, and game tokens (emoji). Each set provides individual SVGs that can be mixed, matched, and composed via the piece-set-resolver fallback chain.</p>
+
+    <div class="gallery-controls">
+      <label>
+        <span>Search:</span>
+        <input type="text" id="search-input" placeholder="e.g. elephant, ferz, king...">
+      </label>
+      <label>
+        <span>View:</span>
+        <select id="view-select">
+          <option value="by-set">By set</option>
+          <option value="by-piece">By piece type</option>
+        </select>
+      </label>
+      <label>
+        <span>Set:</span>
+        <select id="filter-select">
+          <option value="all">All sets</option>
+        </select>
+      </label>
+      <label>
+        <span>Colour:</span>
+        <select id="color-filter">
+          <option value="all">All</option>
+          <option value="w">White</option>
+          <option value="b">Black</option>
+          <option value="neutral">Neutral</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
+          <option value="yellow">Yellow</option>
+        </select>
+      </label>
+      <label>
+        <span>Background:</span>
+        <select id="bg-select">
+          <option value="checkered">Checkered</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="transparent">Transparent</option>
+        </select>
+      </label>
+      <label>
+        <span>Size:</span>
+        <select id="size-select">
+          <option value="45">45px (native)</option>
+          <option value="64" selected>64px</option>
+          <option value="80">80px</option>
+          <option value="120">120px</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="gallery-stats" class="gallery-stats"></div>
+
+    <div id="gallery-container"></div>
+
+    <section class="coverage-section">
+      <h2>Coverage Matrix</h2>
+      <p>Which sets provide which pieces. Green = available, red = missing.</p>
+      <div id="coverage-matrix"></div>
+    </section>
+
+    <section class="licence-section">
+      <h2>Licensing</h2>
+      <table id="licence-table">
+        <thead>
+          <tr>
+            <th>Set</th>
+            <th>Author</th>
+            <th>License</th>
+            <th>Pieces</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+  </div>
+
+  <footer class="site-footer">
+    <a href="https://moddable.games" target="_blank" rel="noopener"><img src="../assets/moddable-logo-white.png" alt="Moddable Games" class="site-footer__logo"></a>
+    <p>MIT License · <a href="https://github.com/Moddable-Games/moddable-chess" target="_blank" rel="noopener">GitHub</a> · v0.9.18</p>
+  </footer>
+
+  <script type="module" src="js/pieces-gallery.js"></script>
+  <script type="module" src="../js/docs-toc.js?v=0.9.18"></script>
+</body>
+</html>

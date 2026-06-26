@@ -361,3 +361,41 @@ h1, h2, h3 { font-family: var(--mg-font-display, 'Rajdhani', system-ui, sans-ser
   width: 100%;
   padding: 0;
 }
+
+.debug-panel {
+  background: var(--play-surface);
+  border: 1px solid var(--play-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.debug-panel h4 {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--play-text);
+  border-bottom: 1px solid var(--play-border);
+  padding-bottom: 4px;
+}
+.debug-row {
+  display: flex;
+  gap: 4px;
+  color: var(--play-text-muted);
+  flex-wrap: wrap;
+}
+.debug-row span:first-child {
+  color: var(--play-text-dim);
+  min-width: 60px;
+  font-weight: 600;
+}
+.debug-row code {
+  background: var(--play-code-bg);
+  padding: 0 3px;
+  border-radius: 2px;
+  font-family: monospace;
+}
+.debug-warn {
+  color: #ffab40;
+  font-style: italic;
+  margin-top: 4px;
+}

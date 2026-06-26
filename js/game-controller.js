@@ -8,6 +8,7 @@ import './board-renderer.js';
 import './game-controller-core.js';
 import './replay.js';
 import './variants/index.js';
+import { PIECES, PIECE_NAMES, getPieceInfo } from './pieces/index.js';
 
 function track(event, params) {
   if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
@@ -611,6 +612,80 @@ function handleTurnChange(turn, turnIndex) {
 function handleRender(g, renderOpts) {
   updateStatus();
   renderHand();
+  renderPieceDebug(g, renderOpts);
+}
+
+
+function renderPieceDebug(g, renderOpts) {
+  const debugEl = document.getElementById('piece-debug');
+  if (!debugEl) return;
+  if (currentVariant !== 'pieceTest') { debugEl.innerHTML = ''; return; }
+
+  const sq = renderOpts.selected;
+  if (sq === null || sq === undefined) {
+    debugEl.innerHTML = '<div class="debug-panel"><em>Click a piece to inspect</em></div>';
+    return;
+  }
+
+  const piece = g.board[sq];
+  if (!piece) { debugEl.innerHTML = ''; return; }
+
+  const type = piece.toLowerCase();
+  const color = piece === piece.toUpperCase() ? 'White' : 'Black';
+  const info = getPieceInfo(type);
+  const name = info ? info.name : type.toUpperCase();
+  const [row, col] = MCE.rc(sq, g);
+  const algebraic = String.fromCharCode(97 + col) + (g.rows - row);
+
+  const moves = renderOpts.legalMoves || [];
+  const quietMoves = moves.filter(m => !m.flag || m.flag === 'double');
+  const captures = moves.filter(m => m.flag === 'capture' || m.flag === 'ep');
+
+  let html = '<div class="debug-panel">';
+  html += `<h4>${name}</h4>`;
+  if (info) {
+    html += `<div class="debug-row"><span>Category:</span> ${info.category}</div>`;
+    html += `<div class="debug-row"><span>Movement:</span> ${info.movement}</div>`;
+    if (info.capture) {
+      html += `<div class="debug-row"><span>Capture:</span> ${info.capture}</div>`;
+    }
+  }
+  html += `<div class="debug-row"><span>Char:</span> <code>${piece}</code> (type: <code>${type}</code>)</div>`;
+  html += `<div class="debug-row"><span>Color:</span> ${color}</div>`;
+  html += `<div class="debug-row"><span>Square:</span> ${algebraic} (idx: ${sq}, row: ${row}, col: ${col})</div>`;
+  html += `<div class="debug-row"><span>Moves:</span> ${quietMoves.length} quiet, ${captures.length} captures</div>`;
+
+  if (quietMoves.length > 0) {
+    const targets = quietMoves.map(m => {
+      const [mr, mc] = MCE.rc(m.to, g);
+      return String.fromCharCode(97 + mc) + (g.rows - mr);
+    });
+    html += `<div class="debug-row"><span>Quiet:</span> ${targets.join(', ')}</div>`;
+  }
+  if (captures.length > 0) {
+    const targets = captures.map(m => {
+      const [mr, mc] = MCE.rc(m.to, g);
+      return String.fromCharCode(97 + mc) + (g.rows - mr);
+    });
+    html += `<div class="debug-row"><span>Captures:</span> ${targets.join(', ')}</div>`;
+  }
+  if (moves.length === 0) {
+    html += `<div class="debug-row debug-warn">No legal moves (would leave king in check?)</div>`;
+  }
+
+  const flags = [];
+  if (g.noCastling) flags.push('noCastling');
+  if (g.noEnPassant) flags.push('noEnPassant');
+  if (g.noPromotion) flags.push('noPromotion');
+  if (g.noCheck) flags.push('noCheck');
+  if (g.torpedo) flags.push('torpedo');
+  if (g.pieceRoles) flags.push('pieceRoles');
+  if (g.divergentPieces) flags.push('divergentPieces');
+  html += `<div class="debug-row"><span>Flags:</span> ${flags.length ? flags.join(', ') : 'none'}</div>`;
+  html += `<div class="debug-row"><span>Turn:</span> ${g.turn === 'w' ? 'White' : 'Black'} (move ${g.fullmove})</div>`;
+
+  html += '</div>';
+  debugEl.innerHTML = html;
 }
 
 function handleUndoCallback(count) {
@@ -714,7 +789,7 @@ function getPromotionPieces() {
   return ['q', 'r', 'b', 'n'];
 }
 
-const PROMO_NAMES = { q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight', a: 'Archbishop', c: 'Chancellor' };
+const PROMO_NAMES = PIECE_NAMES;
 
 function showPromotionDialog(candidates, side, callback) {
   pendingPromotion = { candidates, side, callback };

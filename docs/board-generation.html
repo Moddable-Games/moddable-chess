@@ -203,6 +203,12 @@ const examples = [
     desc: '9x9 grid with promotion zone shading. Pieces rendered as kanji on pentagonal tiles.',
     opts: { boardStyle: 'shogi', rows: 9, cols: 9, tileSize: 32, responsive: true }
   },
+  {
+    style: 'dungeon',
+    title: 'Dungeon',
+    desc: 'Dark-themed grid with terrain tile support. Used by Dungeon Chess for portals, chests, and doors.',
+    opts: { boardStyle: 'dungeon', rows: 8, cols: 8, tileSize: 32, responsive: true }
+  },
 ];
 
 const container = document.getElementById('board-examples');
