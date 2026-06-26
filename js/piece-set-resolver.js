@@ -40,11 +40,10 @@ async function loadAllManifests() {
   const indexUrl = basePath + MANIFESTS_BASE + 'index.json';
   try {
     const resp = await fetch(indexUrl);
-    if (!resp.ok) { console.warn('[PieceSetResolver] index.json failed:', resp.status, indexUrl); return; }
+    if (!resp.ok) return;
     const ids = await resp.json();
     await Promise.all(ids.map(id => loadManifest(id)));
-    console.log('[PieceSetResolver] Loaded', manifests.size, 'manifests');
-  } catch (e) { console.warn('[PieceSetResolver] loadAllManifests error:', e.message); }
+  } catch (e) { /* index not available */ }
 }
 
 function symbolId(char) {
@@ -199,7 +198,6 @@ function getSetsForVariant(variantKey) {
       return true;
     })
     .map(([id, m]) => ({ id, name: m.name, recolorable: m.recolorable }));
-  console.log('[PieceSetResolver] getSetsForVariant(' + variantKey + '):', result.length, 'sets pass from', manifests.size, 'total. Needed:', neededKeys.length, 'keys');
   return result;
 }
 

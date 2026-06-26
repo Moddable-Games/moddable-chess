@@ -1,28 +1,5 @@
 const SETS = [
   {
-    id: 'wikimedia-standard',
-    name: 'Wikimedia CBurnett (Standard)',
-    path: '../assets/pieces/sets/wikimedia/standard/',
-    author: 'Cburnett',
-    license: 'GFDL / CC BY-SA 3.0 / BSD',
-    recolorable: true,
-    notes: 'Multi-licensed. The definitive open-source chess set.',
-    pieces: [
-      { file: 'Chess_klt45.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'Chess_qlt45.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'Chess_rlt45.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'Chess_blt45.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'Chess_nlt45.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'Chess_plt45.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'Chess_kdt45.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'Chess_qdt45.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'Chess_rdt45.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'Chess_bdt45.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'Chess_ndt45.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'Chess_pdt45.svg', char: 'p', color: 'b', name: 'Pawn' },
-    ]
-  },
-  {
     id: 'wikimedia-fairy',
     name: 'Wikimedia Fairy (45px)',
     path: '../assets/pieces/sets/wikimedia/fairy/',
