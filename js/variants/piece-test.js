@@ -4,7 +4,7 @@ MCE.registerVariant('pieceTest', {
   group: 'Dev',
   rows: 8,
   cols: 8,
-  fen: 'KQRBNFAC/1SWGYLHE/7M/4P3/4p3/7m/1swgylhe/kqrbnfac w - - 0 1',
+  fen: 'KQRBNFAC/PSWGYLHE/7M/8/8/7m/pswgylhe/kqrbnfac w - - 0 1',
   noCastling: true,
   title: 'Piece Test',
   description: 'Dev-only: all piece glyphs on one board.',
