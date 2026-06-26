@@ -59,10 +59,13 @@ function parseSVGContent(svgText) {
   const doc = parser.parseFromString(svgText, 'image/svg+xml');
   const svg = doc.querySelector('svg');
   if (!svg) return null;
-  return {
-    viewBox: svg.getAttribute('viewBox') || '0 0 45 45',
-    innerHTML: svg.innerHTML
-  };
+  let viewBox = svg.getAttribute('viewBox');
+  if (!viewBox) {
+    const w = parseFloat(svg.getAttribute('width')) || 45;
+    const h = parseFloat(svg.getAttribute('height')) || 45;
+    viewBox = '0 0 ' + w + ' ' + h;
+  }
+  return { viewBox, innerHTML: svg.innerHTML };
 }
 
 function ensureSpriteContainer() {
