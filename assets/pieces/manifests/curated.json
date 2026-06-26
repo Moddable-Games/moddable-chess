@@ -2,14 +2,14 @@
   "id": "curated",
   "name": "Curated (Best Of)",
   "author": "Various (see source sets)",
-  "license": "Mixed (MIT, SIL OFL, CC BY-SA 4.0)",
+  "license": "Mixed (MIT, GFDL, CC BY-SA 4.0)",
   "recolorable": false,
   "composite": true,
   "sources": {
     "lichess-cburnett": "lichess-cburnett/",
-    "wikimedia-noto": "wikimedia/noto/",
-    "wikimedia-makruk": "wikimedia/makruk/",
     "kaneo": "kaneo/",
+    "wikimedia-cburnett-extended": "wikimedia/standard/",
+    "wikimedia-xogos": "wikimedia/artistic/xogos-da-meiga/",
     "mce-chess": "mce-chess/"
   },
   "pieces": {
@@ -62,44 +62,36 @@
       "file": "bP.svg"
     },
     "wA": {
-      "source": "wikimedia-noto",
-      "file": "WHITE_CHESS_KNIGHT-BISHOP.svg"
+      "source": "kaneo",
+      "file": "wA.svg"
     },
     "bA": {
-      "source": "wikimedia-noto",
-      "file": "BLACK_CHESS_KNIGHT-BISHOP.svg"
+      "source": "kaneo",
+      "file": "bA.svg"
     },
     "wC": {
-      "source": "wikimedia-noto",
-      "file": "WHITE_CHESS_KNIGHT-ROOK.svg"
+      "source": "kaneo",
+      "file": "wC.svg"
     },
     "bC": {
-      "source": "wikimedia-noto",
-      "file": "BLACK_CHESS_KNIGHT-ROOK.svg"
+      "source": "kaneo",
+      "file": "bC.svg"
     },
     "wM": {
-      "source": "wikimedia-noto",
-      "file": "WHITE_CHESS_KNIGHT-QUEEN.svg"
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_mlt45.svg"
     },
     "bM": {
-      "source": "wikimedia-noto",
-      "file": "BLACK_CHESS_KNIGHT-QUEEN.svg"
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_mdt45.svg"
     },
     "wF": {
-      "source": "wikimedia-makruk",
-      "file": "Met_white.svg"
+      "source": "wikimedia-xogos",
+      "file": "Red_Ferz_Xogos_da_Meiga_chess_icons_family.svg"
     },
     "bF": {
-      "source": "wikimedia-makruk",
-      "file": "Met_black.svg"
-    },
-    "wG": {
-      "source": "wikimedia-makruk",
-      "file": "Khon_white.svg"
-    },
-    "bG": {
-      "source": "wikimedia-makruk",
-      "file": "Khon_black.svg"
+      "source": "wikimedia-xogos",
+      "file": "Black_Ferz_Xogos_da_Meiga_chess_icons_family.svg"
     },
     "wE": {
       "source": "kaneo",
@@ -109,6 +101,22 @@
       "source": "kaneo",
       "file": "bE.svg"
     },
+    "wG": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_grt45.svg"
+    },
+    "bG": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_Gdt45.svg"
+    },
+    "wS": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_srt45.svg"
+    },
+    "bS": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_Sdt45.svg"
+    },
     "wH": {
       "source": "kaneo",
       "file": "wH.svg"
@@ -116,6 +124,14 @@
     "bH": {
       "source": "kaneo",
       "file": "bH.svg"
+    },
+    "wL": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_lrt45.svg"
+    },
+    "bL": {
+      "source": "wikimedia-cburnett-extended",
+      "file": "Chess_lat45.svg"
     },
     "wY": {
       "source": "mce-chess",
@@ -125,14 +141,6 @@
       "source": "mce-chess",
       "file": "bY.svg"
     },
-    "wL": {
-      "source": "mce-chess",
-      "file": "wL.svg"
-    },
-    "bL": {
-      "source": "mce-chess",
-      "file": "bL.svg"
-    },
     "wW": {
       "source": "mce-chess",
       "file": "wW.svg"
@@ -140,14 +148,6 @@
     "bW": {
       "source": "mce-chess",
       "file": "bW.svg"
-    },
-    "wS": {
-      "source": "mce-chess",
-      "file": "wS.svg"
-    },
-    "bS": {
-      "source": "mce-chess",
-      "file": "bS.svg"
     },
     "wI": {
       "source": "mce-chess",
