@@ -14,7 +14,7 @@ const BLACK_COLORS = new Set(['b', 'black', 'gote', 'dark']);
 
 const setRegex = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*path:\s*'([^']+)',\s*author:\s*'([^']*)',\s*license:\s*'([^']*)',\s*recolorable:\s*(true|false),\s*notes:\s*'[^']*',\s*pieces:\s*\[([\s\S]*?)\]\s*\}/g;
 
-const SKIP_SETS = new Set(['wikimedia-standard']);
+const SKIP_SETS = new Set(['wikimedia-standard', 'wikimedia-noto-rotated']);
 
 let match;
 let generated = 0;
