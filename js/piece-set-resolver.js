@@ -1,3 +1,5 @@
+import MCE from './chess-engine.js';
+
 const SETS_BASE = 'assets/pieces/sets/';
 const MANIFESTS_BASE = 'assets/pieces/manifests/';
 
@@ -142,7 +144,7 @@ async function resolvePiece(char) {
 }
 
 function getVariantChars(variantKey) {
-  const vc = typeof MCE !== 'undefined' ? MCE.getVariantConfig(variantKey) : null;
+  const vc = MCE.getVariantConfig(variantKey);
   const chars = new Set('KQRBNPkqrbnp'.split(''));
   if (vc && vc.fen) {
     const fenPieces = vc.fen.split(' ')[0].replace(/[0-9\/]/g, '');
