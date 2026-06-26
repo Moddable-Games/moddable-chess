@@ -347,6 +347,22 @@ function renderControls() {
   }
 }
 
+function populateSetSelect(select) {
+  select.innerHTML = '';
+  const variant = currentVariant || 'standard';
+  const sets = PieceSetResolver.getSetsForVariant(variant);
+  const currentSet = PieceSetResolver.getConfig().set;
+  sets.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    if (s.id === currentSet) opt.selected = true;
+    select.appendChild(opt);
+  });
+  if (sets.length <= 1) select.style.display = 'none';
+  else select.style.display = '';
+}
+
 function renderToolbar() {
   toolbarEl.innerHTML = '';
 
@@ -393,15 +409,9 @@ function renderToolbar() {
   leftGroup.appendChild(pieceSelect);
 
   const setSelect = document.createElement('select');
+  setSelect.id = 'piece-set-select';
   setSelect.className = 'toolbar-select';
-  const currentSet = PieceSetResolver.getConfig().set;
-  PieceSetResolver.getAvailableSets().forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
-    if (s.id === currentSet) opt.selected = true;
-    setSelect.appendChild(opt);
-  });
+  populateSetSelect(setSelect);
   setSelect.addEventListener('change', async () => {
     const setId = setSelect.value;
     PieceSetResolver.setConfig({ set: setId });
@@ -472,7 +482,11 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
-  PieceSetResolver.loadForVariant(variant).then(() => { if (ctrl) render(); });
+  PieceSetResolver.loadForVariant(variant).then(() => {
+    if (ctrl) render();
+    const sel = document.getElementById('piece-set-select');
+    if (sel) populateSetSelect(sel);
+  });
   const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   const groupLabel = g ? g.label : '';
   track('variant_select', { variant_name: variant, variant_group: groupLabel });

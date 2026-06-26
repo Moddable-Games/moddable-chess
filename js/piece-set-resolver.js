@@ -1,9 +1,9 @@
 const SETS_PATH = 'assets/pieces/sets/';
 
 const SETS = {
-  'mce-chess': { name: 'MCE Chess', path: 'mce-chess/', recolorable: true },
-  'lichess-cburnett': { name: 'Lichess (cburnett)', path: 'lichess-cburnett/', recolorable: false },
-  'kaneo': { name: 'Kaneo', path: 'kaneo/', recolorable: false },
+  'mce-chess': { name: 'MCE Chess', path: 'mce-chess/', recolorable: true, covers: 'KQRBNPACMSFGEYLHWIkqrbnpacmsfgeylhwi' },
+  'lichess-cburnett': { name: 'Lichess (cburnett)', path: 'lichess-cburnett/', recolorable: false, covers: 'KQRBNPkqrbnp' },
+  'kaneo': { name: 'Kaneo', path: 'kaneo/', recolorable: false, covers: 'KQRBNPkqrbnp' },
 };
 
 const PIECE_CHARS = 'KQRBNPACMSFGEYLHWIkqrbnpacmsfgeylhwi';
@@ -137,6 +137,29 @@ function getAvailableSets() {
   return Object.entries(SETS).map(([id, s]) => ({ id, ...s }));
 }
 
+function getVariantChars(variantKey) {
+  const vc = typeof MCE !== 'undefined' ? MCE.getVariantConfig(variantKey) : null;
+  let chars = new Set('KQRBNPkqrbnp'.split(''));
+  if (vc && vc.fen) {
+    const fenPieces = vc.fen.split(' ')[0].replace(/[0-9\/]/g, '');
+    fenPieces.split('').forEach(c => chars.add(c));
+  }
+  return chars;
+}
+
+function getSetsForVariant(variantKey) {
+  const needed = getVariantChars(variantKey);
+  return Object.entries(SETS)
+    .filter(([, s]) => {
+      const covers = new Set(s.covers.split(''));
+      for (const c of needed) {
+        if (!covers.has(c)) return false;
+      }
+      return true;
+    })
+    .map(([id, s]) => ({ id, ...s }));
+}
+
 function isLoaded(char) {
   return loadedSymbols.has(char);
 }
@@ -147,9 +170,10 @@ const PieceSetResolver = {
   setConfig,
   getConfig,
   getAvailableSets,
+  getSetsForVariant,
   isLoaded,
   SETS,
 };
 
 export default PieceSetResolver;
-export { loadSet, loadForVariant, setConfig, getConfig, getAvailableSets, isLoaded, SETS };
+export { loadSet, loadForVariant, setConfig, getConfig, getAvailableSets, getSetsForVariant, isLoaded, SETS };
