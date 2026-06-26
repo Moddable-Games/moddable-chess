@@ -1,0 +1,22 @@
+{
+  "id": "wikimedia-standard",
+  "name": "Wikimedia CBurnett (Standard)",
+  "path": "wikimedia/standard/",
+  "author": "Cburnett",
+  "license": "GFDL / CC BY-SA 3.0 / BSD",
+  "recolorable": true,
+  "pieces": {
+    "wK": "Chess_klt45.svg",
+    "wQ": "Chess_qlt45.svg",
+    "wR": "Chess_rlt45.svg",
+    "wB": "Chess_blt45.svg",
+    "wN": "Chess_nlt45.svg",
+    "wP": "Chess_plt45.svg",
+    "bK": "Chess_kdt45.svg",
+    "bQ": "Chess_qdt45.svg",
+    "bR": "Chess_rdt45.svg",
+    "bB": "Chess_bdt45.svg",
+    "bN": "Chess_ndt45.svg",
+    "bP": "Chess_pdt45.svg"
+  }
+}

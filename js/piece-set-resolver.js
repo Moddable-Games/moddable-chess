@@ -1,13 +1,7 @@
-const SETS_PATH = 'assets/pieces/sets/';
+const SETS_BASE = 'assets/pieces/sets/';
+const MANIFESTS_BASE = 'assets/pieces/manifests/';
 
-const SETS = {
-  'mce-chess': { name: 'MCE Chess', path: 'mce-chess/', recolorable: true, covers: 'KQRBNPACMSFGEYLHWIkqrbnpacmsfgeylhwi' },
-  'lichess-cburnett': { name: 'Lichess (cburnett)', path: 'lichess-cburnett/', recolorable: false, covers: 'KQRBNPkqrbnp' },
-  'kaneo': { name: 'Kaneo', path: 'kaneo/', recolorable: false, covers: 'KQRBNPkqrbnp' },
-};
-
-const PIECE_CHARS = 'KQRBNPACMSFGEYLHWIkqrbnpacmsfgeylhwi';
-
+let manifests = new Map();
 let activeConfig = { set: 'mce-chess', fallback: 'mce-chess', overrides: {} };
 let loadedSymbols = new Map();
 let spriteContainer = null;
@@ -23,9 +17,31 @@ function getBasePath() {
   return '../';
 }
 
-function pieceFile(char) {
-  const color = char === char.toUpperCase() ? 'w' : 'b';
-  return color + char.toUpperCase() + '.svg';
+async function loadManifest(setId) {
+  if (manifests.has(setId)) return manifests.get(setId);
+  const basePath = getBasePath();
+  const url = basePath + MANIFESTS_BASE + setId + '.json';
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) { manifests.set(setId, null); return null; }
+    const data = await resp.json();
+    manifests.set(setId, data);
+    return data;
+  } catch (e) {
+    manifests.set(setId, null);
+    return null;
+  }
+}
+
+async function loadAllManifests() {
+  const basePath = getBasePath();
+  const indexUrl = basePath + MANIFESTS_BASE + 'index.json';
+  try {
+    const resp = await fetch(indexUrl);
+    if (!resp.ok) return;
+    const ids = await resp.json();
+    await Promise.all(ids.map(id => loadManifest(id)));
+  } catch (e) { /* index not available, load on demand */ }
 }
 
 function symbolId(char) {
@@ -55,7 +71,6 @@ function ensureSpriteContainer() {
   if (!spriteContainer) {
     spriteContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     spriteContainer.setAttribute('style', 'display:none');
-    spriteContainer.setAttribute('data-piece-resolver', 'true');
     document.body.insertBefore(spriteContainer, document.body.firstChild);
   }
   return spriteContainer;
@@ -74,11 +89,18 @@ function injectSymbol(char, viewBox, innerHTML) {
   loadedSymbols.set(char, true);
 }
 
-async function loadPieceFromSet(char, setId) {
-  const set = SETS[setId];
-  if (!set) return false;
+function pieceKey(char) {
+  const color = char === char.toUpperCase() ? 'w' : 'b';
+  return color + char.toUpperCase();
+}
+
+async function loadPieceFromManifest(char, manifest) {
+  if (!manifest || !manifest.pieces) return false;
+  const key = pieceKey(char);
+  const file = manifest.pieces[key];
+  if (!file) return false;
   const basePath = getBasePath();
-  const url = basePath + SETS_PATH + set.path + pieceFile(char);
+  const url = basePath + SETS_BASE + manifest.path + file;
   const svgText = await fetchSVG(url);
   if (!svgText) return false;
   const parsed = parseSVGContent(svgText);
@@ -90,37 +112,44 @@ async function loadPieceFromSet(char, setId) {
 async function resolvePiece(char) {
   const override = activeConfig.overrides[char.toUpperCase()];
   if (override) {
-    const loaded = await loadPieceFromSet(char, override);
-    if (loaded) return true;
+    const m = await loadManifest(override);
+    if (m) { const ok = await loadPieceFromManifest(char, m); if (ok) return true; }
   }
-  const loaded = await loadPieceFromSet(char, activeConfig.set);
-  if (loaded) return true;
+  const primary = await loadManifest(activeConfig.set);
+  if (primary) { const ok = await loadPieceFromManifest(char, primary); if (ok) return true; }
   if (activeConfig.fallback && activeConfig.fallback !== activeConfig.set) {
-    return loadPieceFromSet(char, activeConfig.fallback);
+    const fb = await loadManifest(activeConfig.fallback);
+    if (fb) return loadPieceFromManifest(char, fb);
   }
   return false;
 }
 
-async function loadSet(config) {
-  if (config) {
-    activeConfig = { ...activeConfig, ...config };
+function getVariantChars(variantKey) {
+  const vc = typeof MCE !== 'undefined' ? MCE.getVariantConfig(variantKey) : null;
+  const chars = new Set('KQRBNPkqrbnp'.split(''));
+  if (vc && vc.fen) {
+    const fenPieces = vc.fen.split(' ')[0].replace(/[0-9\/]/g, '');
+    fenPieces.split('').forEach(c => chars.add(c));
   }
-  const chars = PIECE_CHARS.split('');
+  return chars;
+}
+
+async function loadForVariant(variantKey, config) {
+  if (config) activeConfig = { ...activeConfig, ...config };
+  const chars = [...getVariantChars(variantKey)];
   const results = await Promise.allSettled(chars.map(c => resolvePiece(c)));
   return results.filter(r => r.status === 'fulfilled' && r.value).length;
 }
 
-async function loadForVariant(variantKey, config) {
-  if (config) {
-    activeConfig = { ...activeConfig, ...config };
-  }
-  const vc = typeof MCE !== 'undefined' ? MCE.getVariantConfig(variantKey) : null;
-  let chars = 'KQRBNPkqrbnp'.split('');
-  if (vc && vc.fen) {
-    const fenPieces = vc.fen.split(' ')[0].replace(/[0-9\/]/g, '');
-    const unique = [...new Set(fenPieces.split(''))];
-    chars = [...new Set([...chars, ...unique])];
-  }
+async function loadSet(config) {
+  if (config) activeConfig = { ...activeConfig, ...config };
+  const manifest = await loadManifest(activeConfig.set);
+  if (!manifest) return 0;
+  const chars = Object.keys(manifest.pieces).map(k => {
+    const color = k[0];
+    const ch = k.slice(1);
+    return color === 'w' ? ch.toUpperCase() : ch.toLowerCase();
+  });
   const results = await Promise.allSettled(chars.map(c => resolvePiece(c)));
   return results.filter(r => r.status === 'fulfilled' && r.value).length;
 }
@@ -134,30 +163,23 @@ function getConfig() {
 }
 
 function getAvailableSets() {
-  return Object.entries(SETS).map(([id, s]) => ({ id, ...s }));
-}
-
-function getVariantChars(variantKey) {
-  const vc = typeof MCE !== 'undefined' ? MCE.getVariantConfig(variantKey) : null;
-  let chars = new Set('KQRBNPkqrbnp'.split(''));
-  if (vc && vc.fen) {
-    const fenPieces = vc.fen.split(' ')[0].replace(/[0-9\/]/g, '');
-    fenPieces.split('').forEach(c => chars.add(c));
-  }
-  return chars;
+  return [...manifests.entries()]
+    .filter(([, m]) => m !== null)
+    .map(([id, m]) => ({ id, name: m.name, recolorable: m.recolorable }));
 }
 
 function getSetsForVariant(variantKey) {
   const needed = getVariantChars(variantKey);
-  return Object.entries(SETS)
-    .filter(([, s]) => {
-      const covers = new Set(s.covers.split(''));
-      for (const c of needed) {
-        if (!covers.has(c)) return false;
+  const neededKeys = [...needed].map(c => pieceKey(c));
+  return [...manifests.entries()]
+    .filter(([, m]) => {
+      if (!m || !m.pieces) return false;
+      for (const key of neededKeys) {
+        if (!m.pieces[key]) return false;
       }
       return true;
     })
-    .map(([id, s]) => ({ id, ...s }));
+    .map(([id, m]) => ({ id, name: m.name, recolorable: m.recolorable }));
 }
 
 function isLoaded(char) {
@@ -167,13 +189,13 @@ function isLoaded(char) {
 const PieceSetResolver = {
   loadSet,
   loadForVariant,
+  loadAllManifests,
   setConfig,
   getConfig,
   getAvailableSets,
   getSetsForVariant,
   isLoaded,
-  SETS,
 };
 
 export default PieceSetResolver;
-export { loadSet, loadForVariant, setConfig, getConfig, getAvailableSets, getSetsForVariant, isLoaded, SETS };
+export { loadSet, loadForVariant, loadAllManifests, setConfig, getConfig, getAvailableSets, getSetsForVariant, isLoaded };

@@ -1,0 +1,14 @@
+{
+  "id": "wikimedia-fairy",
+  "name": "Wikimedia Fairy (45px)",
+  "path": "wikimedia/fairy/",
+  "author": "Sammy2012, NikNaks93, Francois-Pier, Kwamikagami, others",
+  "license": "CC0 / CC BY-SA 3.0 / CC BY-SA 4.0 (varies)",
+  "recolorable": true,
+  "pieces": {
+    "wF": "White_ferz.svg",
+    "bG": "Chess_Gdt45.svg",
+    "bL": "BLancer.svg",
+    "bF": "Black_ferz.svg"
+  }
+}

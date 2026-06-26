@@ -169,6 +169,7 @@ fetch(basePath + 'assets/pieces.svg?v=0.9.18')
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
 
+    await PieceSetResolver.loadAllManifests();
     const savedSet = localStorage.getItem('mce-piece-set') || 'mce-chess';
     PieceSetResolver.setConfig({ set: savedSet, fallback: 'mce-chess' });
     const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
