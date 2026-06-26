@@ -353,11 +353,16 @@ function populateSetSelect(select) {
   const variant = currentVariant || 'standard';
   const sets = PieceSetResolver.getSetsForVariant(variant);
   const currentSet = PieceSetResolver.getConfig().set;
+  const currentCovers = sets.some(s => s.id === currentSet);
+  if (!currentCovers && sets.length > 0) {
+    PieceSetResolver.setConfig({ set: sets[0].id });
+    PieceSetResolver.loadForVariant(variant).then(() => { if (ctrl) render(); });
+  }
   sets.forEach(s => {
     const opt = document.createElement('option');
     opt.value = s.id;
     opt.textContent = s.name;
-    if (s.id === currentSet) opt.selected = true;
+    if (s.id === (currentCovers ? currentSet : sets[0].id)) opt.selected = true;
     select.appendChild(opt);
   });
   if (sets.length <= 1) select.style.display = 'none';
