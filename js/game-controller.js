@@ -9,6 +9,7 @@ import './game-controller-core.js';
 import './replay.js';
 import './variants/index.js';
 import { PIECES, PIECE_NAMES, getPieceInfo } from './pieces/index.js';
+import PieceSetResolver from './piece-set-resolver.js';
 
 function track(event, params) {
   if (typeof window.gtag === 'function') window.gtag('event', event, params || {});
@@ -163,12 +164,17 @@ let ctrl = null;
 
 fetch(basePath + 'assets/pieces.svg?v=0.9.18')
   .then(r => r.text())
-  .then(svg => {
+  .then(async svg => {
     const div = document.createElement('div');
     div.innerHTML = svg;
     document.body.insertBefore(div.firstChild, document.body.firstChild);
-    if (!embedMode && !fullscreenMode) renderPicker();
+
+    const savedSet = localStorage.getItem('mce-piece-set') || 'mce-chess';
+    PieceSetResolver.setConfig({ set: savedSet, fallback: 'mce-chess' });
     const initVariant = paramVariant && MCE.getVariantConfig(paramVariant) ? paramVariant : 'standard';
+    await PieceSetResolver.loadForVariant(initVariant);
+
+    if (!embedMode && !fullscreenMode) renderPicker();
     startGame(initVariant);
     if (paramFen) {
       MCE.loadFEN(game, paramFen);
@@ -386,6 +392,26 @@ function renderToolbar() {
   });
   leftGroup.appendChild(pieceSelect);
 
+  const setSelect = document.createElement('select');
+  setSelect.className = 'toolbar-select';
+  const currentSet = PieceSetResolver.getConfig().set;
+  PieceSetResolver.getAvailableSets().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    if (s.id === currentSet) opt.selected = true;
+    setSelect.appendChild(opt);
+  });
+  setSelect.addEventListener('change', async () => {
+    const setId = setSelect.value;
+    PieceSetResolver.setConfig({ set: setId });
+    localStorage.setItem('mce-piece-set', setId);
+    await PieceSetResolver.loadForVariant(currentVariant || 'standard');
+    track('piece_set_change', { set_name: setId });
+    render();
+  });
+  leftGroup.appendChild(setSelect);
+
   const styleSelect = document.createElement('select');
   styleSelect.className = 'toolbar-select';
   Object.entries(ANIM_STYLES).forEach(([key, label]) => {
@@ -446,6 +472,7 @@ function removeMoveFromList() {
 
 function startGame(variant) {
   currentVariant = variant;
+  PieceSetResolver.loadForVariant(variant).then(() => { if (ctrl) render(); });
   const g = getVariantGroups().find(gr => gr.variants.some(([k]) => k === variant));
   const groupLabel = g ? g.label : '';
   track('variant_select', { variant_name: variant, variant_group: groupLabel });
