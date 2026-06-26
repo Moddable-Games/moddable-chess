@@ -115,10 +115,17 @@ function pieceKey(char) {
 async function loadPieceFromManifest(char, manifest) {
   if (!manifest || !manifest.pieces) return false;
   const key = pieceKey(char);
-  const file = manifest.pieces[key];
-  if (!file) return false;
+  const entry = manifest.pieces[key];
+  if (!entry) return false;
   const basePath = getBasePath();
-  const url = basePath + SETS_BASE + manifest.path + file;
+  let url;
+  if (typeof entry === 'string') {
+    url = basePath + SETS_BASE + manifest.path + entry;
+  } else {
+    const sourcePath = manifest.sources && manifest.sources[entry.source];
+    if (!sourcePath) return false;
+    url = basePath + SETS_BASE + sourcePath + entry.file;
+  }
   const svgText = await fetchSVG(url);
   if (!svgText) return false;
   const parsed = parseSVGContent(svgText, symbolId(char));

@@ -1,0 +1,161 @@
+{
+  "id": "curated",
+  "name": "Curated (Best Of)",
+  "author": "Various (see source sets)",
+  "license": "Mixed (MIT, SIL OFL, CC BY-SA 4.0)",
+  "recolorable": false,
+  "composite": true,
+  "sources": {
+    "lichess-cburnett": "lichess-cburnett/",
+    "wikimedia-noto": "wikimedia/noto/",
+    "wikimedia-makruk": "wikimedia/makruk/",
+    "kaneo": "kaneo/",
+    "mce-chess": "mce-chess/"
+  },
+  "pieces": {
+    "wK": {
+      "source": "lichess-cburnett",
+      "file": "wK.svg"
+    },
+    "bK": {
+      "source": "lichess-cburnett",
+      "file": "bK.svg"
+    },
+    "wQ": {
+      "source": "lichess-cburnett",
+      "file": "wQ.svg"
+    },
+    "bQ": {
+      "source": "lichess-cburnett",
+      "file": "bQ.svg"
+    },
+    "wR": {
+      "source": "lichess-cburnett",
+      "file": "wR.svg"
+    },
+    "bR": {
+      "source": "lichess-cburnett",
+      "file": "bR.svg"
+    },
+    "wB": {
+      "source": "lichess-cburnett",
+      "file": "wB.svg"
+    },
+    "bB": {
+      "source": "lichess-cburnett",
+      "file": "bB.svg"
+    },
+    "wN": {
+      "source": "lichess-cburnett",
+      "file": "wN.svg"
+    },
+    "bN": {
+      "source": "lichess-cburnett",
+      "file": "bN.svg"
+    },
+    "wP": {
+      "source": "lichess-cburnett",
+      "file": "wP.svg"
+    },
+    "bP": {
+      "source": "lichess-cburnett",
+      "file": "bP.svg"
+    },
+    "wA": {
+      "source": "wikimedia-noto",
+      "file": "WHITE_CHESS_KNIGHT-BISHOP.svg"
+    },
+    "bA": {
+      "source": "wikimedia-noto",
+      "file": "BLACK_CHESS_KNIGHT-BISHOP.svg"
+    },
+    "wC": {
+      "source": "wikimedia-noto",
+      "file": "WHITE_CHESS_KNIGHT-ROOK.svg"
+    },
+    "bC": {
+      "source": "wikimedia-noto",
+      "file": "BLACK_CHESS_KNIGHT-ROOK.svg"
+    },
+    "wM": {
+      "source": "wikimedia-noto",
+      "file": "WHITE_CHESS_KNIGHT-QUEEN.svg"
+    },
+    "bM": {
+      "source": "wikimedia-noto",
+      "file": "BLACK_CHESS_KNIGHT-QUEEN.svg"
+    },
+    "wF": {
+      "source": "wikimedia-makruk",
+      "file": "Met_white.svg"
+    },
+    "bF": {
+      "source": "wikimedia-makruk",
+      "file": "Met_black.svg"
+    },
+    "wG": {
+      "source": "wikimedia-makruk",
+      "file": "Khon_white.svg"
+    },
+    "bG": {
+      "source": "wikimedia-makruk",
+      "file": "Khon_black.svg"
+    },
+    "wE": {
+      "source": "kaneo",
+      "file": "wE.svg"
+    },
+    "bE": {
+      "source": "kaneo",
+      "file": "bE.svg"
+    },
+    "wH": {
+      "source": "kaneo",
+      "file": "wH.svg"
+    },
+    "bH": {
+      "source": "kaneo",
+      "file": "bH.svg"
+    },
+    "wY": {
+      "source": "mce-chess",
+      "file": "wY.svg"
+    },
+    "bY": {
+      "source": "mce-chess",
+      "file": "bY.svg"
+    },
+    "wL": {
+      "source": "mce-chess",
+      "file": "wL.svg"
+    },
+    "bL": {
+      "source": "mce-chess",
+      "file": "bL.svg"
+    },
+    "wW": {
+      "source": "mce-chess",
+      "file": "wW.svg"
+    },
+    "bW": {
+      "source": "mce-chess",
+      "file": "bW.svg"
+    },
+    "wS": {
+      "source": "mce-chess",
+      "file": "wS.svg"
+    },
+    "bS": {
+      "source": "mce-chess",
+      "file": "bS.svg"
+    },
+    "wI": {
+      "source": "mce-chess",
+      "file": "wI.svg"
+    },
+    "bI": {
+      "source": "mce-chess",
+      "file": "bI.svg"
+    }
+  }
+}
