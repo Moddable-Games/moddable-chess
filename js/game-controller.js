@@ -110,7 +110,9 @@ function getVariantGroups() {
   for (const label of GROUP_ORDER) {
     if (groupMap[label]) { groups.push({ label, variants: groupMap[label] }); delete groupMap[label]; }
   }
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   for (const [label, variants] of Object.entries(groupMap)) {
+    if (label === 'Dev' && !isLocal) continue;
     groups.push({ label, variants });
   }
   for (const g of groups) {
