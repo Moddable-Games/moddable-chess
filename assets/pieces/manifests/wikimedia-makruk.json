@@ -1,0 +1,24 @@
+{
+  "id": "wikimedia-makruk",
+  "name": "Wikimedia Makruk (Thai Chess)",
+  "path": "wikimedia/makruk/",
+  "author": "Yevrowl",
+  "license": "CC BY-SA 4.0",
+  "recolorable": false,
+  "pieces": {
+    "wK": "Khun_white.svg",
+    "bK": "Khun_black.svg",
+    "wF": "Met_white.svg",
+    "bF": "Met_black.svg",
+    "wG": "Khon_white.svg",
+    "bG": "Khon_black.svg",
+    "wN": "Ma_white.svg",
+    "bN": "Ma_black.svg",
+    "wR": "Ruea_white.svg",
+    "bR": "Ruea_black.svg",
+    "wP": "Bia_white.svg",
+    "bP": "Bia_black.svg",
+    "wF+": "Biangai_white.svg",
+    "bF+": "Biangai_black.svg"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "wikimedia-kiwen-suwi",
+  "name": "Kiwen Suwi",
+  "path": "wikimedia/artistic/kiwen-suwi/",
+  "author": "Armsjuli",
+  "license": "CC BY-SA 4.0",
+  "recolorable": true,
+  "pieces": {
+    "wK": "Kiwen_Suwi_klt.svg",
+    "bK": "Kiwen_Suwi_kdt.svg",
+    "wQ": "Kiwen_Suwi_qlt.svg",
+    "bQ": "Kiwen_Suwi_qdt.svg",
+    "wR": "Kiwen_Suwi_rlt.svg",
+    "bR": "Kiwen_Suwi_rdt.svg",
+    "wB": "Kiwen_Suwi_blt.svg",
+    "bB": "Kiwen_Suwi_bdt.svg",
+    "wN": "Kiwen_Suwi_nlt.svg",
+    "bN": "Kiwen_Suwi_ndt.svg",
+    "wP": "Kiwen_Suwi_plt.svg",
+    "bP": "Kiwen_Suwi_pdt.svg"
+  }
+}

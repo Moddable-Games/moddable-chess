@@ -1,0 +1,16 @@
+{
+  "id": "wikimedia-colored",
+  "name": "Wikimedia 4-Player Colored",
+  "path": "wikimedia/colored/",
+  "author": "Various",
+  "license": "GFDL / CC BY-SA 3.0",
+  "recolorable": false,
+  "pieces": {
+    "wK": "Red_king.svg",
+    "wQ": "Red_queen.svg",
+    "wR": "Red_rook.svg",
+    "wB": "Red_bishop.svg",
+    "wN": "Red_knight.svg",
+    "wP": "Red_pawn.svg"
+  }
+}

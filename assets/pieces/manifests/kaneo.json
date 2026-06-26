@@ -1,0 +1,32 @@
+{
+  "id": "kaneo",
+  "name": "Kaneo (Kadapadon)",
+  "path": "kaneo/",
+  "author": "Kadapadon",
+  "license": "CC-BY-4.0",
+  "recolorable": false,
+  "pieces": {
+    "wK": "wK.svg",
+    "wQ": "wQ.svg",
+    "wR": "wR.svg",
+    "wB": "wB.svg",
+    "wN": "wN.svg",
+    "wP": "wP.svg",
+    "wA": "wA.svg",
+    "wC": "wC.svg",
+    "wE": "wE.svg",
+    "wH": "wH.svg",
+    "wC2": "wCh.svg",
+    "bK": "bK.svg",
+    "bQ": "bQ.svg",
+    "bR": "bR.svg",
+    "bB": "bB.svg",
+    "bN": "bN.svg",
+    "bP": "bP.svg",
+    "bA": "bA.svg",
+    "bC": "bC.svg",
+    "bE": "bE.svg",
+    "bH": "bH.svg",
+    "bC2": "bCh.svg"
+  }
+}

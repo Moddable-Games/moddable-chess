@@ -1,0 +1,14 @@
+{
+  "id": "wikimedia-xogos",
+  "name": "Xogos da Meiga (Multi-color Fairy)",
+  "path": "wikimedia/artistic/xogos-da-meiga/",
+  "author": "Iago Casabiell Gonzalez",
+  "license": "CC BY-SA 4.0",
+  "recolorable": false,
+  "pieces": {
+    "wE": "Red_Elephant_Xogos_da_Meiga_chess_icons_family.svg",
+    "bE": "Black_Elephant_Xogos_da_Meiga_chess_icons_family.svg",
+    "wF": "Red_Ferz_Xogos_da_Meiga_chess_icons_family.svg",
+    "bF": "Black_Ferz_Xogos_da_Meiga_chess_icons_family.svg"
+  }
+}
