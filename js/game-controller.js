@@ -429,7 +429,13 @@ function renderToolbar() {
     PieceSetResolver.setConfig({ set: setId });
     localStorage.setItem('mce-piece-set', setId);
     await PieceSetResolver.loadForVariant(currentVariant || 'standard');
+    const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
+    const activeSetInfo = sets.find(s => s.id === setId);
+    if (activeSetInfo && !activeSetInfo.recolorable) {
+      MCE.setPieceStyle('auto');
+    }
     track('piece_set_change', { set_name: setId });
+    renderToolbar();
     render();
   });
   leftGroup.appendChild(setSelect);
