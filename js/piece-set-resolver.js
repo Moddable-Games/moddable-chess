@@ -38,10 +38,11 @@ async function loadAllManifests() {
   const indexUrl = basePath + MANIFESTS_BASE + 'index.json';
   try {
     const resp = await fetch(indexUrl);
-    if (!resp.ok) return;
+    if (!resp.ok) { console.warn('[PieceSetResolver] index.json failed:', resp.status, indexUrl); return; }
     const ids = await resp.json();
     await Promise.all(ids.map(id => loadManifest(id)));
-  } catch (e) { /* index not available, load on demand */ }
+    console.log('[PieceSetResolver] Loaded', manifests.size, 'manifests');
+  } catch (e) { console.warn('[PieceSetResolver] loadAllManifests error:', e.message); }
 }
 
 function symbolId(char) {
@@ -187,8 +188,8 @@ function getAvailableSets() {
 function getSetsForVariant(variantKey) {
   const needed = getVariantChars(variantKey);
   const neededKeys = [...needed].map(c => pieceKey(c));
-  return [...manifests.entries()]
-    .filter(([, m]) => {
+  const result = [...manifests.entries()]
+    .filter(([id, m]) => {
       if (!m || !m.pieces) return false;
       for (const key of neededKeys) {
         if (!m.pieces[key]) return false;
@@ -196,6 +197,8 @@ function getSetsForVariant(variantKey) {
       return true;
     })
     .map(([id, m]) => ({ id, name: m.name, recolorable: m.recolorable }));
+  console.log('[PieceSetResolver] getSetsForVariant(' + variantKey + '):', result.length, 'sets pass from', manifests.size, 'total. Needed:', neededKeys.length, 'keys');
+  return result;
 }
 
 function isLoaded(char) {
