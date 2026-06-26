@@ -414,6 +414,20 @@ function renderToolbar() {
   });
   leftGroup.appendChild(pieceSelect);
 
+  const setSelect = document.createElement('select');
+  setSelect.id = 'piece-set-select';
+  setSelect.className = 'toolbar-select';
+  populateSetSelect(setSelect);
+  setSelect.addEventListener('change', async () => {
+    const setId = setSelect.value;
+    PieceSetResolver.setConfig({ set: setId });
+    localStorage.setItem('mce-piece-set', setId);
+    await PieceSetResolver.loadForVariant(currentVariant || 'standard');
+    track('piece_set_change', { set_name: setId });
+    render();
+  });
+  leftGroup.appendChild(setSelect);
+
   const styleSelect = document.createElement('select');
   styleSelect.className = 'toolbar-select';
   Object.entries(ANIM_STYLES).forEach(([key, label]) => {
