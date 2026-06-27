@@ -285,6 +285,22 @@ const xiangqiWestSvg = renderBoardSVG({
 });
 write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board-west.svg`, xiangqiWestSvg, 'xiangqi-start-west');
 
+// Janggi (Korean Chess) — inner elephant setup, no river
+const JANGGI_START_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
+
+const janggiSvg = renderBoardSVG({
+  boardStyle: 'xiangqi',
+  rows: 10,
+  cols: 9,
+  tileSize: 40,
+  showLabels: false,
+  river: false,
+  position: xiangqiFenToPos(JANGGI_START_FEN),
+  pieceDefs: XIANGQI_PIECES_TRAD,
+  title: 'Janggi — starting position (inner elephant setup)',
+});
+write(`${XIANGQI_DIAGRAMS}/janggi-board.svg`, janggiSvg, 'janggi');
+
 // --- Shogi ---
 
 console.log('\nGenerating Shogi boards...');
