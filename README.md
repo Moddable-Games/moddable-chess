@@ -209,6 +209,14 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-27 (v0.9.22)
+- Add 19 piece sets to gallery (40 total, 1517 SVGs): Kadagaden chess/xiangqi/janggi/sittuyin, Ka-hu shogi
+- Family-order sort in gallery (chess → xiangqi → janggi → shogi → sittuyin → draughts → emoji)
+- Decouple board generation into config-driven pipeline: zero per-game code in orchestration
+- Extract position-parser (FEN + placement) and piece-loader (manifest → SVG defs) as reusable primitives
+- Add package exports: ./svg-renderer, ./position, ./piece-loader
+- Fix Janggi board rendering: uses proper Kadagaden Kakao pieces via manifest loading
+
 #### 2026-06-27 (v0.9.21)
 - Complete engine decoupling: all 18 piece types registered via registerPiece with movement primitives
 - Add movement primitive system: Leaper, Rider, compose, divergent (js/movement.js)
