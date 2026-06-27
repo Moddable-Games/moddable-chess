@@ -19,7 +19,7 @@ moddable-chess/
 ├── package.json            ← ESM config + npm exports map
 ├── index.html              ← Homepage / marketing page
 ├── play/
-│   └── index.html          ← Interactive demo (variant picker + board)
+│   └── index.html          ← 3-column app shell with sidebar variant picker, responsive mobile layout
 ├── docs/
 │   ├── index.html          ← Documentation hub
 │   ├── api.html            ← Full API reference
@@ -36,17 +36,24 @@ moddable-chess/
 │   ├── chess-play.js           ← Make/unmake moves, turn logic dispatch
 │   ├── chess-variants.js       ← Variant status + custom piece registration
 │   ├── board-renderer.js       ← SVG board renderer (tilePainter, pieceProvider, afterRender)
+│   ├── piece-set-resolver.js   ← Visual piece set resolution with manifest-driven fallback chains
 │   ├── game-controller-core.js ← Reusable MCE.createGameController() for consumers
 │   ├── replay.js               ← MCE.createReplay() for move-by-move playback
 │   ├── game-controller.js      ← Play page: wires engine to renderer
 │   ├── home.js                 ← Homepage: variant grid from JSON
+│   ├── pieces/                 ← Piece type registry with metadata (name, category, movement rules)
+│   │   ├── index.js            ← Barrel import (loads all 18)
+│   │   └── ...                 ← 18 piece definition files
 │   └── variants/               ← Plugin files (one per variant, ESM)
 │       ├── index.js            ← Barrel import (loads all 70)
 │       ├── standard.js
 │       ├── atomic.js
 │       └── ...                 ← 70 total
 └── assets/
-    └── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
+    ├── pieces.svg          ← Cburnett piece sprites (CC BY-SA 3.0)
+    └── pieces/
+        ├── sets/           ← 22 piece set directories with individual SVGs
+        └── manifests/      ← Manifest JSON files defining set composition
 ```
 
 ---
@@ -178,7 +185,7 @@ Connect to Claude Code or Claude Desktop for AI-powered chess analysis:
 claude mcp add --transport stdio moddable-chess node /path/to/moddable-chess/mcp/server.js
 ```
 
-**Available tools:**
+**Available tools (8):**
 - `chess_list_variants` — Browse all 70 variants with descriptions and rules
 - `chess_get_legal_moves` — Get annotated legal moves for any position
 - `chess_analyze_position` — Engine evaluation with best move and principal variation
@@ -186,7 +193,6 @@ claude mcp add --transport stdio moddable-chess node /path/to/moddable-chess/mcp
 - `chess_make_moves` — Play a sequence of moves, get resulting position
 - `chess_get_opening_book` — Look up book moves for known positions
 - `chess_generate_puzzle` — Serve puzzles from a pool of 1,500+ across 66 variants (via remote); random-search fallback (local)
-- `chess_list_puzzle_types` — Discover available puzzle types with counts and rating ranges (remote only)
 - `chess_render_svg` — Render any position as a self-contained SVG image
 
 ---
@@ -203,18 +209,37 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-27 (v0.9.20)
+- Redesign play page: 3-column app shell layout with sidebar variant picker
+- Add piece set resolver: manifest-driven fallback chains, 22 swappable piece sets
+- Add piece gallery: 1145 SVGs across 22 sets with search/filter UI
+- Add piece type registry: 18 piece types with metadata (js/pieces/)
+- Graphical fairy piece SVGs replace all text-letter glyphs
+- Add 4 new variants: Chaturanga, Shatranj, Absorption, Sittuyin (74 total)
+- Add Xiangqi board renderer, Shogi board provider, and dedicated piece sprites
+- Add board generation docs page with live SVG examples
+- Fix 11 bugs from Kevin's Round 3 playtest
+- Add automated test suite: engine smoke tests + Playwright visual tests
+- Add puzzle pool: 1,500+ puzzles across all variants
+
+#### 2026-06-16 (v0.9.10)
+- Add headless SVG board renderer for chess and draughts families
+- Add chess_render_svg MCP tool (8 tools total)
+- Fix variant bugs from extensive AI vs AI testing (70/70 pass)
+- Rework AI difficulty system with variant-specific evaluators
+- Remove all hardcoded variant names from core engine files
+
 #### 2026-06-10 (v0.9.2)
-- Add GA4 event tracking: variant_select, game_start, game_complete, difficulty_change, theme_change, code_copy, docs_navigate, outbound_click, section_scroll
+- Add GA4 event tracking across all user interactions
+- Add SDK demo page: live themes grid, AI-vs-AI panel
+- Docs overhaul: ESM examples, MCP section, breadcrumb navigation
 
 #### 2026-06-10 (v0.9.0)
 - Migrate entire codebase to native ESM (`<script type="module">`, `import`/`export`)
 - Same source files now run in browser, Node.js, and Cloudflare Workers without any build step
 - Add package.json with `"type": "module"` and npm-style exports map
-- Convert AI worker to module worker (`{ type: 'module' }`)
-- Replace IIFE wrappers with proper import/export across all 80+ source files
+- Add MCP server with 8 AI-callable tools for chess analysis
 - All 70 variants produce legal moves in Node.js without browser globals
-- Update homepage developer examples to show ESM usage
-- Prerequisite for multiplayer (#93), MCP server (website#101), and npm distribution
 
 #### 2026-06-09
 - Add animation style selector: slide, arc, bounce, warp (toolbar dropdown)

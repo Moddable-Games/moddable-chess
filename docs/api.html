@@ -316,6 +316,111 @@ MCE.setPieceStyle('auto');      // default (adapts on dark themes)</code></pre>
 MCE.setPieceStyle('forest');</code></pre>
   <p>The <code>detail</code> colour is used for inner decorative lines on black pieces (cross on bishops, lines on rooks/kings). If omitted, falls back to the stroke colour.</p>
 
+  <h2 id="piece-set-resolver">Piece Set Resolver</h2>
+  <p>The <code>PieceSetResolver</code> manages loading and switching between piece SVG sets. It resolves which SVG symbol to use for each piece character based on a priority chain: per-piece overrides, primary set, then fallback set.</p>
+  <pre class="language-javascript"><code class="language-javascript">import PieceSetResolver from './piece-set-resolver.js';</code></pre>
+
+  <h3>Resolution order</h3>
+  <p>When the renderer needs a piece symbol, the resolver checks in order:</p>
+  <ol>
+    <li><code>overrides[char]</code> — per-piece set override (e.g. use a specific set for knights)</li>
+    <li>Primary set — the configured <code>set</code> value</li>
+    <li>Fallback set — the configured <code>fallback</code> value (covers missing pieces)</li>
+  </ol>
+
+  <h3>PieceSetResolver.loadAllManifests()</h3>
+  <p>Fetches <code>index.json</code> and loads all piece set manifests. Call once at startup to make all sets available.</p>
+  <pre class="language-javascript"><code class="language-javascript">await PieceSetResolver.loadAllManifests();
+const sets = PieceSetResolver.getAvailableSets();
+console.log(sets.length + ' piece sets loaded');</code></pre>
+
+  <h3>PieceSetResolver.loadForVariant(variantKey, config?)</h3>
+  <p>Loads only the piece SVGs needed for a specific variant. Returns the count of pieces loaded. More efficient than <code>loadAllManifests()</code> when you know which variant will be played.</p>
+  <pre class="language-javascript"><code class="language-javascript">const count = await PieceSetResolver.loadForVariant('capablanca');
+console.log(count + ' piece symbols injected');</code></pre>
+
+  <h3>PieceSetResolver.setConfig(config)</h3>
+  <p>Merges the given config into the active resolver configuration. Config shape:</p>
+  <pre class="language-javascript"><code class="language-javascript">PieceSetResolver.setConfig({
+  set: 'staunty',           // primary piece set id
+  fallback: 'classic',      // fallback for missing pieces
+  overrides: { n: 'alpha' } // use 'alpha' set for knights
+});</code></pre>
+
+  <h3>PieceSetResolver.getConfig()</h3>
+  <p>Returns a copy of the active resolver configuration.</p>
+  <pre class="language-javascript"><code class="language-javascript">const cfg = PieceSetResolver.getConfig();
+// { set: 'staunty', fallback: 'classic', overrides: { n: 'alpha' } }</code></pre>
+
+  <h3>PieceSetResolver.getAvailableSets()</h3>
+  <p>Returns an array of all loaded piece set descriptors.</p>
+  <pre class="language-javascript"><code class="language-javascript">const sets = PieceSetResolver.getAvailableSets();
+// [{ id: 'classic', name: 'Classic', recolorable: true }, ...]</code></pre>
+
+  <h3>PieceSetResolver.getSetsForVariant(variantKey)</h3>
+  <p>Returns only the sets that cover all pieces needed by a given variant. Useful for building a set picker that only shows compatible options.</p>
+  <pre class="language-javascript"><code class="language-javascript">const compatible = PieceSetResolver.getSetsForVariant('orda');
+// Only sets that include yurt, lancer, etc.</code></pre>
+
+  <h3>PieceSetResolver.isLoaded(char)</h3>
+  <p>Returns <code>true</code> if the SVG symbol for the given piece character has already been injected into the document.</p>
+  <pre class="language-javascript"><code class="language-javascript">if (!PieceSetResolver.isLoaded('y')) {
+  await PieceSetResolver.loadForVariant('orda');
+}</code></pre>
+
+  <h3>Manifest format</h3>
+  <p>Piece set manifests come in two forms:</p>
+
+  <h4>Simple (single-source)</h4>
+  <p>All pieces come from a single directory. The <code>path</code> field specifies the base path, and piece values are filename strings. Keys use color prefix + uppercase char format (e.g. <code>wK</code>, <code>bQ</code>).</p>
+  <pre class="language-javascript"><code class="language-javascript">{
+  "id": "classic",
+  "name": "Classic",
+  "recolorable": true,
+  "path": "assets/pieces/classic/",
+  "pieces": { "wK": "wK.svg", "bK": "bK.svg", "wQ": "wQ.svg" }
+}</code></pre>
+
+  <h4>Composite (multi-source)</h4>
+  <p>Pieces are drawn from multiple source directories. Set <code>composite: true</code> and provide a <code>sources</code> map. Piece values are objects with <code>source</code> and <code>file</code> properties.</p>
+  <pre class="language-javascript"><code class="language-javascript">{
+  "id": "mixed-fantasy",
+  "name": "Mixed Fantasy",
+  "composite": true,
+  "sources": { "base": "assets/pieces/classic/", "fairy": "assets/pieces/fairy/" },
+  "pieces": { "wK": { "source": "base", "file": "wK.svg" }, "wY": { "source": "fairy", "file": "wY.svg" } }
+}</code></pre>
+
+  <h2 id="piece-registry">Piece Registry</h2>
+  <p>The piece registry provides metadata about all piece types known to the engine (standard and custom). Useful for building piece selectors, documentation, or variant editors.</p>
+  <pre class="language-javascript"><code class="language-javascript">import { PIECES, PIECE_NAMES, getPieceInfo } from './pieces/index.js';</code></pre>
+
+  <h3>MCE.getPieceRegistry()</h3>
+  <p>Returns the full piece handler registry (move generators and attack detectors for all registered piece types).</p>
+  <pre class="language-javascript"><code class="language-javascript">const registry = MCE.getPieceRegistry();
+console.log(Object.keys(registry)); // ['p','n','b','r','q','k','a','c','s','m',...]</code></pre>
+
+  <h3>PIECES</h3>
+  <p>Dictionary keyed by piece character containing full piece metadata objects.</p>
+  <pre class="language-javascript"><code class="language-javascript">import { PIECES } from './pieces/index.js';
+const queen = PIECES['q'];
+// { char: 'q', name: 'Queen', category: 'standard', movement: '...', ... }</code></pre>
+
+  <h3>PIECE_NAMES</h3>
+  <p>Simple map from piece character to human-readable display name.</p>
+  <pre class="language-javascript"><code class="language-javascript">import { PIECE_NAMES } from './pieces/index.js';
+PIECE_NAMES['a']; // 'Archbishop'
+PIECE_NAMES['c']; // 'Chancellor'
+PIECE_NAMES['m']; // 'Maharaja'</code></pre>
+
+  <h3>getPieceInfo(char)</h3>
+  <p>Returns a structured info object for a piece character.</p>
+  <pre class="language-javascript"><code class="language-javascript">import { getPieceInfo } from './pieces/index.js';
+const info = getPieceInfo('a');
+// { char: 'a', name: 'Archbishop', category: 'fairy',
+//   movement: 'knight + bishop', capture: 'knight + bishop',
+//   variants: ['capablanca', 'gothic', ...] }</code></pre>
+
   <h2>AI System</h2>
 
   <h3>MCE.aiPickMove(game, depth, opts)</h3>
@@ -518,7 +623,12 @@ if (move.flag === 'action' && move.action === 'hex') {
     <tr><td><code>ctrl.isThinking()</code></td><td>Returns true if AI is currently searching</td></tr>
     <tr><td><code>ctrl.render()</code></td><td>Force a re-render</td></tr>
     <tr><td><code>ctrl.destroy()</code></td><td>Cleanup: terminates AI worker, removes listeners</td></tr>
+    <tr><td><code>ctrl.setRenderOpts(newOpts)</code></td><td>Merges new render options into the active config and re-renders. Use for responsive resize or dynamic style changes</td></tr>
   </table>
+  <pre class="language-javascript"><code class="language-javascript">// Responsive resize on window change
+window.addEventListener('resize', function() {
+  ctrl.setRenderOpts({ size: boardEl.clientWidth });
+});</code></pre>
 
   <h3>Controller callbacks</h3>
   <table class="docs-table">
@@ -557,6 +667,20 @@ if (move.flag === 'action' && move.action === 'hex') {
       hideArrow();
       execute(); // now actually make the move
     }, 200);
+  }
+});</code></pre>
+
+  <h3>getLegalMovesOverride</h3>
+  <p>Pass a <code>getLegalMovesOverride</code> function in the controller options to replace or filter legal moves before they reach the interaction loop. Return an array of moves to override, or <code>null</code> to use the default.</p>
+  <pre class="language-javascript"><code class="language-javascript">var ctrl = MCE.createGameController(boardEl, game, {
+  getLegalMovesOverride: function(game, state) {
+    // Only allow pawn moves on the first turn
+    if (game.fullmove === 1) {
+      return MCE.legalMoves(game).filter(function(m) {
+        return game.board[m.from] && game.board[m.from].type === 'p';
+      });
+    }
+    return null; // use default
   }
 });</code></pre>
 
@@ -784,9 +908,10 @@ var fireVulnerable = MCE.buildUnitHandler({
     <tr><th>Constant</th><th>Value</th></tr>
     <tr><td><code>MCE.WHITE</code></td><td><code>'w'</code></td></tr>
     <tr><td><code>MCE.BLACK</code></td><td><code>'b'</code></td></tr>
-    <tr><td><code>MCE.PIECE</code></td><td><code>{ P:'p', N:'n', B:'b', R:'r', Q:'q', K:'k', A:'a', C:'c', S:'s' }</code></td></tr>
+    <tr><td><code>MCE.PIECE</code></td><td><code>{ P:'p', N:'n', B:'b', R:'r', Q:'q', K:'k', A:'a', C:'c', S:'s', M:'m' }</code></td></tr>
     <tr><td><code>MCE.INITIAL_FEN</code></td><td>Standard starting position</td></tr>
   </table>
+  <p>Additional fairy piece chars (E, F, G, H, I, L, W, Y) are registered dynamically by the piece modules in <code>js/pieces/</code>. Use <code>MCE.getPieceRegistry()</code> for the full runtime set.</p>
 
   <h2>Embedding</h2>
   <p>The play page supports URL parameters for embedding in iframes. Combine parameters to control appearance and behaviour.</p>
