@@ -154,13 +154,13 @@ function genJumps(g, from, r, c, side, offsets, moves, opts) {
   }
 }
 
-function castlingClear(g, row, from, to, rookFrom, rookTo, side) {
-  const minK = Math.min(from, to), maxK = Math.max(from, to);
-  const minR = Math.min(rookFrom, rookTo), maxR = Math.max(rookFrom, rookTo);
+function castlingClear(g, row, kingCol, destCol, rookCol, rookDestCol, kingSq, rookSq, side) {
+  const minK = Math.min(kingCol, destCol), maxK = Math.max(kingCol, destCol);
+  const minR = Math.min(rookCol, rookDestCol), maxR = Math.max(rookCol, rookDestCol);
   const minAll = Math.min(minK, minR), maxAll = Math.max(maxK, maxR);
   for (let cc = minAll; cc <= maxAll; cc++) {
     const sq = MCE.sq(row, cc, g);
-    if (sq === from || sq === rookFrom) continue;
+    if (sq === kingSq || sq === rookSq) continue;
     if (g.board[sq]) return false;
   }
   for (let cc = minK; cc <= maxK; cc++) {
@@ -184,8 +184,8 @@ function genCastling(g, from, r, c, side, moves) {
     else {
       const kingDest = 6;
       const rookDest = 5;
-      const rookFrom = MCE.sq(row, rookCol, g);
-      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, side)) {
+      const rookSq = MCE.sq(row, rookCol, g);
+      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, from, rookSq, side)) {
         moves.push({ from, to: MCE.sq(row, kingDest, g), flag: 'castle-k' });
       }
     }
@@ -196,8 +196,8 @@ function genCastling(g, from, r, c, side, moves) {
     else {
       const kingDest = 2;
       const rookDest = 3;
-      const rookFrom = MCE.sq(row, rookCol, g);
-      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, side)) {
+      const rookSq = MCE.sq(row, rookCol, g);
+      if (castlingClear(g, row, c, kingDest, rookCol, rookDest, from, rookSq, side)) {
         moves.push({ from, to: MCE.sq(row, kingDest, g), flag: 'castle-q' });
       }
     }

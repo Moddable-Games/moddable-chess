@@ -5,6 +5,7 @@ const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 const pieceRegistry = {};
 const variantRegistry = {};
+const ruleRegistry = {};
 
 function registerVariant(key, config) {
   variantRegistry[key] = config;
@@ -177,6 +178,14 @@ function registerPiece(typeChar, handlers) {
 
 function getPieceRegistry() {
   return pieceRegistry;
+}
+
+function registerRule(id, handlers) {
+  ruleRegistry[id] = handlers;
+}
+
+function getRules() {
+  return ruleRegistry;
 }
 
 function setLegalityFilter(g, fn) {
@@ -355,7 +364,7 @@ function mutateBoard(g, undo, mutations) {
   }
 }
 
-const MCE = { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry, getEffects, hasEffect, addEffect, removeEffect, tickEffects, isSquareBlocked, mutateBoard };
+const MCE = { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, registerRule, getRules, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry, getEffects, hasEffect, addEffect, removeEffect, tickEffects, isSquareBlocked, mutateBoard };
 
-export { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry, getEffects, hasEffect, addEffect, removeEffect, tickEffects, isSquareBlocked, mutateBoard };
+export { PIECE, WHITE, BLACK, INITIAL_FEN, createGame, loadFEN, toFEN, positionKey, rc, sq, wrapCoords, onBoard, getTerrain, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy, algebraicToSq, sqToAlgebraic, registerPiece, getPieceRegistry, registerRule, getRules, setLegalityFilter, setWinCondition, advanceTurn, registerVariant, getVariantConfig, variantRegistry, getEffects, hasEffect, addEffect, removeEffect, tickEffects, isSquareBlocked, mutateBoard };
 export default MCE;

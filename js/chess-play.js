@@ -23,13 +23,14 @@ function makeMove(g, move) {
   const vc = MCE.getVariantConfig ? MCE.getVariantConfig(g.variant) : null;
   const isCapture = captured || flag === 'ep';
   const isAction = flag === 'action';
-
+  const rules = MCE.getRules();
   const isCastling = flag === 'castle-k' || flag === 'castle-q';
+
   let interceptResult = null;
   if (vc && vc.beforeMove) {
     interceptResult = vc.beforeMove(g, move, undo);
   } else if (isAction || isCastling) {
-    // Action moves and castling don't use standard piece movement
+    // Action moves and castling handle their own board state
   } else {
     g.board[to] = piece;
     g.board[from] = null;
@@ -47,61 +48,21 @@ function makeMove(g, move) {
   }
 
   if (!isAction) {
-    if (flag === 'ep') {
-      const [fr] = MCE.rc(from, g);
-      const [, tc] = MCE.rc(to, g);
-      const epCapSq = MCE.sq(fr, tc, g);
-      undo.epCaptured = g.board[epCapSq];
-      undo.epCapSq = epCapSq;
-      undo.capturedAt = epCapSq;
-      if (g.pieceData) {
-        undo.pieceDataEp = g.pieceData[epCapSq];
-        g.pieceData[epCapSq] = null;
+    for (const id in rules) {
+      const rule = rules[id];
+      if (rule.flags && rule.flags.indexOf(flag) !== -1 && rule.onMake) {
+        rule.onMake(g, move, undo);
       }
-      g.board[epCapSq] = null;
     }
-
-    if (flag === 'double') {
-      const [fr, fc] = MCE.rc(from, g);
-      const [tr] = MCE.rc(to, g);
-      g.enPassant = MCE.sq((fr + tr) / 2, fc, g);
-    } else {
+    if (!isCastling && flag !== 'ep' && flag !== 'double') {
       g.enPassant = -1;
     }
-
-    if (flag === 'promo') {
-      g.board[to] = g.turn === WHITE ? promo.toUpperCase() : promo;
-    }
-
-    if (flag === 'castle-k' || flag === 'castle-q') {
-      const [row] = MCE.rc(from, g);
-      const side = g.turn;
-      const sideKey = side === WHITE ? 'w' : 'b';
-      const rsc = g.rookStartCols;
-      let rookFromCol, rookToCol;
-      if (flag === 'castle-k') {
-        rookFromCol = rsc ? rsc[sideKey].k : g.cols - 1;
-        rookToCol = 5;
-      } else {
-        rookFromCol = rsc ? rsc[sideKey].q : 0;
-        rookToCol = 3;
+    for (const id in rules) {
+      const rule = rules[id];
+      if (rule.updateState) {
+        rule.updateState(g, from, to, piece);
       }
-      const rookFrom = MCE.sq(row, rookFromCol, g);
-      const rookTo = MCE.sq(row, rookToCol, g);
-      const rookPiece = g.board[rookFrom];
-      const rookPD = g.pieceData ? g.pieceData[rookFrom] : null;
-      undo.rookFrom = rookFrom;
-      undo.rookTo = rookTo;
-      undo.rookPiece = rookPiece;
-      g.board[from] = null;
-      g.board[rookFrom] = null;
-      if (g.pieceData) { g.pieceData[from] = null; g.pieceData[rookFrom] = null; }
-      g.board[to] = piece;
-      g.board[rookTo] = rookPiece;
-      if (g.pieceData) { g.pieceData[to] = undo.pieceDataFrom; g.pieceData[rookTo] = rookPD; }
     }
-
-    updateCastlingRights(g, from, to, piece);
   }
 
   if (!isAction && (pieceType(piece) === 'p' || captured)) g.halfmove = 0;
@@ -145,16 +106,11 @@ function unmakeMove(g, undo) {
     g.board[undo.redirectedSq] = undo.redirectedPiece;
   }
 
-  if (flag === 'castle-k' || flag === 'castle-q') {
-    g.board[to] = null;
-    g.board[undo.rookTo] = null;
-    if (g.pieceData) { g.pieceData[to] = null; g.pieceData[undo.rookTo] = null; }
-    g.board[from] = piece;
-    g.board[undo.rookFrom] = undo.rookPiece;
-    if (g.pieceData) {
-      g.pieceData[from] = undo.pieceDataFrom;
-      g.pieceData[undo.rookFrom] = undo.pieceDataTo;
-    }
+  const rules = MCE.getRules();
+  const isCastling = flag === 'castle-k' || flag === 'castle-q';
+
+  if (isCastling && rules.castling) {
+    rules.castling.onUnmake(g, undo);
   } else {
     g.board[from] = piece;
     g.board[to] = captured || null;
@@ -162,18 +118,20 @@ function unmakeMove(g, undo) {
     if (g.pieceData) {
       g.pieceData[from] = undo.pieceDataFrom;
       g.pieceData[to] = undo.pieceDataTo;
-      if (flag === 'ep' && undo.pieceDataEp !== undefined) {
-        g.pieceData[undo.epCapSq] = undo.pieceDataEp;
-      }
+    }
+  }
+
+  if (flag === 'ep' && rules['en-passant']) {
+    rules['en-passant'].onUnmake(g, undo);
+  } else if (flag === 'ep') {
+    g.board[undo.epCapSq] = undo.epCaptured;
+    if (g.pieceData && undo.pieceDataEp !== undefined) {
+      g.pieceData[undo.epCapSq] = undo.pieceDataEp;
     }
   }
 
   if (undo.exploded) {
     undo.exploded.forEach(e => { g.board[e.sq] = e.piece; });
-  }
-
-  if (flag === 'ep') {
-    g.board[undo.epCapSq] = undo.epCaptured;
   }
 
   g.castling = undo.castling;
@@ -195,21 +153,6 @@ function unmakeMove(g, undo) {
 
   g.history.pop();
   g.positionHistory.pop();
-}
-
-function updateCastlingRights(g, from, to, piece) {
-  const royal = g.royalPiece || 'k';
-  if (piece === royal.toUpperCase()) { g.castling.K = false; g.castling.Q = false; }
-  if (piece === royal.toLowerCase()) { g.castling.k = false; g.castling.q = false; }
-  const rsc = g.rookStartCols;
-  const wRookK = MCE.sq(g.rows - 1, rsc ? rsc.w.k : g.cols - 1, g);
-  const wRookQ = MCE.sq(g.rows - 1, rsc ? rsc.w.q : 0, g);
-  const bRookK = MCE.sq(0, rsc ? rsc.b.k : g.cols - 1, g);
-  const bRookQ = MCE.sq(0, rsc ? rsc.b.q : 0, g);
-  if (from === wRookK || to === wRookK) g.castling.K = false;
-  if (from === wRookQ || to === wRookQ) g.castling.Q = false;
-  if (from === bRookK || to === bRookK) g.castling.k = false;
-  if (from === bRookQ || to === bRookQ) g.castling.q = false;
 }
 
 function threefoldRepetition(g) {

@@ -1,9 +1,11 @@
 import MCE from '../js/chess-engine.js';
 import '../js/chess-moves.js';
 import '../js/chess-play.js';
-import '../js/chess-variants.js';
 import '../js/chess-units.js';
+import '../js/rules/index.js';
+import '../js/chess-variants.js';
 import '../js/chess-ai.js';
+import '../js/pieces/index.js';
 import '../js/variants/index.js';
 import { renderSvg } from '../js/chess-svg.js';
 
