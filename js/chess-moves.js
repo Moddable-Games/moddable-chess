@@ -89,7 +89,7 @@ function genPawnMoves(g, from, r, c, side, moves) {
 
 function addPawnMove(from, to, toRow, promoRow, moves, g) {
   if (promoRow >= 0 && toRow === promoRow) {
-    const pieces = (g && g.promotionPieces) || ['q','r','b','n','a','c'];
+    const pieces = (g && g.promotionPieces) || ['q','r','b','n'];
     for (const promo of pieces) moves.push({ from, to, flag: 'promo', promo });
   } else {
     moves.push({ from, to, flag: null });

@@ -198,8 +198,17 @@ let dropMode = null;
 let openGroup = 'Classic';
 let filterText = '';
 
+function isMobileView() {
+  return window.innerWidth <= 960;
+}
+
 function renderPicker() {
   pickerEl.innerHTML = '';
+
+  if (isMobileView()) {
+    renderPickerMobile();
+    return;
+  }
 
   const modeBar = document.createElement('div');
   modeBar.className = 'mode-bar';
@@ -216,6 +225,7 @@ function renderPicker() {
 
   modeBar.appendChild(soloBtn);
   modeBar.appendChild(passBtn);
+  pickerEl.appendChild(modeBar);
 
   if (gameMode === 'solo') {
     const colorBar = document.createElement('div');
@@ -230,10 +240,8 @@ function renderPicker() {
     blackBtn.addEventListener('click', () => { aiColor = MCE.WHITE; flipped = true; renderPicker(); startGame(currentVariant || 'standard'); });
     colorBar.appendChild(whiteBtn);
     colorBar.appendChild(blackBtn);
-    modeBar.appendChild(colorBar);
+    pickerEl.appendChild(colorBar);
   }
-
-  pickerEl.appendChild(modeBar);
 
   const search = document.createElement('input');
   search.className = 'variant-search';
@@ -263,17 +271,102 @@ function renderPicker() {
     listWrap.appendChild(header);
 
     if (isOpen) {
+      const list = document.createElement('div');
+      list.className = 'variant-list';
       matches.forEach(([key, label]) => {
         const btn = document.createElement('button');
         btn.className = 'variant-btn' + (key === currentVariant ? ' variant-btn--active' : '');
         btn.textContent = label;
         btn.addEventListener('click', () => startGame(key));
-        listWrap.appendChild(btn);
+        list.appendChild(btn);
       });
+      listWrap.appendChild(list);
     }
   });
 
   pickerEl.appendChild(listWrap);
+}
+
+function renderPickerMobile() {
+  const groups = getVariantGroups();
+  const allVariants = groups.flatMap(g => g.variants.map(([key, label]) => ({ key, label, group: g.label })));
+  const currentIdx = allVariants.findIndex(v => v.key === currentVariant);
+
+  const row1 = document.createElement('div');
+  row1.className = 'mobile-picker-row';
+
+  const modeBar = document.createElement('div');
+  modeBar.className = 'mode-bar';
+  const soloBtn = document.createElement('button');
+  soloBtn.className = 'mode-btn' + (gameMode === 'solo' ? ' mode-btn--active' : '');
+  soloBtn.textContent = 'Solo';
+  soloBtn.addEventListener('click', () => { gameMode = 'solo'; renderPicker(); startGame(currentVariant || 'standard'); });
+  const passBtn = document.createElement('button');
+  passBtn.className = 'mode-btn' + (gameMode === 'pass' ? ' mode-btn--active' : '');
+  passBtn.textContent = 'Pass & Play';
+  passBtn.addEventListener('click', () => { gameMode = 'pass'; renderPicker(); startGame(currentVariant || 'standard'); });
+  modeBar.appendChild(soloBtn);
+  modeBar.appendChild(passBtn);
+
+  if (gameMode === 'solo') {
+    const whiteBtn = document.createElement('button');
+    whiteBtn.className = 'mode-btn' + (aiColor === MCE.BLACK ? ' mode-btn--active' : '');
+    whiteBtn.textContent = '○';
+    whiteBtn.title = 'Play White';
+    whiteBtn.addEventListener('click', () => { aiColor = MCE.BLACK; flipped = false; renderPicker(); startGame(currentVariant || 'standard'); });
+    const blackBtn = document.createElement('button');
+    blackBtn.className = 'mode-btn' + (aiColor === MCE.WHITE ? ' mode-btn--active' : '');
+    blackBtn.textContent = '●';
+    blackBtn.title = 'Play Black';
+    blackBtn.addEventListener('click', () => { aiColor = MCE.WHITE; flipped = true; renderPicker(); startGame(currentVariant || 'standard'); });
+    modeBar.appendChild(whiteBtn);
+    modeBar.appendChild(blackBtn);
+  }
+  row1.appendChild(modeBar);
+  pickerEl.appendChild(row1);
+
+  const row2 = document.createElement('div');
+  row2.className = 'mobile-picker-nav';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'mobile-picker-arrow';
+  prevBtn.textContent = '◀';
+  prevBtn.addEventListener('click', () => {
+    const idx = currentIdx > 0 ? currentIdx - 1 : allVariants.length - 1;
+    startGame(allVariants[idx].key);
+  });
+
+  const groupSelect = document.createElement('select');
+  groupSelect.className = 'mobile-picker-select';
+  groups.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.label;
+    opt.textContent = g.label;
+    if (currentIdx >= 0 && allVariants[currentIdx].group === g.label) opt.selected = true;
+    groupSelect.appendChild(opt);
+  });
+  groupSelect.addEventListener('change', () => {
+    const g = groups.find(gr => gr.label === groupSelect.value);
+    if (g && g.variants.length > 0) startGame(g.variants[0][0]);
+  });
+
+  const variantLabel = document.createElement('span');
+  variantLabel.className = 'mobile-picker-current';
+  variantLabel.textContent = currentIdx >= 0 ? allVariants[currentIdx].label : 'Standard';
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'mobile-picker-arrow';
+  nextBtn.textContent = '▶';
+  nextBtn.addEventListener('click', () => {
+    const idx = currentIdx < allVariants.length - 1 ? currentIdx + 1 : 0;
+    startGame(allVariants[idx].key);
+  });
+
+  row2.appendChild(prevBtn);
+  row2.appendChild(groupSelect);
+  row2.appendChild(variantLabel);
+  row2.appendChild(nextBtn);
+  pickerEl.appendChild(row2);
 }
 
 function renderDescription() {
@@ -285,9 +378,6 @@ function renderDescription() {
 
 function renderControls() {
   controlsEl.innerHTML = '';
-
-  const leftGroup = document.createElement('div');
-  leftGroup.className = 'ctrl-group';
 
   const flipBtn = document.createElement('button');
   flipBtn.className = 'ctrl-btn';
@@ -307,12 +397,14 @@ function renderControls() {
   });
 
   const newBtn = document.createElement('button');
-  newBtn.className = 'ctrl-btn';
+  newBtn.className = 'ctrl-btn ctrl-btn--primary';
   newBtn.textContent = 'New Game';
   newBtn.addEventListener('click', () => {
     startGame(currentVariant);
   });
 
+  const leftGroup = document.createElement('div');
+  leftGroup.className = 'ctrl-group';
   leftGroup.appendChild(flipBtn);
   leftGroup.appendChild(undoBtn);
   leftGroup.appendChild(newBtn);
@@ -321,15 +413,18 @@ function renderControls() {
   if (gameMode === 'solo') {
     const rightGroup = document.createElement('div');
     rightGroup.className = 'ctrl-group';
-
+    const diffLabel = document.createElement('span');
+    diffLabel.className = 'ctrl-label';
+    diffLabel.textContent = 'AI';
+    rightGroup.appendChild(diffLabel);
     const diffSelect = document.createElement('select');
     diffSelect.className = 'ctrl-select';
     const diffLabels = {
-      beginner: 'Novice (~600)',
-      easy: 'Club (~1000)',
-      medium: 'Intermediate (~1200)',
-      hard: 'Advanced (~1400)',
-      expert: 'Expert (~1600)'
+      beginner: 'Novice',
+      easy: 'Club',
+      medium: 'Intermediate',
+      hard: 'Advanced',
+      expert: 'Expert'
     };
     Object.entries(diffLabels).forEach(([key, label]) => {
       const opt = document.createElement('option');
@@ -367,11 +462,6 @@ function populateSetSelect(select) {
   });
   if (sets.length <= 1) select.style.display = 'none';
   else select.style.display = '';
-  const colorSel = document.getElementById('piece-color-select');
-  if (colorSel) {
-    const activeSet = sets.find(s => s.id === (currentCovers ? currentSet : (sets[0] && sets[0].id)));
-    colorSel.style.display = (activeSet && activeSet.recolorable) ? '' : 'none';
-  }
 }
 
 function renderToolbar() {
@@ -380,108 +470,21 @@ function renderToolbar() {
   const leftGroup = document.createElement('div');
   leftGroup.className = 'toolbar-group';
 
-  const themeSelect = document.createElement('select');
-  themeSelect.className = 'toolbar-select';
-  const currentThemeObj = MCE.getTheme();
-  Object.entries(MCE.THEMES).forEach(([key, t]) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = t.label;
-    if (t === currentThemeObj) opt.selected = true;
-    themeSelect.appendChild(opt);
-  });
-  themeSelect.addEventListener('change', () => {
-    MCE.setTheme(themeSelect.value);
-    track('theme_change', { theme_name: themeSelect.value });
-    const url = new URL(location);
-    url.searchParams.set('theme', themeSelect.value);
-    history.replaceState(null, '', url);
-    render();
-  });
-  leftGroup.appendChild(themeSelect);
+  const variantLabel = document.createElement('span');
+  variantLabel.className = 'toolbar-label';
+  const vc = MCE.getVariantConfig(currentVariant);
+  variantLabel.textContent = vc ? vc.label || currentVariant : 'Standard';
+  leftGroup.appendChild(variantLabel);
 
-  const pieceSelect = document.createElement('select');
-  pieceSelect.className = 'toolbar-select';
-  const currentPS = MCE.getPieceStyle();
-  Object.entries(MCE.PIECE_STYLES).forEach(([key, ps]) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = ps.label;
-    if (key === currentPS) opt.selected = true;
-    pieceSelect.appendChild(opt);
-  });
-  pieceSelect.id = 'piece-color-select';
-  pieceSelect.addEventListener('change', () => {
-    MCE.setPieceStyle(pieceSelect.value);
-    const url = new URL(location);
-    url.searchParams.set('pieces', pieceSelect.value);
-    history.replaceState(null, '', url);
-    render();
-  });
-  leftGroup.appendChild(pieceSelect);
-
-  const setSelect = document.createElement('select');
-  setSelect.id = 'piece-set-select';
-  setSelect.className = 'toolbar-select';
-  populateSetSelect(setSelect);
-  setSelect.addEventListener('change', async () => {
-    const setId = setSelect.value;
-    PieceSetResolver.setConfig({ set: setId });
-    localStorage.setItem('mce-piece-set', setId);
-    await PieceSetResolver.loadForVariant(currentVariant || 'standard');
-    const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
-    const activeSetInfo = sets.find(s => s.id === setId);
-    if (activeSetInfo && !activeSetInfo.recolorable) {
-      MCE.setPieceStyle('auto');
-    }
-    track('piece_set_change', { set_name: setId });
-    renderToolbar();
-    render();
-  });
-  leftGroup.appendChild(setSelect);
-
-  const styleSelect = document.createElement('select');
-  styleSelect.className = 'toolbar-select';
-  Object.entries(ANIM_STYLES).forEach(([key, label]) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = label;
-    if (key === animStyle) opt.selected = true;
-    styleSelect.appendChild(opt);
-  });
-  styleSelect.addEventListener('change', () => {
-    animStyle = styleSelect.value;
-    const url = new URL(location);
-    url.searchParams.set('animStyle', animStyle);
-    history.replaceState(null, '', url);
-  });
   toolbarEl.appendChild(leftGroup);
 
   const rightGroup = document.createElement('div');
   rightGroup.className = 'toolbar-group';
 
-  rightGroup.appendChild(styleSelect);
-
-  const speedSelect = document.createElement('select');
-  speedSelect.className = 'toolbar-select';
-  Object.entries(ANIM_SPEEDS).forEach(([key, s]) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = s.label;
-    if (key === animSpeed) opt.selected = true;
-    speedSelect.appendChild(opt);
-  });
-  speedSelect.addEventListener('change', () => {
-    animSpeed = speedSelect.value;
-    const url = new URL(location);
-    url.searchParams.set('animSpeed', animSpeed);
-    history.replaceState(null, '', url);
-  });
-  rightGroup.appendChild(speedSelect);
-
   const fsBtn = document.createElement('button');
   fsBtn.className = 'toolbar-btn';
-  fsBtn.textContent = 'Fullscreen';
+  fsBtn.title = 'Fullscreen';
+  fsBtn.innerHTML = '&#x26F6;';
   fsBtn.addEventListener('click', () => {
     const url = new URL(location);
     url.searchParams.set('mode', 'fullscreen');
@@ -491,7 +494,146 @@ function renderToolbar() {
     startGame(currentVariant || 'standard');
   });
   rightGroup.appendChild(fsBtn);
+
   toolbarEl.appendChild(rightGroup);
+}
+
+let settingsOpen = false;
+
+function renderSettings() {
+  const settingsEl = document.getElementById('settings-section');
+  if (!settingsEl) return;
+  settingsEl.innerHTML = '';
+
+  const header = document.createElement('button');
+  header.className = 'settings-toggle';
+  header.innerHTML = '<span>&#x2699; Settings</span><span class="settings-chevron">' + (settingsOpen ? '&#x25B4;' : '&#x25BE;') + '</span>';
+  header.addEventListener('click', () => {
+    settingsOpen = !settingsOpen;
+    renderSettings();
+  });
+  settingsEl.appendChild(header);
+
+  if (!settingsOpen) return;
+
+  settingsEl.appendChild(makeSettingsRow('Theme', () => {
+    const sel = document.createElement('select');
+    sel.className = 'settings-select';
+    const currentThemeObj = MCE.getTheme();
+    Object.entries(MCE.THEMES).forEach(([key, t]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = t.label;
+      if (t === currentThemeObj) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => {
+      MCE.setTheme(sel.value);
+      track('theme_change', { theme_name: sel.value });
+      const url = new URL(location);
+      url.searchParams.set('theme', sel.value);
+      history.replaceState(null, '', url);
+      render();
+    });
+    return sel;
+  }));
+
+  settingsEl.appendChild(makeSettingsRow('Pieces', () => {
+    const sel = document.createElement('select');
+    sel.className = 'settings-select';
+    sel.id = 'piece-set-select';
+    populateSetSelect(sel);
+    sel.addEventListener('change', async () => {
+      const setId = sel.value;
+      PieceSetResolver.setConfig({ set: setId });
+      localStorage.setItem('mce-piece-set', setId);
+      await PieceSetResolver.loadForVariant(currentVariant || 'standard');
+      const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
+      const activeSetInfo = sets.find(s => s.id === setId);
+      if (activeSetInfo && !activeSetInfo.recolorable) {
+        MCE.setPieceStyle('auto');
+      }
+      track('piece_set_change', { set_name: setId });
+      render();
+      renderSettings();
+    });
+    return sel;
+  }));
+
+  settingsEl.appendChild(makeSettingsRow('Colour', () => {
+    const sel = document.createElement('select');
+    sel.className = 'settings-select';
+    sel.id = 'piece-color-select';
+    const currentPS = MCE.getPieceStyle();
+    Object.entries(MCE.PIECE_STYLES).forEach(([key, ps]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = ps.label;
+      if (key === currentPS) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
+    const currentSet = PieceSetResolver.getConfig().set;
+    const activeSetInfo = sets.find(s => s.id === currentSet);
+    if (activeSetInfo && !activeSetInfo.recolorable) sel.style.display = 'none';
+    sel.addEventListener('change', () => {
+      MCE.setPieceStyle(sel.value);
+      const url = new URL(location);
+      url.searchParams.set('pieces', sel.value);
+      history.replaceState(null, '', url);
+      render();
+    });
+    return sel;
+  }));
+
+  settingsEl.appendChild(makeSettingsRow('Animation', () => {
+    const sel = document.createElement('select');
+    sel.className = 'settings-select';
+    Object.entries(ANIM_STYLES).forEach(([key, label]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = label;
+      if (key === animStyle) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => {
+      animStyle = sel.value;
+      const url = new URL(location);
+      url.searchParams.set('animStyle', animStyle);
+      history.replaceState(null, '', url);
+    });
+    return sel;
+  }));
+
+  settingsEl.appendChild(makeSettingsRow('Speed', () => {
+    const sel = document.createElement('select');
+    sel.className = 'settings-select';
+    Object.entries(ANIM_SPEEDS).forEach(([key, s]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = s.label;
+      if (key === animSpeed) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => {
+      animSpeed = sel.value;
+      const url = new URL(location);
+      url.searchParams.set('animSpeed', animSpeed);
+      history.replaceState(null, '', url);
+    });
+    return sel;
+  }));
+}
+
+function makeSettingsRow(label, buildControl) {
+  const row = document.createElement('div');
+  row.className = 'settings-row';
+  const lbl = document.createElement('span');
+  lbl.className = 'settings-row-label';
+  lbl.textContent = label;
+  row.appendChild(lbl);
+  row.appendChild(buildControl());
+  return row;
 }
 
 function removeMoveFromList() {
@@ -528,22 +670,13 @@ function startGame(variant) {
   dropMode = null;
   movesEl.innerHTML = '';
 
-  const isBoardOnly = embedMode && params.get('boardonly') === '1';
-  let boardWidth;
-  if (isBoardOnly) {
-    boardWidth = container.parentElement.offsetWidth;
-  } else if (fullscreenMode) {
-    const maxH = window.innerHeight - 80;
-    const maxW = window.innerWidth - 40;
-    const aspectRatio = (game.cols || 8) / (game.rows || 8);
-    boardWidth = Math.min(maxW, maxH * aspectRatio);
-  } else {
-    boardWidth = 480;
-  }
+  const boardWidth = computeBoardWidth();
   const tileSize = boardWidth / (game.cols || 8);
   const boardHeight = tileSize * (game.rows || 8);
   container.style.width = boardWidth + 'px';
   container.style.height = boardHeight + 'px';
+  toolbarEl.style.width = boardWidth + 'px';
+  controlsEl.style.width = boardWidth + 'px';
 
   const animDuration = ANIM_SPEEDS[animSpeed] ? ANIM_SPEEDS[animSpeed].ms : 200;
   const players = gameMode === 'solo'
@@ -581,6 +714,7 @@ function startGame(variant) {
   if (!fullscreenMode && !embedMode) {
     renderPicker();
     renderToolbar();
+    renderSettings();
   }
   renderDescription();
   renderControls();
@@ -623,6 +757,59 @@ function renderEffectOverlay(svg, effect, x, y, tileSize, game) {
   return null;
 }
 
+function computeBoardWidth() {
+  const isBoardOnly = embedMode && params.get('boardonly') === '1';
+  if (isBoardOnly) return container.parentElement.offsetWidth;
+  if (fullscreenMode) {
+    const maxH = window.innerHeight - 80;
+    const maxW = window.innerWidth - 40;
+    const aspectRatio = (game.cols || 8) / (game.rows || 8);
+    return Math.min(maxW, maxH * aspectRatio);
+  }
+  const isResponsive = window.innerWidth <= 960;
+  if (isResponsive) {
+    const pad = window.innerWidth <= 500 ? 16 : 32;
+    const w = window.innerWidth - pad;
+    return Math.min(w, 560);
+  }
+  const centerEl = document.getElementById('center');
+  const toolbarH = toolbarEl.offsetHeight || 30;
+  const controlsH = controlsEl.offsetHeight || 44;
+  const padding = 32;
+  const availH = centerEl.clientHeight - toolbarH - controlsH - padding;
+  const availW = centerEl.clientWidth - 48;
+  const aspectRatio = (game.cols || 8) / (game.rows || 8);
+  const w = Math.min(availW, availH * aspectRatio, 680);
+  return Math.max(w, 280);
+}
+
+function resizeBoard() {
+  if (!ctrl || !game) return;
+  const boardWidth = computeBoardWidth();
+  const tileSize = boardWidth / (game.cols || 8);
+  const boardHeight = tileSize * (game.rows || 8);
+  container.style.width = boardWidth + 'px';
+  container.style.height = boardHeight + 'px';
+  toolbarEl.style.width = boardWidth + 'px';
+  controlsEl.style.width = boardWidth + 'px';
+  ctrl.setRenderOpts({ size: boardWidth });
+  ctrl.render();
+}
+
+let resizeTimer;
+let lastMobileState = isMobileView();
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    resizeBoard();
+    const nowMobile = isMobileView();
+    if (nowMobile !== lastMobileState) {
+      lastMobileState = nowMobile;
+      if (!fullscreenMode && !embedMode) renderPicker();
+    }
+  }, 100);
+});
+
 function render() {
   if (ctrl) ctrl.render();
 }
@@ -655,7 +842,7 @@ function handleSquareClick(sq, g, api) {
 }
 
 function handleMoveCallback(move, undo, captured, side) {
-  trackCaptures(move, side);
+  trackCaptures(move, side, captured, undo);
   addMoveToList(move, side);
   dropMode = null;
   renderControls();
@@ -767,9 +954,13 @@ function trackGameComplete(result) {
   track('game_complete', { variant_name: currentVariant, result: result, move_count: ctrl ? ctrl.getState().undoStackLength : 0 });
 }
 
+function setStatus(text) {
+  statusEl.textContent = text;
+}
+
 function updateStatus() {
   if (game.duckPhase) {
-    statusEl.textContent = nameFor(game.turn) + ' — place the duck';
+    setStatus(nameFor(game.turn) + ' — place the duck');
     return;
   }
 
@@ -782,20 +973,20 @@ function updateStatus() {
 
   if (vc && vc.statusText) {
     const custom = vc.statusText(game, { nameFor, nameForOpp, gameOver, variantStatus });
-    if (custom) { statusEl.textContent = custom; return; }
+    if (custom) { setStatus(custom); return; }
   }
 
   if (variantStatus) {
     if (variantStatus === 'checkmate') {
-      statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
+      setStatus('Checkmate — ' + nameForOpp(game.turn) + ' wins!');
     } else if (variantStatus === 'stalemate') {
-      statusEl.textContent = 'Stalemate — draw';
+      setStatus('Stalemate — draw');
     } else if (variantStatus.endsWith('-w')) {
-      statusEl.textContent = playerNames.w + ' wins!';
+      setStatus(playerNames.w + ' wins!');
     } else if (variantStatus.endsWith('-b')) {
-      statusEl.textContent = playerNames.b + ' wins!';
+      setStatus(playerNames.b + ' wins!');
     } else {
-      statusEl.textContent = nameForOpp(game.turn) + ' wins!';
+      setStatus(nameForOpp(game.turn) + ' wins!');
     }
     return;
   }
@@ -805,43 +996,43 @@ function updateStatus() {
   if (status === 'checkmate') {
     gameOver = true;
     trackGameComplete('checkmate');
-    statusEl.textContent = 'Checkmate — ' + nameForOpp(game.turn) + ' wins!';
+    setStatus('Checkmate — ' + nameForOpp(game.turn) + ' wins!');
   } else if (status === 'stalemate') {
     gameOver = true;
     trackGameComplete('stalemate');
     const sm = game.stalemateMeaning || 'draw';
     if (sm === 'loss') {
-      statusEl.textContent = nameForOpp(game.turn) + ' wins — opponent stalemated!';
+      setStatus(nameForOpp(game.turn) + ' wins — opponent stalemated!');
     } else if (sm === 'win') {
-      statusEl.textContent = nameForOpp(game.turn) + ' wins — stalemate!';
+      setStatus(nameForOpp(game.turn) + ' wins — stalemate!');
     } else {
-      statusEl.textContent = 'Stalemate — draw';
+      setStatus('Stalemate — draw');
     }
   } else if (status === 'draw-repetition') {
     gameOver = true;
     trackGameComplete('draw-repetition');
-    statusEl.textContent = 'Draw — threefold repetition';
+    setStatus('Draw — threefold repetition');
   } else if (status === 'draw-material') {
     gameOver = true;
     trackGameComplete('draw-material');
-    statusEl.textContent = 'Draw — insufficient material';
+    setStatus('Draw — insufficient material');
   } else if (status === 'draw-50') {
     gameOver = true;
     trackGameComplete('draw-50');
-    statusEl.textContent = 'Draw — 50-move rule';
+    setStatus('Draw — 50-move rule');
   } else if (status === 'check') {
-    statusEl.textContent = turn + ' to move (check!)';
+    setStatus(turn + ' to move (check!)');
     const threshold = game.checkThreshold || 0;
     if (threshold > 0) {
       game.checkCount[game.turn]++;
       if (game.checkCount[game.turn] >= threshold) {
         gameOver = true;
         trackGameComplete('check-threshold');
-        statusEl.textContent = nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!');
+        setStatus(nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!'));
       }
     }
   } else {
-    statusEl.textContent = turn + ' to move';
+    setStatus(turn + ' to move');
   }
 }
 
@@ -909,20 +1100,19 @@ function dismissPromotionDialog() {
   if (el) el.remove();
 }
 
-function trackCaptures(move, movingSide) {
-  const capturedPiece = game.board[move.to];
+function trackCaptures(move, movingSide, captured, undo) {
+  if (!captured) return;
 
-  if (capturedPiece) {
-    capturedPieces[movingSide].push(capturedPiece);
-  } else if (move.flag === 'ep') {
-    const [fr] = MCE.rc(move.from, game);
-    const [, tc] = MCE.rc(move.to, game);
-    const epCapSq = MCE.sq(fr, tc, game);
-    if (game.board[epCapSq]) capturedPieces[movingSide].push(game.board[epCapSq]);
+  if (move.flag === 'ep') {
+    const epPiece = undo && undo.captured;
+    if (epPiece) capturedPieces[movingSide].push(epPiece);
+  } else {
+    const capPiece = undo && undo.captured;
+    if (capPiece) capturedPieces[movingSide].push(capPiece);
   }
 
   const vc = MCE.getVariantConfig(currentVariant);
-  if (vc && vc.explosionCaptures && (capturedPiece || move.flag === 'ep')) {
+  if (vc && vc.explosionCaptures) {
     const extras = vc.explosionCaptures(game, move);
     if (extras) {
       for (let i = 0; i < extras.length; i++) {
@@ -943,7 +1133,7 @@ function renderCaptured() {
   whiteRow.className = 'captured-row';
   const whiteLabel = document.createElement('span');
   whiteLabel.className = 'captured-label';
-  whiteLabel.textContent = 'White:';
+  whiteLabel.textContent = '▲';
   whiteRow.appendChild(whiteLabel);
   for (const p of sortCaptured(capturedPieces.w)) {
     whiteRow.appendChild(createPieceIcon(p, SVGns));
@@ -953,7 +1143,7 @@ function renderCaptured() {
   blackRow.className = 'captured-row';
   const blackLabel = document.createElement('span');
   blackLabel.className = 'captured-label';
-  blackLabel.textContent = 'Black:';
+  blackLabel.textContent = '▼';
   blackRow.appendChild(blackLabel);
   for (const p of sortCaptured(capturedPieces.b)) {
     blackRow.appendChild(createPieceIcon(p, SVGns));
@@ -1068,6 +1258,7 @@ function applyFullscreenMode() {
   });
   var app = document.getElementById('app');
   if (app) {
+    app.style.display = 'flex';
     app.style.justifyContent = 'center';
     app.style.alignItems = 'center';
     app.style.padding = '0';
@@ -1075,7 +1266,7 @@ function applyFullscreenMode() {
   }
   var center = document.getElementById('center');
   if (center) {
-    center.style.flex = 'none';
+    center.style.overflow = 'visible';
   }
   function exitFullscreenMode() {
     fullscreenMode = false;
@@ -1085,9 +1276,9 @@ function applyFullscreenMode() {
     });
     document.querySelectorAll('.site-footer').forEach(function(el) { el.style.display = ''; });
     var app = document.getElementById('app');
-    if (app) { app.style.justifyContent = ''; app.style.alignItems = ''; app.style.padding = ''; app.style.height = ''; }
+    if (app) { app.style.display = ''; app.style.justifyContent = ''; app.style.alignItems = ''; app.style.padding = ''; app.style.height = ''; }
     var ctr = document.getElementById('center');
-    if (ctr) { ctr.style.flex = ''; }
+    if (ctr) { ctr.style.overflow = ''; }
     var btn = document.querySelector('.fullscreen-exit');
     if (btn) btn.remove();
     var url = new URL(window.location.href);
