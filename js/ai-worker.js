@@ -1,6 +1,9 @@
 import MCE from './chess-engine.js';
 import './chess-moves.js';
 import './chess-play.js';
+import './chess-units.js';
+import './rules/index.js';
+import './pieces/index.js';
 import './chess-variants.js';
 import './chess-ai.js';
 
