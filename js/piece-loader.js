@@ -26,9 +26,31 @@ export function loadManifestPieceDefs(manifestPath, setsDir) {
       const h = hMatch ? parseFloat(hMatch[1]) : 100;
       viewBox = `0 0 ${w} ${h}`;
     }
-    defs[fenChar] = `<svg viewBox="${viewBox}" width="100" height="100">${innerMatch[1].trim()}</svg>`;
+    const prefix = key.toLowerCase();
+    const content = namespaceIds(innerMatch[1].trim(), prefix);
+    defs[fenChar] = `<svg viewBox="${viewBox}" width="100" height="100">${content}</svg>`;
   }
   return defs;
+}
+
+function namespaceIds(svgContent, prefix) {
+  const ids = new Set();
+  const idDefRegex = /\bid="([^"]+)"/g;
+  let match;
+  while ((match = idDefRegex.exec(svgContent)) !== null) {
+    ids.add(match[1]);
+  }
+  if (ids.size === 0) return svgContent;
+
+  let result = svgContent;
+  for (const id of ids) {
+    const namespaced = `${prefix}-${id}`;
+    result = result.replaceAll(`id="${id}"`, `id="${namespaced}"`);
+    result = result.replaceAll(`url(#${id})`, `url(#${namespaced})`);
+    result = result.replaceAll(`href="#${id}"`, `href="#${namespaced}"`);
+    result = result.replaceAll(`xlink:href="#${id}"`, `xlink:href="#${namespaced}"`);
+  }
+  return result;
 }
 
 export function loadSpriteSheetDefs(spriteModule) {
