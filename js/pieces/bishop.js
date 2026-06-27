@@ -1,4 +1,7 @@
 import MCE from '../chess-engine.js';
+import { Rider } from '../movement.js';
+
+const movement = Rider('bishop');
 
 MCE.registerPiece('b', {
   name: 'Bishop',
@@ -6,15 +9,7 @@ MCE.registerPiece('b', {
   movement: 'Slides any number of squares diagonally',
   capture: null,
   variants: ['standard', 'capablanca', 'grand'],
-
-  genMoves(g, from, side) {
-    const moves = [];
-    const [r, c] = MCE.rc(from, g);
-    MCE.genSlides(g, from, r, c, side, MCE.BISHOP_DIRS, moves);
-    return moves;
-  },
-
-  attacks(g, from, target) {
-    return MCE.slidesTo(g, from, target, MCE.BISHOP_DIRS);
-  },
+  primitives: [{ type: 'rider', dirs: 'bishop' }],
+  genMoves: movement.genMoves,
+  attacks: movement.attacks,
 });
