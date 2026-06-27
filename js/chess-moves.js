@@ -1,4 +1,4 @@
-import MCE, { PIECE, WHITE, BLACK, pieceColor, pieceType, pieceOwner, isFriendly, isEnemy } from './chess-engine.js';
+import MCE, { WHITE, pieceType, pieceOwner, isFriendly, isEnemy } from './chess-engine.js';
 
 const KNIGHT_OFFSETS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
 const BISHOP_DIRS = [[-1,-1],[-1,1],[1,-1],[1,1]];
@@ -21,28 +21,17 @@ function pseudoLegalMoves(g) {
     if (!p || !isFriendly(i, side, g)) continue;
     const type = pieceType(p);
     const role = getRole(g, type);
-    const [r, c] = MCE.rc(i, g);
-    if (registry[type]) {
-      const custom = registry[type].genMoves(g, i, side);
-      if (custom) custom.forEach(m => moves.push(m));
-    } else if (g.divergentPieces && g.divergentPieces[type]) {
+    if (g.divergentPieces && g.divergentPieces[type]) {
+      const [r, c] = MCE.rc(i, g);
       const dp = g.divergentPieces[type];
       const genMove = dp.moveStyle === 'slide' ? genSlides : genJumps;
       const genCap = dp.captureStyle === 'slide' ? genSlides : genJumps;
       genMove(g, i, r, c, side, dp.move, moves, { moveOnly: true });
       genCap(g, i, r, c, side, dp.capture, moves, { attackOnly: true });
-    } else if (type === PIECE.P) genPawnMoves(g, i, r, c, side, moves);
-    else if (role === 'n') genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves);
-    else if (role === 'b') genSlides(g, i, r, c, side, BISHOP_DIRS, moves);
-    else if (role === 'r') genSlides(g, i, r, c, side, ROOK_DIRS, moves);
-    else if (role === 'q') genSlides(g, i, r, c, side, QUEEN_DIRS, moves);
-    else if (role === 'k') {
-      genJumps(g, i, r, c, side, KING_DIRS, moves);
-      if (!g.noCastling) genCastling(g, i, r, c, side, moves);
+    } else if (registry[role]) {
+      const custom = registry[role].genMoves(g, i, side);
+      if (custom) custom.forEach(m => moves.push(m));
     }
-    else if (type === PIECE.A) { genSlides(g, i, r, c, side, BISHOP_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
-    else if (type === PIECE.C) { genSlides(g, i, r, c, side, ROOK_DIRS, moves); genJumps(g, i, r, c, side, KNIGHT_OFFSETS, moves); }
-    else if (type === PIECE.S) { genJumps(g, i, r, c, side, KING_DIRS, moves); }
   }
   return moves;
 }
@@ -232,10 +221,6 @@ function isAttacked(g, target, bySide) {
 
 function attacks(g, from, target, piece) {
   const type = pieceType(piece);
-  const registry = MCE.getPieceRegistry();
-  if (registry[type]) {
-    return registry[type].attacks(g, from, target);
-  }
   if (g.divergentPieces && g.divergentPieces[type]) {
     const dp = g.divergentPieces[type];
     const [fr, fc] = MCE.rc(from, g);
@@ -244,29 +229,11 @@ function attacks(g, from, target, piece) {
     return dp.capture.some(([dr, dc]) => fr + dr === tr && fc + dc === tc);
   }
   const role = getRole(g, type);
-  const [fr, fc] = MCE.rc(from, g);
-  const [tr, tc] = MCE.rc(target, g);
-  const dr = tr - fr, dc = tc - fc;
-  if (type === PIECE.P) {
-    const owner = pieceOwner(from, g);
-    const dir = g.pawnDirection ? g.pawnDirection(owner) : (owner === WHITE ? -1 : 1);
-    const style = g.pawnMoveStyle || 'standard';
-    if (style === 'berolina') return dr === dir && dc === 0;
-    return dr === dir && Math.abs(dc) === 1;
+  const registry = MCE.getPieceRegistry();
+  if (registry[role]) {
+    return registry[role].attacks(g, from, target);
   }
-  if (role === 'n') return KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc);
-  if (role === 'k') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && (dr !== 0 || dc !== 0);
-  if (type === PIECE.S) return Math.abs(dr) <= 1 && Math.abs(dc) <= 1;
-  if (type === PIECE.A) {
-    if (KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc)) return true;
-    return slidesTo(g, from, target, BISHOP_DIRS);
-  }
-  if (type === PIECE.C) {
-    if (KNIGHT_OFFSETS.some(([r,c]) => fr+r===tr && fc+c===tc)) return true;
-    return slidesTo(g, from, target, ROOK_DIRS);
-  }
-  const dirs = role === 'b' ? BISHOP_DIRS : role === 'r' ? ROOK_DIRS : QUEEN_DIRS;
-  return slidesTo(g, from, target, dirs);
+  return false;
 }
 
 function slidesTo(g, from, target, dirs, opts) {
@@ -472,8 +439,8 @@ function genGappedSlides(g, from, r, c, side, dirs, moves, opts) {
 
 Object.assign(MCE, {
   pseudoLegalMoves, legalMoves, inCheck, isAttacked,
-  genSlides, genJumps, genCannon, genGappedSlides, slidesTo, cannonReaches, gappedSlidesTo,
+  genSlides, genJumps, genCannon, genGappedSlides, genCastling, genPawnMoves, slidesTo, cannonReaches, gappedSlidesTo,
   KNIGHT_OFFSETS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS
 });
 
-export { pseudoLegalMoves, legalMoves, inCheck, isAttacked, genSlides, genJumps, genCannon, genGappedSlides, slidesTo, cannonReaches, gappedSlidesTo, KNIGHT_OFFSETS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS };
+export { pseudoLegalMoves, legalMoves, inCheck, isAttacked, genSlides, genJumps, genCannon, genGappedSlides, genCastling, genPawnMoves, slidesTo, cannonReaches, gappedSlidesTo, KNIGHT_OFFSETS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS };

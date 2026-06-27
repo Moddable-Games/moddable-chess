@@ -392,16 +392,17 @@ console.log(count + ' piece symbols injected');</code></pre>
 }</code></pre>
 
   <h2 id="piece-registry">Piece Registry</h2>
-  <p>The piece registry provides metadata about all piece types known to the engine (standard and custom). Useful for building piece selectors, documentation, or variant editors.</p>
+  <p>All 18 piece types are registered via <code>MCE.registerPiece()</code> in <code>js/pieces/</code>. Every piece provides its own move generation and attack detection. The core engine has no hardcoded knowledge of any piece type.</p>
   <pre class="language-javascript"><code class="language-javascript">import { PIECES, PIECE_NAMES, getPieceInfo } from './pieces/index.js';</code></pre>
 
   <h3>MCE.getPieceRegistry()</h3>
-  <p>Returns the full piece handler registry (move generators and attack detectors for all registered piece types).</p>
+  <p>Returns the full piece handler registry: move generators and attack detectors for all 18 registered piece types.</p>
   <pre class="language-javascript"><code class="language-javascript">const registry = MCE.getPieceRegistry();
-console.log(Object.keys(registry)); // ['p','n','b','r','q','k','a','c','s','m',...]</code></pre>
+console.log(Object.keys(registry).sort());
+// ['a','b','c','e','f','g','h','i','k','l','m','n','p','q','r','s','w','y']</code></pre>
 
   <h3>PIECES</h3>
-  <p>Dictionary keyed by piece character containing full piece metadata objects.</p>
+  <p>Dictionary of all 18 piece types with full metadata. Built from the registry at import time.</p>
   <pre class="language-javascript"><code class="language-javascript">import { PIECES } from './pieces/index.js';
 const queen = PIECES['q'];
 // { char: 'q', name: 'Queen', category: 'standard', movement: '...', ... }</code></pre>
@@ -911,7 +912,7 @@ var fireVulnerable = MCE.buildUnitHandler({
     <tr><td><code>MCE.PIECE</code></td><td><code>{ P:'p', N:'n', B:'b', R:'r', Q:'q', K:'k', A:'a', C:'c', S:'s', M:'m' }</code></td></tr>
     <tr><td><code>MCE.INITIAL_FEN</code></td><td>Standard starting position</td></tr>
   </table>
-  <p>Additional fairy piece chars (E, F, G, H, I, L, W, Y) are registered dynamically by the piece modules in <code>js/pieces/</code>. Use <code>MCE.getPieceRegistry()</code> for the full runtime set.</p>
+  <p><code>MCE.PIECE</code> is a convenience enum for common piece chars. The full set of 18 registered piece types is available via <code>MCE.getPieceRegistry()</code>.</p>
 
   <h2>Embedding</h2>
   <p>The play page supports URL parameters for embedding in iframes. Combine parameters to control appearance and behaviour.</p>

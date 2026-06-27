@@ -1,5 +1,12 @@
 import MCE from '../chess-engine.js';
 
+import './pawn.js';
+import './knight.js';
+import './bishop.js';
+import './rook.js';
+import './queen.js';
+import './king.js';
+
 import './fers.js';
 import './khon.js';
 import './elephant.js';
@@ -12,13 +19,6 @@ import './archbishop.js';
 import './chancellor.js';
 import './sage.js';
 import './maharaja.js';
-
-import { PAWN_META } from './pawn.js';
-import { KNIGHT_META } from './knight.js';
-import { BISHOP_META } from './bishop.js';
-import { ROOK_META } from './rook.js';
-import { QUEEN_META } from './queen.js';
-import { KING_META } from './king.js';
 
 const registry = MCE.getPieceRegistry();
 
@@ -33,13 +33,6 @@ for (const [char, handler] of Object.entries(registry)) {
     capture: handler.capture || null,
     variants: handler.variants || [],
   };
-}
-
-const standardMeta = [PAWN_META, KNIGHT_META, BISHOP_META, ROOK_META, QUEEN_META, KING_META];
-for (const meta of standardMeta) {
-  if (!PIECES[meta.char]) {
-    PIECES[meta.char] = meta;
-  }
 }
 
 export const PIECE_NAMES = Object.fromEntries(
