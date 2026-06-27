@@ -422,6 +422,69 @@ const info = getPieceInfo('a');
 //   movement: 'knight + bishop', capture: 'knight + bishop',
 //   variants: ['capablanca', 'gothic', ...] }</code></pre>
 
+  <h2 id="movement-primitives">Movement Primitives</h2>
+  <p>Pieces are composed from reusable movement primitives defined in <code>js/movement.js</code>. This enables config-driven piece creation without writing custom genMoves/attacks functions.</p>
+  <pre class="language-javascript"><code class="language-javascript">import { Leaper, Rider, compose, divergent, OFFSETS } from './movement.js';</code></pre>
+
+  <h3>MCE.Leaper(offsets)</h3>
+  <p>Creates a jump primitive. The piece can reach any square at the given offsets from its current position.</p>
+  <pre class="language-javascript"><code class="language-javascript">const knight = Leaper('knight');    // L-shaped jumps
+const fers = Leaper('bishop');      // one diagonal step
+const elephant = Leaper('elephant'); // (2,2) diagonal leap
+const camel = Leaper('camel');      // (3,1) extended knight
+
+// Custom offsets:
+const dabbaba = Leaper([[0,2],[0,-2],[2,0],[-2,0]]);</code></pre>
+
+  <h3>MCE.Rider(dirs)</h3>
+  <p>Creates a slide primitive. The piece moves any number of squares along the given directions until blocked.</p>
+  <pre class="language-javascript"><code class="language-javascript">const bishop = Rider('bishop');  // diagonal slides
+const rook = Rider('rook');      // orthogonal slides
+const queen = Rider('queen');    // all 8 directions</code></pre>
+
+  <h3>MCE.compose(...primitives)</h3>
+  <p>Merges multiple movement types into one piece. The piece can use any of the provided primitives.</p>
+  <pre class="language-javascript"><code class="language-javascript">const archbishop = compose(Rider('bishop'), Leaper('knight'));
+const chancellor = compose(Rider('rook'), Leaper('knight'));
+const maharaja = compose(Rider('queen'), Leaper('knight'));</code></pre>
+
+  <h3>MCE.divergent(movePrimitive, capturePrimitive)</h3>
+  <p>Creates a piece that moves differently from how it captures (like Orda pieces).</p>
+  <pre class="language-javascript"><code class="language-javascript">const yurt = divergent(Leaper('bishop'), Leaper('rook'));
+// Moves diagonally, captures orthogonally
+
+const lancer = divergent(Rider('rook'), Leaper('knight'));
+// Moves like a rook, captures like a knight</code></pre>
+
+  <h3>MCE.OFFSETS</h3>
+  <p>Named offset sets available as string shortcuts:</p>
+  <table class="docs-table">
+    <tr><th>Name</th><th>Offsets</th><th>Description</th></tr>
+    <tr><td><code>'knight'</code></td><td>(2,1) in all orientations</td><td>Standard knight jumps</td></tr>
+    <tr><td><code>'king'</code></td><td>All 8 adjacent squares</td><td>One step any direction</td></tr>
+    <tr><td><code>'bishop'</code></td><td>4 diagonal steps</td><td>One diagonal step (Fers)</td></tr>
+    <tr><td><code>'rook'</code></td><td>4 orthogonal steps</td><td>One orthogonal step (Wazir)</td></tr>
+    <tr><td><code>'queen'</code></td><td>All 8 directions</td><td>One step any direction</td></tr>
+    <tr><td><code>'elephant'</code></td><td>(2,2) in all orientations</td><td>Alfil/Elephant leap</td></tr>
+    <tr><td><code>'camel'</code></td><td>(3,1) in all orientations</td><td>Extended knight</td></tr>
+    <tr><td><code>'dabbaba'</code></td><td>(2,0) in all orientations</td><td>Orthogonal 2-leap</td></tr>
+    <tr><td><code>'zebra'</code></td><td>(3,2) in all orientations</td><td>Extended knight variant</td></tr>
+  </table>
+
+  <h3>Registering a piece from primitives</h3>
+  <pre class="language-javascript"><code class="language-javascript">import { compose, Rider, Leaper } from './movement.js';
+
+const movement = compose(Rider('bishop'), Leaper('knight'));
+
+MCE.registerPiece('a', {
+  name: 'Archbishop',
+  category: 'compound',
+  movement: 'Slides diagonally + L-shaped jump',
+  primitives: [{ type: 'rider', dirs: 'bishop' }, { type: 'leaper', offsets: 'knight' }],
+  genMoves: movement.genMoves,
+  attacks: movement.attacks,
+});</code></pre>
+
   <h2>AI System</h2>
 
   <h3>MCE.aiPickMove(game, depth, opts)</h3>
