@@ -209,6 +209,14 @@ Open `http://localhost:8000/`
 
 ### Changelog
 
+#### 2026-06-27 (v0.9.21)
+- Complete engine decoupling: all 18 piece types registered via registerPiece with movement primitives
+- Add movement primitive system: Leaper, Rider, compose, divergent (js/movement.js)
+- Extract chess rules into plugin system: castling, en-passant, promotion, check (js/rules/)
+- Add registerRule/getRules API to core engine
+- Core move generator (pseudoLegalMoves, attacks) is now fully piece-agnostic
+- Fix pre-existing castlingClear bug (column vs square index comparison)
+
 #### 2026-06-27 (v0.9.20)
 - Redesign play page: 3-column app shell layout with sidebar variant picker
 - Add piece set resolver: manifest-driven fallback chains, 22 swappable piece sets
