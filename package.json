@@ -15,6 +15,9 @@
     "./variants": "./js/chess-variants.js",
     "./units": "./js/chess-units.js",
     "./svg": "./js/chess-svg.js",
+    "./svg-renderer": "./js/svg-renderer.js",
+    "./position": "./js/position-parser.js",
+    "./piece-loader": "./js/piece-loader.js",
     "./mcp": "./mcp/tools.js"
   },
   "scripts": {

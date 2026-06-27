@@ -1,176 +1,58 @@
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, readFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { renderBoardSVG } from '../js/svg-renderer.js';
+import { positionFromFEN, positionFromPlacement } from '../js/position-parser.js';
+import { loadManifestPieceDefs } from '../js/piece-loader.js';
+import { XIANGQI_PIECES_TRAD, XIANGQI_PIECES_WEST } from '../js/xiangqi-pieces.js';
+import { SHOGI_PIECES } from '../js/shogi-pieces.js';
 
-const RULES_ROOT = '../moddable-rules/games';
-const CHESS_DIAGRAMS = `${RULES_ROOT}/moddable-chess/diagrams/svg`;
-const DRAUGHTS_DIAGRAMS = `${RULES_ROOT}/draughts/diagrams/svg`;
-const GO_DIAGRAMS = `${RULES_ROOT}/go/diagrams/svg`;
-const MORRIS_DIAGRAMS = `${RULES_ROOT}/morris/diagrams/svg`;
-const DUNGEON_DIAGRAMS = `${RULES_ROOT}/dungeon-chess/diagrams/svg`;
-const UR_DIAGRAMS = `${RULES_ROOT}/royal-ur/diagrams/svg`;
-const XIANGQI_DIAGRAMS = `${RULES_ROOT}/xiangqi/diagrams/svg`;
-const SHOGI_DIAGRAMS = `${RULES_ROOT}/shogi/diagrams/svg`;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..');
+const MANIFESTS_DIR = join(ROOT, 'assets', 'pieces', 'manifests');
+const SETS_DIR = join(ROOT, 'assets', 'pieces', 'sets');
+const RULES_ROOT = join(ROOT, '..', 'moddable-rules', 'games');
 
-let generated = 0;
-let failed = 0;
-const gaps = [];
+// --- Piece set resolution ---
 
-function write(path, svg, name) {
-  try {
-    const dir = path.substring(0, path.lastIndexOf('/'));
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(path, svg);
-    generated++;
-  } catch (e) {
-    console.error(`  FAIL: ${name} — ${e.message}`);
-    failed++;
-    gaps.push({ name, error: e.message });
+function resolvePieces(board) {
+  if (!board.pieceSet) return undefined;
+  if (board.pieceSet.type === 'manifest') {
+    return loadManifestPieceDefs(
+      join(MANIFESTS_DIR, board.pieceSet.id + '.json'),
+      SETS_DIR
+    );
   }
-}
-
-// --- Chess boards (70 variants) ---
-
-const STANDARD_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-
-const CHESS_VARIANTS = await loadChessVariants();
-
-const MANUAL_CHESS_VARIANTS = [
-  { slug: 'chaturanga', name: 'Chaturanga', fen: 'rnefkenr/pppppppp/8/8/8/8/PPPPPPPP/RNEFKENR', rows: 8, cols: 8 },
-  { slug: 'shatranj', name: 'Shatranj', fen: 'rnekfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKFENR', rows: 8, cols: 8 },
-  { slug: 'diana', name: 'Diana Chess', fen: 'rbbkr1/pppppp/6/6/PPPPPP/RBBKR1', rows: 6, cols: 6 },
-  { slug: 'petty', name: 'Petty Chess', fen: 'rnbqk/ppppp/5/5/PPPPP/RNBQK', rows: 6, cols: 5 },
-];
-
-for (const manual of MANUAL_CHESS_VARIANTS) {
-  const existing = CHESS_VARIANTS.findIndex(v => v.slug === manual.slug);
-  if (existing >= 0) CHESS_VARIANTS[existing] = { ...CHESS_VARIANTS[existing], ...manual };
-  else CHESS_VARIANTS.push(manual);
-}
-
-console.log(`\nGenerating chess boards (${CHESS_VARIANTS.length} variants)...`);
-for (const v of CHESS_VARIANTS) {
-  const pos = fenToPosition(v.fen || STANDARD_FEN, v.rows || 8, v.cols || 8);
-  const svg = renderBoardSVG({
-    boardStyle: 'checkered',
-    rows: v.rows || 8,
-    cols: v.cols || 8,
-    tileSize: 40,
-    title: `${v.name} — starting position`,
-    position: pos,
-  });
-  write(`${CHESS_DIAGRAMS}/${v.slug}-board.svg`, svg, v.slug);
-}
-
-// --- Draughts boards ---
-
-console.log('\nGenerating draughts boards...');
-
-const DRAUGHTS_CONFIGS = [
-  { key: 'english', name: 'English Draughts', rows: 8, cols: 8, style: 'checkered', pieceRows: [0,1,2,5,6,7] },
-  { key: 'international', name: 'International Draughts', rows: 10, cols: 10, style: 'checkered', pieceRows: [0,1,2,3,6,7,8,9] },
-  { key: 'canadian', name: 'Canadian Draughts', rows: 12, cols: 12, style: 'checkered', pieceRows: [0,1,2,3,4,7,8,9,10,11] },
-  { key: 'frisian', name: 'Frisian Draughts', rows: 10, cols: 10, style: 'checkered', pieceRows: [0,1,2,3,6,7,8,9] },
-  { key: 'lasca', name: 'Lasca', rows: 7, cols: 7, style: 'checkered', pieceRows: [0,1,2,4,5,6] },
-  { key: 'turkish', name: 'Turkish Draughts', rows: 8, cols: 8, style: 'mono-grid', pieceRows: [1,2,5,6] },
-  { key: 'thai', name: 'Thai Draughts', rows: 8, cols: 8, style: 'checkered', pieceRows: [0,1,6,7] },
-  { key: 'alquerque', name: 'Alquerque', rows: 5, cols: 5, style: 'alquerque', pieceRows: null },
-];
-
-for (const d of DRAUGHTS_CONFIGS) {
-  let position = {};
-  if (d.style === 'alquerque') {
-    position = buildAlquerquePosition();
-  } else if (d.style === 'mono-grid') {
-    position = buildTurkishPosition(d);
-  } else {
-    position = buildDraughtsPosition(d);
+  if (board.pieceSet.type === 'sprite') {
+    return board.pieceSet.defs;
   }
-
-  const svg = renderBoardSVG({
-    boardStyle: d.style,
-    rows: d.rows,
-    cols: d.cols,
-    tileSize: 40,
-    title: `${d.name} — starting position`,
-    position,
-  });
-  write(`${DRAUGHTS_DIAGRAMS}/${d.key}-board.svg`, svg, d.key);
+  return undefined;
 }
 
-// --- Go boards ---
+// --- Position resolution ---
 
-console.log('\nGenerating Go boards...');
-
-for (const size of [9, 13, 19]) {
-  const svg = renderBoardSVG({
-    boardStyle: 'go',
-    rows: size,
-    cols: size,
-    tileSize: 20,
-    title: `Go — ${size}×${size} board (empty)`,
-  });
-  write(`${GO_DIAGRAMS}/go-${size}x${size}-board.svg`, svg, `go-${size}x${size}`);
-}
-
-// --- Morris boards ---
-
-console.log('\nGenerating Morris boards...');
-
-const MORRIS_CONFIGS = [
-  { key: 'three-mens-morris', name: "Three Men's Morris", rings: 1, diagonals: true },
-  { key: 'six-mens-morris', name: "Six Men's Morris", rings: 2, diagonals: false },
-  { key: 'nine-mens-morris', name: "Nine Men's Morris", rings: 3, diagonals: false },
-  { key: 'twelve-mens-morris', name: "Twelve Men's Morris", rings: 3, diagonals: true },
-  { key: 'morabaraba', name: 'Morabaraba', rings: 3, diagonals: true },
-  { key: 'lasker-morris', name: 'Lasker Morris', rings: 3, diagonals: false },
-  { key: 'shax', name: 'Shax', rings: 3, diagonals: false },
-];
-
-for (const m of MORRIS_CONFIGS) {
-  const svg = renderBoardSVG({
-    boardStyle: 'morris',
-    rings: m.rings,
-    diagonals: m.diagonals,
-    boardSize: 320,
-    showLabels: false,
-    title: `${m.name} board`,
-  });
-  write(`${MORRIS_DIAGRAMS}/${m.key}-board.svg`, svg, m.key);
-}
-
-// --- Dungeon Chess boards ---
-
-console.log('\nGenerating Dungeon Chess boards...');
-
-const dcMapsPath = '../dungeon-chess/data/maps.json';
-if (existsSync(dcMapsPath)) {
-  const dcData = JSON.parse(readFileSync(dcMapsPath, 'utf8'));
-  const DC_SLUG_MAP = {
-    'compact': 'compact-skirmish',
-    'two_player': 'two-player-dungeon',
-    'four_player': 'four-player-dungeon',
-  };
-
-  for (const m of dcData.maps) {
-    const slug = DC_SLUG_MAP[m.id] || m.id;
-    const terrain = convertDcGrid(m);
-    const svg = renderBoardSVG({
-      boardStyle: 'dungeon',
-      tileSize: 19,
-      showLabels: false,
-      title: `${m.name} (${m.rows}×${m.cols})`,
-      terrain,
+function resolvePosition(board) {
+  if (!board.position) return {};
+  const p = board.position;
+  if (p.type === 'fen') {
+    return positionFromFEN(p.fen, board.rows, board.cols, p.opts);
+  }
+  if (p.type === 'placement') {
+    return positionFromPlacement({
+      rows: board.rows,
+      cols: board.cols,
+      pieceRows: p.pieceRows,
+      style: p.style,
     });
-    write(`${DUNGEON_DIAGRAMS}/${slug}.svg`, svg, slug);
   }
-} else {
-  console.log('  Warning: dungeon-chess/data/maps.json not found, skipping');
+  return {};
 }
 
-function convertDcGrid(map) {
+// --- Terrain resolution (Dungeon Chess) ---
+
+function resolveTerrainFromDCMap(map) {
   const { grid, rows, cols, players } = map;
   const terrain = [];
-
   const spawnRows = new Set();
   const spawnCols = new Set();
 
@@ -223,155 +105,20 @@ function convertDcGrid(map) {
   return terrain;
 }
 
-// --- Royal Ur ---
+// --- Board config discovery ---
 
-console.log('\nGenerating Royal Ur board...');
+function discoverChessBoards() {
+  const variantsDir = join(ROOT, 'js', 'variants');
+  const rulesDir = join(RULES_ROOT, 'moddable-chess', 'content', 'variants');
+  const files = readdirSync(variantsDir).filter(f => f.endsWith('.js') && f !== 'index.js');
+  const boards = [];
 
-const urSvg = renderBoardSVG({
-  boardStyle: 'royal-ur',
-  tileSize: 40,
-  showLabels: false,
-  title: 'Royal Game of Ur — board layout',
-});
-write(`${UR_DIAGRAMS}/royal-ur-board.svg`, urSvg, 'royal-ur');
-
-// --- Xiangqi ---
-
-console.log('\nGenerating Xiangqi boards...');
-
-import { XIANGQI_PIECES_TRAD } from '../js/xiangqi-pieces.js';
-
-const XIANGQI_START_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
-
-function xiangqiFenToPos(fen) {
-  const pos = {};
-  const ranks = fen.split('/');
-  for (let r = 0; r < ranks.length; r++) {
-    let c = 0;
-    for (const ch of ranks[r]) {
-      if (/\d/.test(ch)) { c += parseInt(ch, 10); continue; }
-      const file = String.fromCharCode(97 + c);
-      const rank = ranks.length - r;
-      pos[`${file}${rank}`] = ch;
-      c++;
-    }
-  }
-  return pos;
-}
-
-const xiangqiSvg = renderBoardSVG({
-  boardStyle: 'xiangqi',
-  rows: 10,
-  cols: 9,
-  tileSize: 40,
-  showLabels: false,
-  position: xiangqiFenToPos(XIANGQI_START_FEN),
-  pieceDefs: XIANGQI_PIECES_TRAD,
-  title: 'Xiangqi — starting position (Chinese)',
-});
-write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board.svg`, xiangqiSvg, 'xiangqi-start');
-
-import { XIANGQI_PIECES_WEST } from '../js/xiangqi-pieces.js';
-
-const xiangqiWestSvg = renderBoardSVG({
-  boardStyle: 'xiangqi',
-  rows: 10,
-  cols: 9,
-  tileSize: 40,
-  showLabels: false,
-  position: xiangqiFenToPos(XIANGQI_START_FEN),
-  pieceDefs: XIANGQI_PIECES_WEST,
-  title: 'Xiangqi — starting position (Western)',
-});
-write(`${XIANGQI_DIAGRAMS}/xiangqi-start-board-west.svg`, xiangqiWestSvg, 'xiangqi-start-west');
-
-// Janggi (Korean Chess) — inner elephant setup, no river
-const JANGGI_START_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
-
-const janggiSvg = renderBoardSVG({
-  boardStyle: 'xiangqi',
-  rows: 10,
-  cols: 9,
-  tileSize: 40,
-  showLabels: false,
-  river: false,
-  position: xiangqiFenToPos(JANGGI_START_FEN),
-  pieceDefs: XIANGQI_PIECES_TRAD,
-  title: 'Janggi — starting position (inner elephant setup)',
-});
-write(`${XIANGQI_DIAGRAMS}/janggi-board.svg`, janggiSvg, 'janggi');
-
-// --- Shogi ---
-
-console.log('\nGenerating Shogi boards...');
-
-import { SHOGI_PIECES } from '../js/shogi-pieces.js';
-
-const SHOGI_VARIANTS = [
-  { key: 'standard', name: 'Standard Shogi', rows: 9, cols: 9, fen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' },
-  { key: 'hasami', name: 'Hasami Shogi', rows: 9, cols: 9, fen: 'ppppppppp/9/9/9/9/9/9/9/PPPPPPPPP' },
-  { key: 'kyoto', name: 'Kyoto Shogi', rows: 5, cols: 5, fen: 'p+nks+l/5/5/5/+LSK+NP' },
-  { key: 'minishogi', name: 'Minishogi', rows: 5, cols: 5, fen: 'rbsgk/4p/5/P4/KGSBR' },
-];
-
-function shogiFenToPos(fen, rows, cols) {
-  const pos = {};
-  const ranks = fen.split('/');
-  for (let r = 0; r < ranks.length; r++) {
-    let c = 0;
-    let promoted = false;
-    for (const ch of ranks[r]) {
-      if (ch === '+') { promoted = true; continue; }
-      if (/\d/.test(ch)) { c += parseInt(ch, 10); promoted = false; continue; }
-      const file = String.fromCharCode(97 + c);
-      const rank = rows - r;
-      pos[`${file}${rank}`] = promoted ? `+${ch}` : ch;
-      c++;
-      promoted = false;
-    }
-  }
-  return pos;
-}
-
-for (const v of SHOGI_VARIANTS) {
-  const pos = shogiFenToPos(v.fen, v.rows, v.cols);
-  const svg = renderBoardSVG({
-    boardStyle: 'shogi',
-    rows: v.rows,
-    cols: v.cols,
-    tileSize: 40,
-    showLabels: false,
-    position: pos,
-    pieceDefs: SHOGI_PIECES,
-    title: `${v.name} — starting position`,
-  });
-  write(`${SHOGI_DIAGRAMS}/${v.key}-board.svg`, svg, `shogi-${v.key}`);
-}
-
-// --- Report ---
-
-console.log(`\n=== Generation Complete ===`);
-console.log(`  Generated: ${generated}`);
-console.log(`  Failed: ${failed}`);
-if (gaps.length > 0) {
-  console.log(`\n  Gaps detected:`);
-  for (const g of gaps) console.log(`    - ${g.name}: ${g.error}`);
-}
-console.log('');
-
-// --- Helper functions ---
-
-async function loadChessVariants() {
-  const { readFileSync, readdirSync, existsSync } = await import('fs');
-  const files = readdirSync('./js/variants').filter(f => f.endsWith('.js') && f !== 'index.js');
-  const rulesDir = RULES_ROOT + '/moddable-chess/content/variants';
-  const variants = [];
+  const SLUG_MAP = { 'chess960': 'fischer-random', 'teleport-chess': 'teleportation' };
 
   for (const file of files) {
-    const content = readFileSync('./js/variants/' + file, 'utf8');
+    const content = readFileSync(join(variantsDir, file), 'utf8');
     const keyMatch = content.match(/registerVariant\(['"]([^'"]+)/);
     if (!keyMatch) continue;
-    const key = keyMatch[1];
 
     const fenMatch = content.match(/fen:\s*['"]([^'"]+)/);
     const rowsMatch = content.match(/rows:\s*(\d+)/);
@@ -379,119 +126,258 @@ async function loadChessVariants() {
     const labelMatch = content.match(/label:\s*['"]([^'"]+)/);
     const titleMatch = content.match(/title:\s*['"]([^'"]+)/);
 
-    const SLUG_MAP = {
-      'chess960': 'fischer-random',
-      'teleport-chess': 'teleportation',
-    };
-
     const fileStem = file.replace('.js', '');
     let slug = SLUG_MAP[fileStem] || fileStem;
-    if (!existsSync(`${rulesDir}/${slug}.md`)) {
+    if (!existsSync(join(rulesDir, slug + '.md'))) {
       const stripped = slug.replace(/-chess$/, '');
-      if (existsSync(`${rulesDir}/${stripped}.md`)) {
-        slug = stripped;
-      }
+      if (existsSync(join(rulesDir, stripped + '.md'))) slug = stripped;
     }
 
-    variants.push({
-      key,
+    const rows = rowsMatch ? parseInt(rowsMatch[1]) : 8;
+    const cols = colsMatch ? parseInt(colsMatch[1]) : 8;
+    const name = titleMatch ? titleMatch[1] : (labelMatch ? labelMatch[1] : keyMatch[1]);
+    const fen = fenMatch ? fenMatch[1] : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+
+    boards.push({
       slug,
-      name: titleMatch ? titleMatch[1] : (labelMatch ? labelMatch[1] : key),
-      fen: fenMatch ? fenMatch[1] : null,
-      rows: rowsMatch ? parseInt(rowsMatch[1]) : 8,
-      cols: colsMatch ? parseInt(colsMatch[1]) : 8,
+      title: `${name} — starting position`,
+      provider: 'checkered',
+      rows,
+      cols,
+      tileSize: 40,
+      position: { type: 'fen', fen },
+      outputDir: join(RULES_ROOT, 'moddable-chess', 'diagrams', 'svg'),
     });
   }
 
-  console.log(`  Loaded ${variants.length} variants from plugin files`);
-  return variants;
-}
+  const MANUAL = [
+    { slug: 'chaturanga', name: 'Chaturanga', fen: 'rnefkenr/pppppppp/8/8/8/8/PPPPPPPP/RNEFKENR', rows: 8, cols: 8 },
+    { slug: 'shatranj', name: 'Shatranj', fen: 'rnekfenr/pppppppp/8/8/8/8/PPPPPPPP/RNEKFENR', rows: 8, cols: 8 },
+    { slug: 'diana', name: 'Diana Chess', fen: 'rbbkr1/pppppp/6/6/PPPPPP/RBBKR1', rows: 6, cols: 6 },
+    { slug: 'petty', name: 'Petty Chess', fen: 'rnbqk/ppppp/5/5/PPPPP/RNBQK', rows: 6, cols: 5 },
+  ];
 
-function toKebab(str) {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-function parseBoardSize(str) {
-  if (!str) return { rows: 8, cols: 8 };
-  const match = str.match(/(\d+)×(\d+)/);
-  if (match) return { rows: parseInt(match[1]), cols: parseInt(match[2]) };
-  return { rows: 8, cols: 8 };
-}
-
-function fenToPosition(fen, rows, cols) {
-  const position = {};
-  const ranks = fen.split(' ')[0].split('/');
-  for (let r = 0; r < ranks.length && r < rows; r++) {
-    let c = 0;
-    for (const ch of ranks[r]) {
-      if (c >= cols) break;
-      const num = parseInt(ch);
-      if (!isNaN(num)) {
-        c += num;
-      } else {
-        const file = String.fromCharCode(97 + c);
-        const rank = rows - r;
-        position[`${file}${rank}`] = ch;
-        c++;
-      }
-    }
+  for (const m of MANUAL) {
+    const existing = boards.findIndex(b => b.slug === m.slug);
+    const entry = {
+      slug: m.slug,
+      title: `${m.name} — starting position`,
+      provider: 'checkered',
+      rows: m.rows,
+      cols: m.cols,
+      tileSize: 40,
+      position: { type: 'fen', fen: m.fen },
+      outputDir: join(RULES_ROOT, 'moddable-chess', 'diagrams', 'svg'),
+    };
+    if (existing >= 0) boards[existing] = entry;
+    else boards.push(entry);
   }
-  return position;
+
+  return boards;
 }
 
-function buildDraughtsPosition(config) {
-  const { rows, cols, pieceRows } = config;
-  const position = {};
-  const midRow = Math.floor(rows / 2);
+// --- Static board configs ---
 
-  for (const r of pieceRows) {
-    for (let c = 0; c < cols; c++) {
-      if ((r + c) % 2 !== 0) continue;
-      const file = String.fromCharCode(97 + c);
-      const rank = rows - r;
-      const color = r < midRow ? 'black' : 'white';
-      position[`${file}${rank}`] = { type: 'man', color };
-    }
-  }
-  return position;
+const DRAUGHTS_BOARDS = [
+  { slug: 'english', name: 'English Draughts', rows: 8, cols: 8, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,2,5,6,7] } },
+  { slug: 'international', name: 'International Draughts', rows: 10, cols: 10, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,2,3,6,7,8,9] } },
+  { slug: 'canadian', name: 'Canadian Draughts', rows: 12, cols: 12, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,2,3,4,7,8,9,10,11] } },
+  { slug: 'frisian', name: 'Frisian Draughts', rows: 10, cols: 10, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,2,3,6,7,8,9] } },
+  { slug: 'lasca', name: 'Lasca', rows: 7, cols: 7, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,2,4,5,6] } },
+  { slug: 'turkish', name: 'Turkish Draughts', rows: 8, cols: 8, provider: 'mono-grid', position: { type: 'placement', style: 'turkish', pieceRows: [1,2,5,6] } },
+  { slug: 'thai', name: 'Thai Draughts', rows: 8, cols: 8, provider: 'checkered', position: { type: 'placement', style: 'checkered', pieceRows: [0,1,6,7] } },
+  { slug: 'alquerque', name: 'Alquerque', rows: 5, cols: 5, provider: 'alquerque', position: { type: 'placement', style: 'alquerque' } },
+].map(d => ({
+  ...d,
+  title: `${d.name} — starting position`,
+  tileSize: 40,
+  outputDir: join(RULES_ROOT, 'draughts', 'diagrams', 'svg'),
+}));
+
+const GO_BOARDS = [9, 13, 19].map(size => ({
+  slug: `go-${size}x${size}`,
+  title: `Go — ${size}×${size} board (empty)`,
+  provider: 'go',
+  rows: size,
+  cols: size,
+  tileSize: 20,
+  outputDir: join(RULES_ROOT, 'go', 'diagrams', 'svg'),
+}));
+
+const MORRIS_BOARDS = [
+  { slug: 'three-mens-morris', name: "Three Men's Morris", providerOpts: { rings: 1, diagonals: true } },
+  { slug: 'six-mens-morris', name: "Six Men's Morris", providerOpts: { rings: 2, diagonals: false } },
+  { slug: 'nine-mens-morris', name: "Nine Men's Morris", providerOpts: { rings: 3, diagonals: false } },
+  { slug: 'twelve-mens-morris', name: "Twelve Men's Morris", providerOpts: { rings: 3, diagonals: true } },
+  { slug: 'morabaraba', name: 'Morabaraba', providerOpts: { rings: 3, diagonals: true } },
+  { slug: 'lasker-morris', name: 'Lasker Morris', providerOpts: { rings: 3, diagonals: false } },
+  { slug: 'shax', name: 'Shax', providerOpts: { rings: 3, diagonals: false } },
+].map(m => ({
+  ...m,
+  title: `${m.name} board`,
+  provider: 'morris',
+  tileSize: 40,
+  showLabels: false,
+  outputDir: join(RULES_ROOT, 'morris', 'diagrams', 'svg'),
+}));
+
+const XIANGQI_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
+const JANGGI_FEN = 'rneakaenr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNEAKAENR';
+
+const XIANGQI_BOARDS = [
+  {
+    slug: 'xiangqi-start',
+    title: 'Xiangqi — starting position (Chinese)',
+    provider: 'xiangqi',
+    rows: 10, cols: 9, tileSize: 40, showLabels: false,
+    position: { type: 'fen', fen: XIANGQI_FEN },
+    pieceSet: { type: 'sprite', defs: XIANGQI_PIECES_TRAD },
+    outputDir: join(RULES_ROOT, 'xiangqi', 'diagrams', 'svg'),
+  },
+  {
+    slug: 'xiangqi-start-west',
+    filename: 'xiangqi-start-board-west.svg',
+    title: 'Xiangqi — starting position (Western)',
+    provider: 'xiangqi',
+    rows: 10, cols: 9, tileSize: 40, showLabels: false,
+    position: { type: 'fen', fen: XIANGQI_FEN },
+    pieceSet: { type: 'sprite', defs: XIANGQI_PIECES_WEST },
+    outputDir: join(RULES_ROOT, 'xiangqi', 'diagrams', 'svg'),
+  },
+  {
+    slug: 'janggi',
+    title: 'Janggi — starting position (inner elephant setup)',
+    provider: 'xiangqi',
+    rows: 10, cols: 9, tileSize: 40, showLabels: false,
+    providerOpts: { river: false },
+    position: { type: 'fen', fen: JANGGI_FEN },
+    pieceSet: { type: 'manifest', id: 'kadagaden-janggi-kakao' },
+    outputDir: join(RULES_ROOT, 'xiangqi', 'diagrams', 'svg'),
+  },
+];
+
+const SHOGI_BOARDS = [
+  { slug: 'standard', name: 'Standard Shogi', rows: 9, cols: 9, fen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' },
+  { slug: 'hasami', name: 'Hasami Shogi', rows: 9, cols: 9, fen: 'ppppppppp/9/9/9/9/9/9/9/PPPPPPPPP' },
+  { slug: 'kyoto', name: 'Kyoto Shogi', rows: 5, cols: 5, fen: 'p+nks+l/5/5/5/+LSK+NP' },
+  { slug: 'minishogi', name: 'Minishogi', rows: 5, cols: 5, fen: 'rbsgk/4p/5/P4/KGSBR' },
+].map(v => ({
+  slug: v.slug,
+  title: `${v.name} — starting position`,
+  provider: 'shogi',
+  rows: v.rows,
+  cols: v.cols,
+  tileSize: 40,
+  showLabels: false,
+  position: { type: 'fen', fen: v.fen, opts: { promotedPrefix: '+' } },
+  pieceSet: { type: 'sprite', defs: SHOGI_PIECES },
+  outputDir: join(RULES_ROOT, 'shogi', 'diagrams', 'svg'),
+}));
+
+// --- Dungeon Chess (reads external data file) ---
+
+function discoverDungeonBoards() {
+  const dcMapsPath = join(ROOT, '..', 'dungeon-chess', 'data', 'maps.json');
+  if (!existsSync(dcMapsPath)) return [];
+
+  const dcData = JSON.parse(readFileSync(dcMapsPath, 'utf8'));
+  const SLUG_MAP = { 'compact': 'compact-skirmish', 'two_player': 'two-player-dungeon', 'four_player': 'four-player-dungeon' };
+
+  return dcData.maps.map(m => {
+    const slug = SLUG_MAP[m.id] || m.id;
+    return {
+      slug,
+      filename: `${slug}.svg`,
+      title: `${m.name} (${m.rows}×${m.cols})`,
+      provider: 'dungeon',
+      tileSize: 19,
+      showLabels: false,
+      providerOpts: { terrain: resolveTerrainFromDCMap(m) },
+      outputDir: join(RULES_ROOT, 'dungeon-chess', 'diagrams', 'svg'),
+    };
+  });
 }
 
-function buildTurkishPosition(config) {
-  const { rows, cols, pieceRows } = config;
-  const position = {};
-  const midRow = Math.floor(rows / 2);
+// --- Royal Ur ---
 
-  for (const r of pieceRows) {
-    for (let c = 0; c < cols; c++) {
-      const file = String.fromCharCode(97 + c);
-      const rank = rows - r;
-      const color = r < midRow ? 'black' : 'white';
-      position[`${file}${rank}`] = { type: 'man', color };
-    }
+const UR_BOARDS = [{
+  slug: 'royal-ur',
+  title: 'Royal Game of Ur — board layout',
+  provider: 'royal-ur',
+  tileSize: 40,
+  showLabels: false,
+  outputDir: join(RULES_ROOT, 'royal-ur', 'diagrams', 'svg'),
+}];
+
+// === Generation pipeline ===
+
+let generated = 0;
+let failed = 0;
+
+function generate(board) {
+  const position = resolvePosition(board);
+  const pieceDefs = resolvePieces(board);
+
+  const opts = {
+    boardStyle: board.provider,
+    rows: board.rows,
+    cols: board.cols,
+    tileSize: board.tileSize || 40,
+    title: board.title,
+    showLabels: board.showLabels,
+    position,
+    pieceDefs,
+    ...(board.providerOpts || {}),
+  };
+
+  const svg = renderBoardSVG(opts);
+  const filename = board.filename || `${board.slug}-board.svg`;
+  const outputPath = join(board.outputDir, filename);
+
+  try {
+    mkdirSync(board.outputDir, { recursive: true });
+    writeFileSync(outputPath, svg);
+    generated++;
+  } catch (e) {
+    console.error(`  FAIL: ${board.slug} — ${e.message}`);
+    failed++;
   }
-  return position;
 }
 
-function buildAlquerquePosition() {
-  const position = {};
-  for (let r = 0; r < 2; r++) {
-    for (let c = 0; c < 5; c++) {
-      const file = String.fromCharCode(97 + c);
-      const rank = 5 - r;
-      position[`${file}${rank}`] = { type: 'man', color: 'black' };
-    }
-  }
-  position['d3'] = { type: 'man', color: 'black' };
-  position['e3'] = { type: 'man', color: 'black' };
-  for (let r = 3; r < 5; r++) {
-    for (let c = 0; c < 5; c++) {
-      const file = String.fromCharCode(97 + c);
-      const rank = 5 - r;
-      position[`${file}${rank}`] = { type: 'man', color: 'white' };
-    }
-  }
-  position['a3'] = { type: 'man', color: 'white' };
-  position['b3'] = { type: 'man', color: 'white' };
-  return position;
+// --- Collect all boards ---
+
+const chessBoards = discoverChessBoards();
+const dungeonBoards = discoverDungeonBoards();
+
+const ALL_BOARDS = [
+  ...chessBoards,
+  ...DRAUGHTS_BOARDS,
+  ...GO_BOARDS,
+  ...MORRIS_BOARDS,
+  ...dungeonBoards,
+  ...UR_BOARDS,
+  ...XIANGQI_BOARDS,
+  ...SHOGI_BOARDS,
+];
+
+// --- Run ---
+
+console.log(`\nGenerating ${ALL_BOARDS.length} boards...\n`);
+
+const groups = {};
+for (const board of ALL_BOARDS) {
+  const group = board.outputDir.split('/').slice(-3, -2)[0] || 'other';
+  groups[group] = (groups[group] || 0) + 1;
 }
 
+for (const board of ALL_BOARDS) {
+  generate(board);
+}
+
+console.log(`\n=== Generation Complete ===`);
+console.log(`  Generated: ${generated}`);
+console.log(`  Failed: ${failed}`);
+for (const [group, count] of Object.entries(groups)) {
+  console.log(`  ${group}: ${count}`);
+}
+console.log('');
