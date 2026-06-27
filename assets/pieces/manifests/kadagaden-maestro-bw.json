@@ -1,0 +1,22 @@
+{
+  "id": "kadagaden-maestro-bw",
+  "name": "Maestro BW (Kadagaden)",
+  "path": "kadagaden-maestro-bw/",
+  "author": "Kadagaden",
+  "license": "CC-BY-4.0",
+  "recolorable": false,
+  "pieces": {
+    "wK": "wK.svg",
+    "wQ": "wQ.svg",
+    "wR": "wR.svg",
+    "wB": "wB.svg",
+    "wN": "wN.svg",
+    "wP": "wP.svg",
+    "bK": "bK.svg",
+    "bQ": "bQ.svg",
+    "bR": "bR.svg",
+    "bB": "bB.svg",
+    "bN": "bN.svg",
+    "bP": "bP.svg"
+  }
+}
