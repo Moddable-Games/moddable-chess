@@ -130,7 +130,7 @@ function createVariantGame(variant) {
     const fen = vc.fen || INITIAL_FEN;
     loadFEN(g, fen);
     g.positionHistory.push(positionKey(g));
-    if (vc.init) vc.init(g);
+    if (vc.init) { vc.init(g); g._initDone = true; }
     return g;
   }
 
