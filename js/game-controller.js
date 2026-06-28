@@ -482,6 +482,55 @@ function renderToolbar() {
   const rightGroup = document.createElement('div');
   rightGroup.className = 'toolbar-group';
 
+  const themeSel = document.createElement('select');
+  themeSel.className = 'toolbar-select';
+  themeSel.title = 'Board theme';
+  const currentThemeObj = MCE.getTheme();
+  Object.entries(MCE.THEMES).forEach(([key, t]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = t.label;
+    if (t === currentThemeObj) opt.selected = true;
+    themeSel.appendChild(opt);
+  });
+  themeSel.addEventListener('change', () => {
+    MCE.setTheme(themeSel.value);
+    track('theme_change', { theme_name: themeSel.value });
+    const url = new URL(location);
+    url.searchParams.set('theme', themeSel.value);
+    history.replaceState(null, '', url);
+    render();
+  });
+  rightGroup.appendChild(themeSel);
+
+  const pieceSel = document.createElement('select');
+  pieceSel.className = 'toolbar-select';
+  pieceSel.title = 'Piece set';
+  populateSetSelect(pieceSel);
+  pieceSel.addEventListener('change', async () => {
+    const setId = pieceSel.value;
+    PieceSetResolver.setConfig({ set: setId });
+    localStorage.setItem('mce-piece-set', setId);
+    await PieceSetResolver.loadForVariant(currentVariant || 'standard');
+    const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
+    const activeSetInfo = sets.find(s => s.id === setId);
+    if (activeSetInfo && !activeSetInfo.recolorable) {
+      MCE.setPieceStyle('auto');
+    }
+    track('piece_set_change', { set_name: setId });
+    render();
+  });
+  rightGroup.appendChild(pieceSel);
+
+  const gearBtn = document.createElement('button');
+  gearBtn.className = 'toolbar-btn';
+  gearBtn.title = 'Display options';
+  gearBtn.innerHTML = '&#x2699;';
+  gearBtn.addEventListener('click', () => {
+    toggleAdvancedPopup(gearBtn);
+  });
+  rightGroup.appendChild(gearBtn);
+
   const fsBtn = document.createElement('button');
   fsBtn.className = 'toolbar-btn';
   fsBtn.title = 'Fullscreen';
@@ -499,72 +548,21 @@ function renderToolbar() {
   toolbarEl.appendChild(rightGroup);
 }
 
-let settingsOpen = false;
+let advancedPopup = null;
 
-function renderSettings() {
-  const settingsEl = document.getElementById('settings-section');
-  if (!settingsEl) return;
-  settingsEl.innerHTML = '';
+function toggleAdvancedPopup(anchor) {
+  if (advancedPopup) {
+    advancedPopup.remove();
+    advancedPopup = null;
+    return;
+  }
 
-  const header = document.createElement('button');
-  header.className = 'settings-toggle';
-  header.innerHTML = '<span>&#x2699; Settings</span><span class="settings-chevron">' + (settingsOpen ? '&#x25B4;' : '&#x25BE;') + '</span>';
-  header.addEventListener('click', () => {
-    settingsOpen = !settingsOpen;
-    renderSettings();
-  });
-  settingsEl.appendChild(header);
+  advancedPopup = document.createElement('div');
+  advancedPopup.className = 'advanced-popup';
 
-  if (!settingsOpen) return;
-
-  settingsEl.appendChild(makeSettingsRow('Theme', () => {
+  const colourRow = makePopupRow('Colour', () => {
     const sel = document.createElement('select');
-    sel.className = 'settings-select';
-    const currentThemeObj = MCE.getTheme();
-    Object.entries(MCE.THEMES).forEach(([key, t]) => {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = t.label;
-      if (t === currentThemeObj) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    sel.addEventListener('change', () => {
-      MCE.setTheme(sel.value);
-      track('theme_change', { theme_name: sel.value });
-      const url = new URL(location);
-      url.searchParams.set('theme', sel.value);
-      history.replaceState(null, '', url);
-      render();
-    });
-    return sel;
-  }));
-
-  settingsEl.appendChild(makeSettingsRow('Pieces', () => {
-    const sel = document.createElement('select');
-    sel.className = 'settings-select';
-    sel.id = 'piece-set-select';
-    populateSetSelect(sel);
-    sel.addEventListener('change', async () => {
-      const setId = sel.value;
-      PieceSetResolver.setConfig({ set: setId });
-      localStorage.setItem('mce-piece-set', setId);
-      await PieceSetResolver.loadForVariant(currentVariant || 'standard');
-      const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
-      const activeSetInfo = sets.find(s => s.id === setId);
-      if (activeSetInfo && !activeSetInfo.recolorable) {
-        MCE.setPieceStyle('auto');
-      }
-      track('piece_set_change', { set_name: setId });
-      render();
-      renderSettings();
-    });
-    return sel;
-  }));
-
-  settingsEl.appendChild(makeSettingsRow('Colour', () => {
-    const sel = document.createElement('select');
-    sel.className = 'settings-select';
-    sel.id = 'piece-color-select';
+    sel.className = 'toolbar-select';
     const currentPS = MCE.getPieceStyle();
     Object.entries(MCE.PIECE_STYLES).forEach(([key, ps]) => {
       const opt = document.createElement('option');
@@ -576,7 +574,7 @@ function renderSettings() {
     const sets = PieceSetResolver.getSetsForVariant(currentVariant || 'standard');
     const currentSet = PieceSetResolver.getConfig().set;
     const activeSetInfo = sets.find(s => s.id === currentSet);
-    if (activeSetInfo && !activeSetInfo.recolorable) sel.style.display = 'none';
+    if (activeSetInfo && !activeSetInfo.recolorable) sel.disabled = true;
     sel.addEventListener('change', () => {
       MCE.setPieceStyle(sel.value);
       const url = new URL(location);
@@ -585,11 +583,12 @@ function renderSettings() {
       render();
     });
     return sel;
-  }));
+  });
+  advancedPopup.appendChild(colourRow);
 
-  settingsEl.appendChild(makeSettingsRow('Animation', () => {
+  const animRow = makePopupRow('Animation', () => {
     const sel = document.createElement('select');
-    sel.className = 'settings-select';
+    sel.className = 'toolbar-select';
     Object.entries(ANIM_STYLES).forEach(([key, label]) => {
       const opt = document.createElement('option');
       opt.value = key;
@@ -604,11 +603,12 @@ function renderSettings() {
       history.replaceState(null, '', url);
     });
     return sel;
-  }));
+  });
+  advancedPopup.appendChild(animRow);
 
-  settingsEl.appendChild(makeSettingsRow('Speed', () => {
+  const speedRow = makePopupRow('Speed', () => {
     const sel = document.createElement('select');
-    sel.className = 'settings-select';
+    sel.className = 'toolbar-select';
     Object.entries(ANIM_SPEEDS).forEach(([key, s]) => {
       const opt = document.createElement('option');
       opt.value = key;
@@ -623,18 +623,35 @@ function renderSettings() {
       history.replaceState(null, '', url);
     });
     return sel;
-  }));
+  });
+  advancedPopup.appendChild(speedRow);
+
+  anchor.parentElement.appendChild(advancedPopup);
+
+  const closeOnClickOutside = (e) => {
+    if (advancedPopup && !advancedPopup.contains(e.target) && e.target !== anchor) {
+      advancedPopup.remove();
+      advancedPopup = null;
+      document.removeEventListener('click', closeOnClickOutside);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', closeOnClickOutside), 0);
 }
 
-function makeSettingsRow(label, buildControl) {
+function makePopupRow(label, buildControl) {
   const row = document.createElement('div');
-  row.className = 'settings-row';
+  row.className = 'popup-row';
   const lbl = document.createElement('span');
-  lbl.className = 'settings-row-label';
+  lbl.className = 'popup-row-label';
   lbl.textContent = label;
   row.appendChild(lbl);
   row.appendChild(buildControl());
   return row;
+}
+
+function renderSettings() {
+  const settingsEl = document.getElementById('settings-section');
+  if (settingsEl) settingsEl.innerHTML = '';
 }
 
 function removeMoveFromList() {

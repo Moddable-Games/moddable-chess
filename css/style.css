@@ -823,5 +823,34 @@ h1, h2, h3, h4 {
 
 .toolbar-select:hover { border-color: var(--play-border-hover); color: var(--play-text); }
 
+.advanced-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: var(--play-surface);
+  border: 1px solid var(--play-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 100;
+  min-width: 180px;
+}
+
+.popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.popup-row-label {
+  font-size: 12px;
+  color: var(--play-text-muted);
+}
+
+.toolbar-group { position: relative; }
+
 /* Footer: pin to bottom when viewport allows */
 .site-footer { display: none; }
