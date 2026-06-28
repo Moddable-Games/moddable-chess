@@ -278,6 +278,17 @@ Open `http://localhost:8000/`
 - Improve transparent theme contrast: use grey-based rgba instead of white-based
 - Bump cache-busting strings to v0.7.1
 
+#### 2026-06-28
+- Expand piece gallery to 85 sets / 2,550 SVGs across 18 game families
+- Add pieces for: draughts, go, amazons, backgammon, abalone, lines-of-action, oware, othello, breakthrough, dameo, togyzkumalak, playing cards
+- New chess sources: maurimo/chess-art (MIT), rhosgfx (CC0), chessnut (Apache), Firi, kiwen-suwi, flugsio shapes, KDE Knights
+- New shogi: LuffyKudo chess-themed, PlayStrategy 1kanji/2kanji/ctw
+- New fairy: PlayStrategy mono (46 individual fairy piece SVGs)
+- Refactor gallery page to manifest-driven auto-discovery (#123)
+- Every set now has structured manifest.json + LICENSE with source attribution
+- Gallery intro text, stats, and licence table all dynamically computed
+- Add family filter (18 game families) and source repo links to gallery UI
+
 #### 2026-06-02
 - Add renderBoard hooks: excludePieces array, suppressHighlights, legalMoveRenderer
 - Add tilePainter transform positioning (supports `<g>` elements)

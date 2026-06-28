@@ -4,3 +4,4 @@ node_modules/
 tests/svg-output/
 tests/screenshots/
 .puzzle-cache/
+.claude/
