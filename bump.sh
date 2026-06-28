@@ -19,10 +19,11 @@ esac
 NEW="${MAJOR}.${MINOR}.${PATCH}"
 echo "$NEW" > "$VERSION_FILE"
 
-# Update all ?v= query strings in HTML files
+# Update all ?v= query strings and version displays in HTML files
 find . -name "*.html" -not -path "./.git/*" | while read -r file; do
   sed -i '' "s/\?v=[0-9][0-9.]*/?v=${NEW}/g" "$file"
   sed -i '' "s/· v[0-9][0-9.]*/· v${NEW}/g" "$file"
+  sed -i '' "s/>v[0-9][0-9.]*</>v${NEW}</g" "$file"
 done
 
 # Update package.json version
