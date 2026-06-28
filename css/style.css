@@ -227,6 +227,15 @@ h1, h2, h3, h4 {
   font-weight: 600;
   color: var(--play-text);
   font-family: var(--mg-font-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+#board-toolbar .toolbar-group:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 
