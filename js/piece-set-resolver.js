@@ -22,9 +22,19 @@ function getBasePath() {
 async function loadManifest(setId) {
   if (manifests.has(setId)) return manifests.get(setId);
   const basePath = getBasePath();
-  const url = basePath + MANIFESTS_BASE + setId + '.json';
+  const unifiedUrl = basePath + SETS_BASE + setId + '/manifest.json';
   try {
-    const resp = await fetch(url);
+    const resp = await fetch(unifiedUrl);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (!data.path) data.path = setId + '/';
+      manifests.set(setId, data);
+      return data;
+    }
+  } catch (e) {}
+  const legacyUrl = basePath + MANIFESTS_BASE + setId + '.json';
+  try {
+    const resp = await fetch(legacyUrl);
     if (!resp.ok) { manifests.set(setId, null); return null; }
     const data = await resp.json();
     manifests.set(setId, data);
@@ -37,13 +47,23 @@ async function loadManifest(setId) {
 
 async function loadAllManifests() {
   const basePath = getBasePath();
+  const galleryUrl = basePath + 'assets/pieces/gallery-index.json';
+  try {
+    const resp = await fetch(galleryUrl);
+    if (resp.ok) {
+      const all = await resp.json();
+      const playableIds = all.filter(s => s.playable).map(s => s.id);
+      await Promise.all(playableIds.map(id => loadManifest(id)));
+      return;
+    }
+  } catch (e) {}
   const indexUrl = basePath + MANIFESTS_BASE + 'index.json';
   try {
     const resp = await fetch(indexUrl);
     if (!resp.ok) return;
     const ids = await resp.json();
     await Promise.all(ids.map(id => loadManifest(id)));
-  } catch (e) { /* index not available */ }
+  } catch (e) {}
 }
 
 function symbolId(char) {

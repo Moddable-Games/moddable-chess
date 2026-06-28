@@ -5,7 +5,22 @@
   "author": "Maurizio Monge",
   "license": "MIT",
   "source": "https://github.com/maurimo/chess-art",
-  "pieceCount": 12,
   "authorUrl": "https://github.com/maurimo",
-  "licenseUrl": "https://opensource.org/licenses/MIT"
+  "licenseUrl": "https://opensource.org/licenses/MIT",
+  "playable": true,
+  "recolorable": false,
+  "pieces": {
+    "wK": "wK.svg",
+    "wQ": "wQ.svg",
+    "wR": "wR.svg",
+    "wB": "wB.svg",
+    "wN": "wN.svg",
+    "wP": "wP.svg",
+    "bK": "bK.svg",
+    "bQ": "bQ.svg",
+    "bR": "bR.svg",
+    "bB": "bB.svg",
+    "bN": "bN.svg",
+    "bP": "bP.svg"
+  }
 }

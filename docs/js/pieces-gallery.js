@@ -1,5 +1,11 @@
 let SETS = [];
 
+function getPieceCount(set) {
+  if (getPieceCount(set)) return getPieceCount(set);
+  if (set.pieces) return Object.keys(set.pieces).length;
+  return 0;
+}
+
 async function loadGalleryIndex() {
   const resp = await fetch('../assets/pieces/gallery-index.json');
   SETS = await resp.json();
@@ -7,7 +13,7 @@ async function loadGalleryIndex() {
 }
 
 function renderIntro(sets) {
-  const totalPieces = sets.reduce((sum, s) => sum + s.pieceCount, 0);
+  const totalPieces = sets.reduce((sum, s) => sum + getPieceCount(s), 0);
   const families = [...new Set(sets.map(s => s.family))];
   const familyList = families.sort().map(f => f.replace(/-/g, ' ')).join(', ');
   document.getElementById('gallery-intro').textContent =
@@ -30,7 +36,7 @@ function populateFilters(sets) {
   sets.forEach(s => {
     const opt = document.createElement('option');
     opt.value = s.id;
-    opt.textContent = `${s.name} (${s.pieceCount})`;
+    opt.textContent = `${s.name} (${getPieceCount(s)})`;
     setFilter.appendChild(opt);
   });
 }
@@ -85,7 +91,7 @@ function renderGallery(sets, options = {}) {
 
     const countBadge = document.createElement('span');
     countBadge.className = 'piece-count';
-    countBadge.textContent = `${set.pieceCount} SVGs`;
+    countBadge.textContent = `${getPieceCount(set)} SVGs`;
     meta.appendChild(countBadge);
 
     header.appendChild(meta);
@@ -159,7 +165,7 @@ async function loadSvgList(set) {
 
 function renderStats(filtered) {
   const statsEl = document.getElementById('gallery-stats');
-  const totalPieces = filtered.reduce((sum, s) => sum + s.pieceCount, 0);
+  const totalPieces = filtered.reduce((sum, s) => sum + getPieceCount(s), 0);
   const families = [...new Set(filtered.map(s => s.family))];
   statsEl.textContent = `Showing ${filtered.length} sets · ${totalPieces.toLocaleString()} SVGs · ${families.length} families`;
 }
@@ -202,7 +208,7 @@ function renderLicenceTable(sets) {
     tr.appendChild(sourceCell);
 
     const countCell = document.createElement('td');
-    countCell.textContent = set.pieceCount;
+    countCell.textContent = getPieceCount(set);
     tr.appendChild(countCell);
 
     tbody.appendChild(tr);
@@ -313,7 +319,7 @@ async function init() {
     filtered.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s.id;
-      opt.textContent = `${s.name} (${s.pieceCount})`;
+      opt.textContent = `${s.name} (${getPieceCount(s)})`;
       setFilter.appendChild(opt);
     });
     render(sets);

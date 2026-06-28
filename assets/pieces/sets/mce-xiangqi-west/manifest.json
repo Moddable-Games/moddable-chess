@@ -5,6 +5,23 @@
   "author": "Mark Smalley",
   "license": "MIT",
   "source": "https://github.com/nicebadguy/moddable-chess",
-  "pieceCount": 14,
-  "licenseUrl": "https://opensource.org/licenses/MIT"
+  "licenseUrl": "https://opensource.org/licenses/MIT",
+  "playable": true,
+  "recolorable": true,
+  "pieces": {
+    "bA": "bA.svg",
+    "bC": "bC.svg",
+    "bE": "bE.svg",
+    "bK": "bK.svg",
+    "bN": "bN.svg",
+    "bP": "bP.svg",
+    "bR": "bR.svg",
+    "wA": "rA.svg",
+    "wC": "rC.svg",
+    "wE": "rE.svg",
+    "wK": "rK.svg",
+    "wN": "rN.svg",
+    "wP": "rP.svg",
+    "wR": "rR.svg"
+  }
 }

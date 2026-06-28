@@ -5,7 +5,17 @@
   "author": "LuffyKudo / Jemierry J.I. Maglinte Jumawan",
   "license": "CC-BY-SA-4.0",
   "source": "https://github.com/LuffyKudo/JI-Shogi-Themed-Chess",
-  "pieceCount": 7,
   "authorUrl": "https://github.com/LuffyKudo",
-  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "playable": false,
+  "recolorable": false,
+  "pieces": {
+    "Bishop": "Bishop.svg",
+    "Jewel": "Jewel.svg",
+    "King": "King.svg",
+    "Knight": "Knight.svg",
+    "Pawn": "Pawn.svg",
+    "Queen": "Queen.svg",
+    "Rook": "Rook.svg"
+  }
 }
