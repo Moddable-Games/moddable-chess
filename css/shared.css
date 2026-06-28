@@ -55,6 +55,13 @@ p, li { text-wrap: pretty; }
   letter-spacing: -0.02em;
 }
 
+.site-nav__version {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 8px;
+  align-self: center;
+}
+
 .site-nav__links {
   display: flex;
   gap: 0;
