@@ -1,0 +1,22 @@
+{
+  "id": "kiwen-suwi",
+  "name": "Kiwen Suwi",
+  "path": "kiwen-suwi/",
+  "author": "neverRare",
+  "license": "CC-BY-4.0",
+  "recolorable": true,
+  "pieces": {
+    "wK": "white-king.svg",
+    "wQ": "white-queen.svg",
+    "wR": "white-rook.svg",
+    "wB": "white-bishop.svg",
+    "wN": "white-knight.svg",
+    "wP": "white-pawn.svg",
+    "bK": "black-king.svg",
+    "bQ": "black-queen.svg",
+    "bR": "black-rook.svg",
+    "bB": "black-bishop.svg",
+    "bN": "black-knight.svg",
+    "bP": "black-pawn.svg"
+  }
+}

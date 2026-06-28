@@ -1,0 +1,22 @@
+{
+  "id": "maurimo-skulls",
+  "name": "Monge Skulls",
+  "path": "maurimo-skulls/",
+  "author": "Maurizio Monge",
+  "license": "MIT",
+  "recolorable": false,
+  "pieces": {
+    "wK": "wk.svg",
+    "wQ": "wq.svg",
+    "wR": "wr.svg",
+    "wB": "wb.svg",
+    "wN": "wn.svg",
+    "wP": "wp.svg",
+    "bK": "bk.svg",
+    "bQ": "bq.svg",
+    "bR": "br.svg",
+    "bB": "bb.svg",
+    "bN": "bn.svg",
+    "bP": "bp.svg"
+  }
+}
