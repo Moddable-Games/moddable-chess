@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45 45" width="45" height="45">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-24.026073 193.1726 45 45" width="45" height="45">
 <defs xmlns:ns1="http://www.inkscape.org/namespaces/inkscape" id="defs84">
     <filter id="filter5051">
       <feGaussianBlur id="feGaussianBlur5053" stdDeviation="2.235023" ns1:collect="always" />
@@ -16,7 +16,7 @@
       <path d="M 380.19461,383.04239 L 380.19461,371.04239 L 252.19463,371.04239 L 124.19462,371.04239 L 124.19462,383.04239 L 124.19462,395.04239 L 252.19463,395.04239 L 380.19461,395.04239 L 380.19461,383.04239 z" transform="translate(554.82183,264.50049)" id="path2433" style="fill:#ffffff" />
       <path d="M 405.19461,422.54239 L 405.19461,413.04239 L 252.19463,413.04239 L 99.194618,413.04239 L 99.194618,422.54239 L 99.194618,432.04239 L 252.19463,432.04239 L 405.19461,432.04239 L 405.19461,422.54239 z" transform="translate(554.82183,264.50049)" id="path2435" style="fill:#ffffff" />
     </g>
-    <rect width="200" height="200" x="344.58084" y="167.66782" id="rect2411" style="opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:16.70000076;stroke-dasharray:none;stroke-opacity:1" />
+    
   </g>
   
 </svg>

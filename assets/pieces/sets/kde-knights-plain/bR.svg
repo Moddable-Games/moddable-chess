@@ -14,7 +14,7 @@
         <path d="M 0,0 L 17,0" transform="translate(5.75,8.25)" id="path5050" style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:2" />
         <path d="M 0,0 L 23,0" transform="translate(2.75,5.75)" id="path5052" style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:2" />
       </g>
-      <rect width="45" height="45" x="0" y="0" id="rect3549" />
+      
     </g>
   
 </svg>

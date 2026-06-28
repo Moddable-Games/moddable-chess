@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45 45" width="45" height="45">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="14.2569 133.62 45 45" width="45" height="45">
 <g id="BlackBishop">
     <g transform="translate(14.2569,133.62)" id="BB">
       <path d="M 3,2 C 6.38526,1.02767 13.1147,2.43082 16.5,0 C 19.8853,2.43082 26.6147,1.02767 30,2 C 30,2 31.6459,2.54151 33,4 C 32.3229,4.97233 31.3541,4.98616 30,4.5 C 26.6147,3.52767 19.8853,4.95849 16.5,3.5 C 13.1147,4.95849 6.38526,3.52767 3,4.5 C 1.6459,4.98616 0.677051,4.97233 0,4 C 1.3541,2.05534 3,2 3,2 z" transform="translate(0.75,29.25)" id="path4582" style="fill:#2e3436;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:round" />
@@ -10,7 +10,7 @@
       <path d="M 0,0 L 0,5" transform="translate(17.25,10.75)" id="path4592" style="fill:#2e3436;stroke:#ffffff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4" />
       <path d="M 0,0 L 5,0" transform="translate(14.75,13.25)" id="path4594" style="fill:#2e3436;stroke:#ffffff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4" />
     </g>
-    <rect width="45" height="45" x="0" y="0" transform="translate(9.00689,128.527)" id="rect3388" />
+    
   </g>
   
 </svg>

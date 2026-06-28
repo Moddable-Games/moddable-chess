@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45 45" width="45" height="45">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-284.69631 174.21655 45 45" width="45" height="45">
 <defs xmlns:ns1="http://www.inkscape.org/namespaces/inkscape" id="defs84">
     <filter id="filter5051">
       <feGaussianBlur id="feGaussianBlur5053" stdDeviation="2.235023" ns1:collect="always" />
@@ -15,7 +15,7 @@
       <path d="M 168.27782,121.0625 C 163.29924,121.09649 159.27731,125.19455 159.2773,130.25 C 159.2773,135.30544 163.29924,139.43477 168.27782,139.46875 C 168.29857,139.46889 168.3187,139.46875 168.33948,139.46875 L 400.81171,139.46875 L 400.81171,139.4375 C 401.01662,139.45155 401.21978,139.46875 401.4282,139.46875 C 406.43541,139.46875 410.52117,135.32649 410.52118,130.25 C 410.52118,125.1735 406.4354,121.0625 401.4282,121.0625 C 401.21978,121.0625 401.01662,121.0797 400.81171,121.09375 L 400.81171,121.0625 L 168.33948,121.0625 L 168.27782,121.0625 z" id="path2432" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:16.70000076;stroke-dasharray:none;stroke-opacity:1" />
       <path d="M 168.27782,352.99352 C 163.29924,353.02751 159.27731,357.12557 159.2773,362.18102 C 159.2773,367.23646 163.29924,371.36579 168.27782,371.39977 C 168.29857,371.39991 168.3187,371.39977 168.33948,371.39977 L 400.81171,371.39977 L 400.81171,371.36852 C 401.01662,371.38257 401.21978,371.39977 401.4282,371.39977 C 406.43541,371.39977 410.52117,367.25751 410.52118,362.18102 C 410.52118,357.10452 406.4354,352.99352 401.4282,352.99352 C 401.21978,352.99352 401.01662,353.01072 400.81171,353.02477 L 400.81171,352.99352 L 168.33948,352.99352 L 168.27782,352.99352 z" id="path3240" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:16.70000076;stroke-dasharray:none;stroke-opacity:1" />
     </g>
-    <rect width="200" height="200" x="348.42871" y="176.09134" id="rect3257" style="opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:16.70000076;stroke-dasharray:none;stroke-opacity:1" />
+    
   </g>
   
 </svg>

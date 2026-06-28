@@ -11,7 +11,7 @@
         <path d="M 0,1.5 C 5.5,-0.5 15.5,-0.5 21,1.5" transform="translate(6.42313,26.75)" id="path6578" style="fill:none;stroke:#ffffff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round" />
         <path d="M 25.5205,12.4924 C 25.5205,12.4924 34.0205,8.49243 31.5464,2.83898 C 27.6679,-3.01102 18.5205,0.992428 16.0205,7.49243 L 16.0322,9.58898 L 16.0205,7.49243 C 13.5205,0.992428 3.42687,-3.01102 0.517946,2.83898 C -1.97952,8.49243 5.36615,11.839 5.36615,11.839" transform="translate(1.40265,11.7576)" id="path5638" style="fill:none;stroke:#ffffff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round" />
       </g>
-      <rect width="45" height="45" x="0" y="0" id="rect3501" />
+      
     </g>
     
 </svg>
