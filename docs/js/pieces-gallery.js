@@ -1,7 +1,7 @@
 let SETS = [];
 
 function getPieceCount(set) {
-  if (getPieceCount(set)) return getPieceCount(set);
+  if (set.pieceCount) return set.pieceCount;
   if (set.pieces) return Object.keys(set.pieces).length;
   return 0;
 }
