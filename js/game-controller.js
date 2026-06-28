@@ -190,6 +190,21 @@ let gameMode = paramMode === 'pass' ? 'pass' : 'solo';
 let aiDifficulty = params.get('difficulty') || 'medium';
 let aiColor = MCE.BLACK;
 const playerNames = { w: paramP1, b: paramP2 };
+
+function updatePlayerNames() {
+  if (gameMode === 'solo') {
+    const aiSide = aiColor === MCE.BLACK ? 'b' : 'w';
+    const humanSide = aiColor === MCE.BLACK ? 'w' : 'b';
+    if (aiSide === 'b' && paramP2 === 'Black') playerNames.b = 'The House';
+    else if (aiSide === 'w' && paramP1 === 'White') playerNames.w = 'The House';
+    if (humanSide === 'w' && paramP1 === 'White') playerNames.w = 'You';
+    else if (humanSide === 'b' && paramP2 === 'Black') playerNames.b = 'You';
+  } else {
+    playerNames.w = paramP1;
+    playerNames.b = paramP2;
+  }
+}
+updatePlayerNames();
 let gameOver = false;
 let flipped = false;
 let capturedPieces = { w: [], b: [] };
@@ -480,12 +495,7 @@ function renderToolbar() {
 
   const modeInfo = document.createElement('span');
   modeInfo.className = 'toolbar-mode';
-  if (gameMode === 'solo') {
-    const aiName = paramP2 !== 'Black' ? playerNames.b : 'The House';
-    modeInfo.textContent = `${playerNames.w} vs ${aiName}`;
-  } else {
-    modeInfo.textContent = `${playerNames.w} vs ${playerNames.b}`;
-  }
+  modeInfo.textContent = `${playerNames.w} vs ${playerNames.b}`;
   leftGroup.appendChild(modeInfo);
 
   toolbarEl.appendChild(leftGroup);
@@ -674,6 +684,7 @@ function removeMoveFromList() {
 }
 
 function startGame(variant) {
+  updatePlayerNames();
   currentVariant = variant;
   PieceSetResolver.loadForVariant(variant).then(() => {
     if (ctrl) render();
