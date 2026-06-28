@@ -147,18 +147,10 @@ function renderGallery(sets, options = {}) {
 
 async function loadSvgList(set) {
   if (set._svgCache) return set._svgCache;
-  const path = getSetPath(set);
-  try {
-    const resp = await fetch(path);
-    if (!resp.ok) throw new Error();
-    const html = await resp.text();
-    const matches = html.match(/[\w.%+-]+\.svg/g);
-    if (matches && matches.length > 0) {
-      const svgs = [...new Set(matches)].filter(f => !f.includes('manifest') && !f.includes('LICENSE')).sort();
-      set._svgCache = svgs;
-      return svgs;
-    }
-  } catch (e) {}
+  if (set.pieces && Object.keys(set.pieces).length > 0) {
+    set._svgCache = Object.values(set.pieces).sort();
+    return set._svgCache;
+  }
   set._svgCache = [];
   return [];
 }
