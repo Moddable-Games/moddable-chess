@@ -1,7 +1,8 @@
-<?xml version='1.0' encoding='utf-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs id="defs4" />
-  <g id="BlackPawn">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45 45" width="45" height="45">
+<g id="BlackPawn">
     <path d="M 196.284,135.777 C 194.076,135.777 192.284,137.569 192.284,139.777 C 192.284,140.6621 192.57797,141.48923 193.06525,142.152 C 191.11327,143.27392 189.784,145.36549 189.784,147.777 C 189.784,149.8109 190.72604,151.6161 192.19025,152.8082 C 189.1911,153.8661 184.784,158.355 184.784,166.277 L 207.784,166.277 C 207.784,158.355 203.3769,153.8661 200.3778,152.8082 C 201.842,151.6161 202.784,149.8109 202.784,147.777 C 202.784,145.36549 201.4547,143.27392 199.5027,142.152 C 199.99,141.48923 200.284,140.6621 200.284,139.777 C 200.284,137.569 198.492,135.777 196.284,135.777 z" id="path3194" style="fill:#2e3436;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none" />
-    <rect width="45" height="45" x="173.784" y="128.52699" id="rect3526" style="fill:none" />
+    <rect width="45" height="45" x="173.784" y="128.52699" id="rect3526"  />
   </g>
-  </svg>
+  
+</svg>

@@ -1,5 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs id="defs3700">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45 45" width="45" height="45">
+<defs xmlns:ns2="http://www.inkscape.org/namespaces/inkscape" xmlns:xlink="http://www.w3.org/1999/xlink" id="defs3700">
     <linearGradient id="linearGradient3740">
       <stop id="stop3742" style="stop-color:#e6eff7;stop-opacity:1" offset="0" />
       <stop id="stop3744" style="stop-color:#e6eff7;stop-opacity:0" offset="1" />
@@ -32,7 +33,7 @@
       <stop id="stop3775" style="stop-color:#312c20;stop-opacity:1" offset="1" />
     </linearGradient>
     <filter id="filter3767" color-interpolation-filters="sRGB">
-      <feGaussianBlur id="feGaussianBlur3769" stdDeviation="20.951469" inkscape:collect="always" />
+      <feGaussianBlur id="feGaussianBlur3769" stdDeviation="20.951469" ns2:collect="always" />
     </filter>
     <radialGradient cx="1033.5078" cy="1169.8499" r="408.07211" fx="1033.5078" fy="1169.8499" id="radialGradient3730" xlink:href="#linearGradient3714-801" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1,0,0,0.8194983,0,211.15995)" />
     <linearGradient id="linearGradient3714-801">
@@ -47,7 +48,7 @@
       <stop id="stop3966-3" style="stop-color:#ffffff;stop-opacity:0" offset="1" />
     </linearGradient>
     <filter height="1.3222857" y="-0.16114286" width="1.1367273" x="-0.068363637" id="filter3814" color-interpolation-filters="sRGB">
-      <feGaussianBlur id="feGaussianBlur3816" stdDeviation="7.0899242" inkscape:collect="always" />
+      <feGaussianBlur id="feGaussianBlur3816" stdDeviation="7.0899242" ns2:collect="always" />
     </filter>
     <linearGradient x1="670.52679" y1="2115.0645" x2="541.25116" y2="2118.8357" id="linearGradient3721" xlink:href="#linearGradient3714-801" gradientUnits="userSpaceOnUse" />
     <radialGradient cx="475.17575" cy="1743.4718" r="179.71709" fx="475.17575" fy="1743.4718" id="radialGradient4354" xlink:href="#linearGradient3962-3" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.5455916,-1.8452643e-8,3.5599905e-8,1.1751202,215.92378,-305.31716)" />
@@ -248,7 +249,7 @@
       <stop id="stop3775-2" style="stop-color:#312c20;stop-opacity:1" offset="1" />
     </linearGradient>
     <filter id="filter3767-2" color-interpolation-filters="sRGB">
-      <feGaussianBlur id="feGaussianBlur3769-4" stdDeviation="20.951469" inkscape:collect="always" />
+      <feGaussianBlur id="feGaussianBlur3769-4" stdDeviation="20.951469" ns2:collect="always" />
     </filter>
     <radialGradient cx="1033.5078" cy="1169.8499" r="408.07211" fx="1033.5078" fy="1169.8499" id="radialGradient3049" xlink:href="#linearGradient3678" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1,0,0,0.8194983,0,211.15995)" />
     <linearGradient id="linearGradient3678">
@@ -263,7 +264,7 @@
       <stop id="stop3638-7" style="stop-color:#ff153e;stop-opacity:0" offset="1" />
     </linearGradient>
     <filter height="1.3222857" y="-0.16114286" width="1.1367273" x="-0.068363637" id="filter3814-1" color-interpolation-filters="sRGB">
-      <feGaussianBlur id="feGaussianBlur3816-6" stdDeviation="7.0899242" inkscape:collect="always" />
+      <feGaussianBlur id="feGaussianBlur3816-6" stdDeviation="7.0899242" ns2:collect="always" />
     </filter>
     <linearGradient x1="670.52679" y1="2115.0645" x2="541.25116" y2="2118.8357" id="linearGradient3057" xlink:href="#linearGradient3678" gradientUnits="userSpaceOnUse" />
     <radialGradient cx="475.17575" cy="1743.4718" r="179.71709" fx="475.17575" fy="1743.4718" id="radialGradient3059" xlink:href="#linearGradient3634-17" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.5455916,-1.8452643e-8,3.5599905e-8,1.1751202,215.92378,-305.31716)" />
@@ -277,7 +278,8 @@
     <radialGradient cx="554.66669" cy="1029.3334" r="85.333336" fx="554.66669" fy="1029.3334" id="radialGradient3251" xlink:href="#linearGradient3962-9" gradientUnits="userSpaceOnUse" />
     <radialGradient cx="-882.66663" cy="1030.8578" r="282.66669" fx="-882.66663" fy="1030.8578" id="radialGradient4876" xlink:href="#linearGradient3962-9" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1.4502759,-1.4559449e-7,-1.845882e-7,1.8386948,-397.58153,-925.7658)" />
   </defs>
-  <g id="BlackRook">
+  
+<g id="BlackRook">
       <rect width="200" height="200" x="232" y="680.36218" id="rect5779" style="opacity:0;fill:#312c20;fill-opacity:1;fill-rule:nonzero;stroke:none" />
       <g transform="matrix(7.969457e-2,0,0,7.969457e-2,251.911,672.73265)" id="g2841-9">
         <path d="M 347.96875,159.25 C 307.3115,159.25 274.5625,191.999 274.5625,232.65625 L 274.5625,2348.375 C 274.5625,2389.0322 307.3115,2421.75 347.96875,2421.75 L 1590.5312,2421.75 C 1631.1885,2421.75 1663.9375,2389.0322 1663.9375,2348.375 L 1663.9375,232.65625 C 1663.9375,191.999 1631.1885,159.25 1590.5312,159.25 L 1316.5932,159.25 C 1279.2175,154.57182 1267.5037,171.27857 1274.0312,203.18644 L 1274.0312,261.59375 C 1274.0312,302.251 1241.3135,334.96875 1200.6562,334.96875 L 770.8125,334.96875 C 730.15525,334.96875 697.4375,302.251 697.4375,261.59375 L 697.4375,215.54237 C 696.66149,156.53318 672.73291,166.98171 654.86441,159.25 L 347.96875,159.25 L 347.96875,159.25 z" id="path4938" style="opacity:0.5;fill:#a0002c;fill-opacity:1;stroke:#000000;stroke-width:62.73953247;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
@@ -308,4 +310,5 @@
         <path d="M 1311.5474,166.26619 C 1284.3558,166.76619 1276.0859,183.0343 1281.7974,210.95369 L 1281.7974,269.35994 C 1281.7974,305.77493 1255.5494,335.7988 1220.86,341.67244 L 1221.235,343.70369 C 1312.4877,341.76214 1285.2994,256.31994 1314.4224,215.54744 C 1343.5456,174.77494 1539.6538,198.08386 1578.485,180.60994 C 1588.3966,176.14969 1596.6388,171.5634 1603.4537,167.20369 C 1601.7483,167.08619 1600.0336,167.01619 1598.2974,167.01619 L 1324.36,167.01619 C 1319.688,166.43142 1315.432,166.19476 1311.5474,166.26619 L 1311.5474,166.26619 z M 367.04744,167.01619 C 440.56763,187.47553 608.04112,191.44448 644.57869,184.48494 C 657.75305,181.97554 672.12983,177.83363 685.57869,173.39119 C 678.24626,170.323 669.94316,170.17576 662.64119,167.01619 L 367.04744,167.01619 L 367.04744,167.01619 z" id="path3809-3" style="fill:#e61a55;stroke:none" />
       </g>
     </g>
-    </svg>
+    
+</svg>
