@@ -7,7 +7,7 @@
   "source": "https://github.com/maurimo/chess-art",
   "authorUrl": "https://github.com/maurimo",
   "licenseUrl": "https://opensource.org/licenses/MIT",
-  "playable": true,
+  "playable": false,
   "recolorable": false,
   "pieces": {
     "wK": "wk.svg",
