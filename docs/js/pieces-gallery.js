@@ -209,11 +209,78 @@ function renderLicenceTable(sets) {
   });
 }
 
+function renderByPieceType(sets, options = {}) {
+  const container = document.getElementById('gallery-container');
+  const { search, family, size = 64, bg = 'checkered' } = options;
+
+  let filtered = sets;
+  if (family && family !== 'all') filtered = filtered.filter(s => s.family === family);
+
+  const pieceMap = {};
+  filtered.forEach(set => {
+    const setPath = getSetPath(set);
+    const svgFiles = set._svgCache || [];
+    svgFiles.forEach(file => {
+      const name = file.replace('.svg', '');
+      if (!pieceMap[name]) pieceMap[name] = [];
+      pieceMap[name].push({ set, file, path: setPath + file });
+    });
+  });
+
+  const entries = Object.entries(pieceMap).sort((a, b) => a[0].localeCompare(b[0]));
+  const filteredEntries = search
+    ? entries.filter(([name]) => name.toLowerCase().includes(search.toLowerCase()))
+    : entries;
+
+  container.innerHTML = '';
+
+  filteredEntries.forEach(([name, items]) => {
+    const section = document.createElement('div');
+    section.className = 'set-section';
+
+    const title = document.createElement('h2');
+    title.innerHTML = `${name} <span class="piece-count">(${items.length} sets)</span>`;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'piece-grid';
+    grid.style.setProperty('--cell-size', `${size + 16}px`);
+    grid.style.setProperty('--piece-size', `${size}px`);
+
+    items.forEach(({ set, file, path }) => {
+      const cell = document.createElement('div');
+      cell.className = `piece-cell bg-${bg}`;
+      cell.title = `${set.name}: ${file}`;
+
+      const img = document.createElement('img');
+      img.src = path;
+      img.alt = file;
+      img.width = size;
+      img.height = size;
+      img.loading = 'lazy';
+      cell.appendChild(img);
+
+      const label = document.createElement('span');
+      label.className = 'piece-label';
+      label.innerHTML = `<span class="set-tag">${set.id}</span>`;
+      cell.appendChild(label);
+
+      grid.appendChild(cell);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+
+  renderStats(filtered);
+}
+
 function getOptions() {
   return {
     search: document.getElementById('search-input').value.trim(),
     family: document.getElementById('family-filter').value,
     setId: document.getElementById('filter-select').value,
+    view: document.getElementById('view-select').value,
     size: parseInt(document.getElementById('size-select').value),
     bg: document.getElementById('bg-select').value,
   };
@@ -226,14 +293,14 @@ async function init() {
   renderLicenceTable(sets);
 
   await Promise.all(sets.map(s => loadSvgList(s)));
-  renderGallery(sets, getOptions());
+  render(sets);
 
-  const controls = ['search-input', 'filter-select', 'size-select', 'bg-select', 'color-filter'];
+  const controls = ['search-input', 'filter-select', 'size-select', 'bg-select', 'color-filter', 'view-select'];
   controls.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => {
-        renderGallery(sets, getOptions());
+        render(sets);
       });
     }
   });
@@ -249,8 +316,18 @@ async function init() {
       opt.textContent = `${s.name} (${s.pieceCount})`;
       setFilter.appendChild(opt);
     });
-    renderGallery(sets, getOptions());
+    render(sets);
   });
 }
 
+function render(sets) {
+  const opts = getOptions();
+  if (opts.view === 'by-piece') {
+    renderByPieceType(sets, opts);
+  } else {
+    renderGallery(sets, opts);
+  }
+}
+
 init();
+
