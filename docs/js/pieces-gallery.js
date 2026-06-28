@@ -61,37 +61,37 @@ function renderGallery(sets, options = {}) {
     if (filesToShow.length === 0 && search) return;
 
     const section = document.createElement('div');
-    section.className = 'gallery-set';
+    section.className = 'set-section';
 
     const header = document.createElement('div');
-    header.className = 'gallery-set__header';
+    header.className = 'set-header';
 
-    const title = document.createElement('h3');
+    const title = document.createElement('h2');
     title.textContent = set.name;
     header.appendChild(title);
 
     const meta = document.createElement('div');
-    meta.className = 'gallery-set__meta';
+    meta.className = 'set-meta';
 
     const familyBadge = document.createElement('span');
-    familyBadge.className = 'badge badge--family';
+    familyBadge.className = 'set-format';
     familyBadge.textContent = set.family.replace(/-/g, ' ');
     meta.appendChild(familyBadge);
 
     const licenseBadge = document.createElement('span');
-    licenseBadge.className = 'badge badge--license';
+    licenseBadge.className = 'recolor-badge';
     licenseBadge.textContent = set.license;
     meta.appendChild(licenseBadge);
 
     const countBadge = document.createElement('span');
-    countBadge.className = 'badge badge--count';
+    countBadge.className = 'piece-count';
     countBadge.textContent = `${set.pieceCount} SVGs`;
     meta.appendChild(countBadge);
 
     header.appendChild(meta);
 
     const attribution = document.createElement('div');
-    attribution.className = 'gallery-set__attribution';
+    attribution.className = 'set-meta';
     let authorHtml = set.author;
     if (set.authorUrl) {
       authorHtml = `<a href="${set.authorUrl}" target="_blank" rel="noopener">${set.author}</a>`;
@@ -106,13 +106,14 @@ function renderGallery(sets, options = {}) {
     section.appendChild(header);
 
     const grid = document.createElement('div');
-    grid.className = `gallery-grid bg-${bg}`;
+    grid.className = 'piece-grid';
+    grid.style.setProperty('--cell-size', `${size + 16}px`);
     grid.style.setProperty('--piece-size', `${size}px`);
 
     const displayFiles = filesToShow.length > 0 ? filesToShow : svgFiles;
     displayFiles.forEach(file => {
       const cell = document.createElement('div');
-      cell.className = 'gallery-cell';
+      cell.className = `piece-cell bg-${bg}`;
       cell.title = file;
 
       const img = document.createElement('img');
@@ -124,7 +125,7 @@ function renderGallery(sets, options = {}) {
       cell.appendChild(img);
 
       const label = document.createElement('span');
-      label.className = 'gallery-cell__label';
+      label.className = 'piece-label';
       label.textContent = file.replace('.svg', '');
       cell.appendChild(label);
 
