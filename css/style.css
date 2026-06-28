@@ -326,12 +326,12 @@ h1, h2, h3, h4 {
 #status {
   grid-column: 1 / -1;
   padding: 8px 24px;
-  background: rgba(111,181,255,0.08);
-  border-bottom: 1px solid var(--play-border);
+  background: rgba(245,183,77,0.12);
+  border-bottom: 1px solid rgba(245,183,77,0.25);
   font-size: 15px;
   font-weight: 700;
   font-family: var(--mg-font-display);
-  color: #fff;
+  color: #f5b74d;
   text-align: center;
   letter-spacing: 0.02em;
 }
