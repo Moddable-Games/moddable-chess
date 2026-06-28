@@ -275,38 +275,8 @@
     "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
   },
   {
-    "id": "kde-knights-east-west",
-    "name": "Kde Knights East West",
-    "family": "chess",
-    "author": "KDE Project contributors",
-    "license": "GPL-2.0",
-    "source": "https://github.com/KDE/knights/tree/master/themes",
-    "pieceCount": 12,
-    "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
-  },
-  {
-    "id": "kde-knights-gray",
-    "name": "Kde Knights Gray",
-    "family": "chess",
-    "author": "KDE Project contributors",
-    "license": "GPL-2.0",
-    "source": "https://github.com/KDE/knights/tree/master/themes",
-    "pieceCount": 12,
-    "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
-  },
-  {
     "id": "kde-knights-plain",
     "name": "Kde Knights Plain",
-    "family": "chess",
-    "author": "KDE Project contributors",
-    "license": "GPL-2.0",
-    "source": "https://github.com/KDE/knights/tree/master/themes",
-    "pieceCount": 12,
-    "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
-  },
-  {
-    "id": "kde-knights-xboard2",
-    "name": "Kde Knights Xboard2",
     "family": "chess",
     "author": "KDE Project contributors",
     "license": "GPL-2.0",
