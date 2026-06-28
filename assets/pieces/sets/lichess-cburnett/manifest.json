@@ -1,0 +1,11 @@
+{
+  "id": "lichess-cburnett",
+  "name": "Lichess CBurnett",
+  "family": "chess",
+  "author": "Colin M.L. Burnett",
+  "license": "GPL-2.0+",
+  "source": "https://github.com/lichess-org/lila/tree/master/public/piece/cburnett",
+  "pieceCount": 12,
+  "authorUrl": "https://en.wikipedia.org/wiki/User:Cburnett",
+  "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
+}

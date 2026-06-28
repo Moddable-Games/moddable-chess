@@ -1,0 +1,11 @@
+{
+  "id": "chessnut",
+  "name": "Chessnut",
+  "family": "chess",
+  "author": "Alexis Luengas",
+  "license": "Apache-2.0",
+  "source": "https://github.com/LexLuengas/chessnut-pieces",
+  "pieceCount": 12,
+  "authorUrl": "https://github.com/LexLuengas",
+  "licenseUrl": "https://www.apache.org/licenses/LICENSE-2.0"
+}

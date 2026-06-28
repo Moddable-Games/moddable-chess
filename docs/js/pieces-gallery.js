@@ -1,2272 +1,255 @@
-const SETS = [
-  {
-    id: 'wikimedia-fairy',
-    name: 'Wikimedia Fairy (45px)',
-    path: '../assets/pieces/sets/wikimedia/fairy/',
-    author: 'Sammy2012, NikNaks93, Francois-Pier, Kwamikagami, others',
-    license: 'CC0 / CC BY-SA 3.0 / CC BY-SA 4.0 (varies)',
-    recolorable: true,
-    notes: 'Fairy chess extensions — CBurnett style + standalone pieces. 22 SVGs covering 10 piece types.',
-    pieces: [
-      { file: 'Chess_Flt45.svg', char: 'f', color: 'w', name: 'Fers (CBurnett)' },
-      { file: 'Chess_Gdt45.svg', char: 'G', color: 'b', name: 'Grasshopper' },
-      { file: 'BLancer.svg', char: 'l', color: 'b', name: 'Lancer' },
-      { file: 'WHITE_CHESS_FERZ.svg', char: 'f', color: 'w', name: 'Ferz (Noto)' },
-      { file: 'BLACK_CHESS_FERZ.svg', char: 'f', color: 'b', name: 'Ferz (Noto)' },
-      { file: 'WHITE_CHESS_ALFIL.svg', char: 'alfil', color: 'w', name: 'Alfil (Noto)' },
-      { file: 'BLACK_CHESS_ALFIL.svg', char: 'alfil', color: 'b', name: 'Alfil (Noto)' },
-      { file: 'White_ferz.svg', char: 'f', color: 'w', name: 'Ferz (standalone)' },
-      { file: 'Black_ferz.svg', char: 'f', color: 'b', name: 'Ferz (standalone)' },
-      { file: 'White_alfil.svg', char: 'alfil', color: 'w', name: 'Alfil' },
-      { file: 'Black_alfil.svg', char: 'alfil', color: 'b', name: 'Alfil' },
-      { file: 'White_chess_camel.svg', char: 'camel', color: 'w', name: 'Camel (3,1 leaper)' },
-      { file: 'Black_chess_camel.svg', char: 'camel', color: 'b', name: 'Camel (3,1 leaper)' },
-      { file: 'White_chess_giraffe.svg', char: 'giraffe', color: 'w', name: 'Giraffe (4,1 leaper)' },
-      { file: 'Black_chess_giraffe.svg', char: 'giraffe', color: 'b', name: 'Giraffe (4,1 leaper)' },
-      { file: 'White_dabbaba.svg', char: 'dabbaba', color: 'w', name: 'Dabbaba (2-sq orthogonal)' },
-      { file: 'Black_dabbaba.svg', char: 'dabbaba', color: 'b', name: 'Dabbaba (2-sq orthogonal)' },
-      { file: 'Black_wazir.svg', char: 'wazir', color: 'b', name: 'Wazir (1-sq orthogonal)' },
-    ]
-  },
-  {
-    id: 'wikimedia-makruk',
-    name: 'Wikimedia Makruk (Thai Chess)',
-    path: '../assets/pieces/sets/wikimedia/makruk/',
-    author: 'Yevrowl',
-    license: 'CC BY-SA 4.0',
-    recolorable: false,
-    notes: 'Complete Thai chess set. 6 piece types × 2 sides + Biangai (promoted pawn).',
-    pieces: [
-      { file: 'Khun_white.svg', char: 'k', color: 'w', name: 'Khun (King)' },
-      { file: 'Khun_black.svg', char: 'k', color: 'b', name: 'Khun (King)' },
-      { file: 'Met_white.svg', char: 'f', color: 'w', name: 'Met (Fers/Queen)' },
-      { file: 'Met_black.svg', char: 'f', color: 'b', name: 'Met (Fers/Queen)' },
-      { file: 'Khon_white.svg', char: 'g', color: 'w', name: 'Khon (Silver General)' },
-      { file: 'Khon_black.svg', char: 'g', color: 'b', name: 'Khon (Silver General)' },
-      { file: 'Ma_white.svg', char: 'n', color: 'w', name: 'Ma (Horse/Knight)' },
-      { file: 'Ma_black.svg', char: 'n', color: 'b', name: 'Ma (Horse/Knight)' },
-      { file: 'Ruea_white.svg', char: 'r', color: 'w', name: 'Ruea (Boat/Rook)' },
-      { file: 'Ruea_black.svg', char: 'r', color: 'b', name: 'Ruea (Boat/Rook)' },
-      { file: 'Bia_white.svg', char: 'p', color: 'w', name: 'Bia (Cowrie/Pawn)' },
-      { file: 'Bia_black.svg', char: 'p', color: 'b', name: 'Bia (Cowrie/Pawn)' },
-      { file: 'Biangai_white.svg', char: 'f+', color: 'w', name: 'Biangai (Promoted Pawn)' },
-      { file: 'Biangai_black.svg', char: 'f+', color: 'b', name: 'Biangai (Promoted Pawn)' },
-    ]
-  },
-  {
-    id: 'kaneo',
-    name: 'Kaneo (Kadapadon)',
-    path: '../assets/pieces/sets/kaneo/',
-    author: 'Kadapadon',
-    license: 'CC-BY-4.0',
-    recolorable: false,
-    notes: 'Fairy chess coverage. 50mm viewBox.',
-    pieces: [
-      { file: 'wK.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'wQ.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'wR.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'wB.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'wN.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'wP.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'wA.svg', char: 'a', color: 'w', name: 'Archbishop' },
-      { file: 'wC.svg', char: 'c', color: 'w', name: 'Chancellor' },
-      { file: 'wE.svg', char: 'e', color: 'w', name: 'Elephant' },
-      { file: 'wH.svg', char: 'h', color: 'w', name: 'Hawk/Archer' },
-      { file: 'wCh.svg', char: 'c2', color: 'w', name: 'Chancellor (alt)' },
-      { file: 'bK.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'bQ.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'bR.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'bB.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'bN.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'bP.svg', char: 'p', color: 'b', name: 'Pawn' },
-      { file: 'bA.svg', char: 'a', color: 'b', name: 'Archbishop' },
-      { file: 'bC.svg', char: 'c', color: 'b', name: 'Chancellor' },
-      { file: 'bE.svg', char: 'e', color: 'b', name: 'Elephant' },
-      { file: 'bH.svg', char: 'h', color: 'b', name: 'Hawk/Archer' },
-      { file: 'bCh.svg', char: 'c2', color: 'b', name: 'Chancellor (alt)' },
-    ]
-  },
-  {
-    id: 'lichess-cburnett',
-    name: 'Lichess CBurnett',
-    path: '../assets/pieces/sets/lichess-cburnett/',
-    author: 'Cburnett (via Lichess)',
-    license: 'MIT',
-    recolorable: true,
-    notes: 'Standard 6 pieces only. High quality, scalable viewBox.',
-    pieces: [
-      { file: 'wK.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'wQ.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'wR.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'wB.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'wN.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'wP.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'bK.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'bQ.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'bR.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'bB.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'bN.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'bP.svg', char: 'p', color: 'b', name: 'Pawn' },
-    ]
-  },
-  {
-    id: 'wikimedia-kiwen-suwi',
-    name: 'Kiwen Suwi',
-    path: '../assets/pieces/sets/wikimedia/artistic/kiwen-suwi/',
-    author: 'Armsjuli',
-    license: 'CC BY-SA 4.0',
-    recolorable: true,
-    notes: 'Complete minimalist set. Clean geometric style, all 6 piece types × 2 colours.',
-    pieces: [
-      { file: 'Kiwen_Suwi_klt.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'Kiwen_Suwi_kdt.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'Kiwen_Suwi_qlt.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'Kiwen_Suwi_qdt.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'Kiwen_Suwi_rlt.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'Kiwen_Suwi_rdt.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'Kiwen_Suwi_blt.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'Kiwen_Suwi_bdt.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'Kiwen_Suwi_nlt.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'Kiwen_Suwi_ndt.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'Kiwen_Suwi_plt.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'Kiwen_Suwi_pdt.svg', char: 'p', color: 'b', name: 'Pawn' },
-    ]
-  },
-  {
-    id: 'wikimedia-colored',
-    name: 'Wikimedia 4-Player Colored',
-    path: '../assets/pieces/sets/wikimedia/colored/',
-    author: 'Various',
-    license: 'GFDL / CC BY-SA 3.0',
-    recolorable: false,
-    notes: 'Blue, Green, Red, Yellow pieces for 4-player variants. Yellow missing bishop+rook (not on Wikimedia).',
-    pieces: [
-      { file: 'Blue_king.svg', char: 'k', color: 'blue', name: 'Blue King' },
-      { file: 'Blue_queen.svg', char: 'q', color: 'blue', name: 'Blue Queen' },
-      { file: 'Blue_rook.svg', char: 'r', color: 'blue', name: 'Blue Rook' },
-      { file: 'Blue_bishop.svg', char: 'b', color: 'blue', name: 'Blue Bishop' },
-      { file: 'Blue_knight.svg', char: 'n', color: 'blue', name: 'Blue Knight' },
-      { file: 'Blue_pawn.svg', char: 'p', color: 'blue', name: 'Blue Pawn' },
-      { file: 'Green_king.svg', char: 'k', color: 'green', name: 'Green King' },
-      { file: 'Green_queen.svg', char: 'q', color: 'green', name: 'Green Queen' },
-      { file: 'Green_rook.svg', char: 'r', color: 'green', name: 'Green Rook' },
-      { file: 'Green_bishop.svg', char: 'b', color: 'green', name: 'Green Bishop' },
-      { file: 'Green_knight.svg', char: 'n', color: 'green', name: 'Green Knight' },
-      { file: 'Green_pawn.svg', char: 'p', color: 'green', name: 'Green Pawn' },
-      { file: 'Red_king.svg', char: 'k', color: 'red', name: 'Red King' },
-      { file: 'Red_queen.svg', char: 'q', color: 'red', name: 'Red Queen' },
-      { file: 'Red_rook.svg', char: 'r', color: 'red', name: 'Red Rook' },
-      { file: 'Red_bishop.svg', char: 'b', color: 'red', name: 'Red Bishop' },
-      { file: 'Red_knight.svg', char: 'n', color: 'red', name: 'Red Knight' },
-      { file: 'Red_pawn.svg', char: 'p', color: 'red', name: 'Red Pawn' },
-      { file: 'Yellow_king.svg', char: 'k', color: 'yellow', name: 'Yellow King' },
-      { file: 'Yellow_queen.svg', char: 'q', color: 'yellow', name: 'Yellow Queen' },
-      { file: 'Yellow_knight.svg', char: 'n', color: 'yellow', name: 'Yellow Knight' },
-      { file: 'Yellow_pawn.svg', char: 'p', color: 'yellow', name: 'Yellow Pawn' },
-    ]
-  },
-];
+let SETS = [];
 
-const ADDITIONAL_SETS = [
-  {
-    id: 'wikimedia-noto',
-    name: 'Noto Sans Symbols2 (Unicode)',
-    path: '../assets/pieces/sets/wikimedia/noto/',
-    author: 'Ekirahardian (Google Noto project)',
-    license: 'SIL OFL 1.1',
-    recolorable: true,
-    notes: 'Unicode chess symbols. 26 non-rotated pieces: standard + compounds + equihopper + neutrals. 91 total incl. rotated.',
-    pieces: [
-      { file: 'WHITE_CHESS_KING.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'WHITE_CHESS_QUEEN.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'WHITE_CHESS_ROOK.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'WHITE_CHESS_BISHOP.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'WHITE_CHESS_KNIGHT.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'WHITE_CHESS_PAWN.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'BLACK_CHESS_KING.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'BLACK_CHESS_QUEEN.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'BLACK_CHESS_ROOK.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'BLACK_CHESS_BISHOP.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'BLACK_CHESS_KNIGHT.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'BLACK_CHESS_PAWN.svg', char: 'p', color: 'b', name: 'Pawn' },
-          { file: 'NEUTRAL_CHESS_ROOK.svg', char: 'r', color: 'neutral', name: 'Rook (neutral)' },
-            { file: 'WHITE_CHESS_KNIGHT-BISHOP.svg', char: 'a', color: 'w', name: 'Archbishop (N+B)' },
-      { file: 'BLACK_CHESS_KNIGHT-BISHOP.svg', char: 'a', color: 'b', name: 'Archbishop (N+B)' },
-      { file: 'WHITE_CHESS_KNIGHT-ROOK.svg', char: 'c', color: 'w', name: 'Chancellor (N+R)' },
-      { file: 'BLACK_CHESS_KNIGHT-ROOK.svg', char: 'c', color: 'b', name: 'Chancellor (N+R)' },
-      { file: 'WHITE_CHESS_KNIGHT-QUEEN.svg', char: 'm', color: 'w', name: 'Amazon/Maharaja (N+Q)' },
-      { file: 'BLACK_CHESS_KNIGHT-QUEEN.svg', char: 'm', color: 'b', name: 'Amazon/Maharaja (N+Q)' },
-      { file: 'WHITE_CHESS_EQUIHOPPER.svg', char: 'eq', color: 'w', name: 'Equihopper' },
-      { file: 'BLACK_CHESS_EQUIHOPPER.svg', char: 'eq', color: 'b', name: 'Equihopper' },
-    ]
-  },
-  {
-    id: 'wikimedia-monge-fantasy',
-    name: 'Monge Fantasy',
-    path: '../assets/pieces/sets/wikimedia/artistic/monge-fantasy/',
-    author: 'Maurizio Monge',
-    license: 'CC BY-SA (assumed)',
-    recolorable: false,
-    notes: 'Artistic fantasy-themed standard pieces.',
-    pieces: [
-      { file: 'Chess_Maurizio_Monge_Fantasy_wk.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_wq.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_wr.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_wb.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_wn.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_wp.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_bk.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_bq.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_br.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_bb.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_bn.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'Chess_Maurizio_Monge_Fantasy_bp.svg', char: 'p', color: 'b', name: 'Pawn' },
-    ]
-  },
-  {
-    id: 'wikimedia-monge-spatial',
-    name: 'Monge Spatial',
-    path: '../assets/pieces/sets/wikimedia/artistic/monge-spatial/',
-    author: 'Maurizio Monge',
-    license: 'CC BY-SA (assumed)',
-    recolorable: false,
-    notes: 'Abstract/spatial artistic style.',
-    pieces: [
-      { file: 'Chess_Maurizio_Monge_Spatial_wk.svg', char: 'k', color: 'w', name: 'King' },
-      { file: 'Chess_Maurizio_Monge_Spatial_wq.svg', char: 'q', color: 'w', name: 'Queen' },
-      { file: 'Chess_Maurizio_Monge_Spatial_wr.svg', char: 'r', color: 'w', name: 'Rook' },
-      { file: 'Chess_Maurizio_Monge_Spatial_wb.svg', char: 'b', color: 'w', name: 'Bishop' },
-      { file: 'Chess_Maurizio_Monge_Spatial_wn.svg', char: 'n', color: 'w', name: 'Knight' },
-      { file: 'Chess_Maurizio_Monge_Spatial_wp.svg', char: 'p', color: 'w', name: 'Pawn' },
-      { file: 'Chess_Maurizio_Monge_Spatial_bk.svg', char: 'k', color: 'b', name: 'King' },
-      { file: 'Chess_Maurizio_Monge_Spatial_bq.svg', char: 'q', color: 'b', name: 'Queen' },
-      { file: 'Chess_Maurizio_Monge_Spatial_br.svg', char: 'r', color: 'b', name: 'Rook' },
-      { file: 'Chess_Maurizio_Monge_Spatial_bb.svg', char: 'b', color: 'b', name: 'Bishop' },
-      { file: 'Chess_Maurizio_Monge_Spatial_bn.svg', char: 'n', color: 'b', name: 'Knight' },
-      { file: 'Chess_Maurizio_Monge_Spatial_bp.svg', char: 'p', color: 'b', name: 'Pawn' },
-    ]
-  },
-  {
-    id: 'wikimedia-dobutsu',
-    name: 'Dobutsu (Animal Shogi)',
-    path: '../assets/pieces/sets/wikimedia/dobutsu/',
-    author: 'LuffyKudo',
-    license: 'CC BY-SA 4.0',
-    recolorable: false,
-    notes: 'Animal-themed pieces for kids\' Shogi. Lion=King, Elephant=Rook, Giraffe=Bishop, Chick=Pawn.',
-    pieces: [
-      { file: 'Dobutsu_Chess_King.svg', char: 'k', color: 'w', name: 'Lion (King)' },
-      { file: 'Dobutsu_Chess_Queen.svg', char: 'q', color: 'w', name: 'Power piece' },
-      { file: 'Dobutsu_Chess_Rook.svg', char: 'r', color: 'w', name: 'Elephant (Rook)' },
-      { file: 'Dobutsu_Chess_Bishop.svg', char: 'b', color: 'w', name: 'Giraffe (Bishop)' },
-      { file: 'Dobutsu_Chess_Knight.svg', char: 'n', color: 'w', name: 'Horse (Knight)' },
-      { file: 'Dobutsu_Chess_Pawn.svg', char: 'p', color: 'w', name: 'Chick (Pawn)' },
-    ]
-  },
-  {
-    id: 'wikimedia-draughts',
-    name: 'Draughts (Checkers)',
-    path: '../assets/pieces/sets/wikimedia/draughts/',
-    author: 'Cburnett',
-    license: 'GFDL / CC BY-SA 3.0 / BSD',
-    recolorable: true,
-    notes: 'Complete draughts set: Man and King × 2 colours. CBurnett style at 45px.',
-    pieces: [
-      { file: 'Draughts_mlt45.svg', char: 'man', color: 'w', name: 'Man (white)' },
-      { file: 'Draughts_mdt45.svg', char: 'man', color: 'b', name: 'Man (black)' },
-      { file: 'Draughts_klt45.svg', char: 'king', color: 'w', name: 'King (white)' },
-      { file: 'Draughts_kdt45.svg', char: 'king', color: 'b', name: 'King (black)' },
-      ]
-  },
-  {
-    id: 'wikimedia-xogos',
-    name: 'Xogos da Meiga (Multi-color Fairy)',
-    path: '../assets/pieces/sets/wikimedia/artistic/xogos-da-meiga/',
-    author: 'Iago Casabiell Gonzalez',
-    license: 'CC BY-SA 4.0',
-    recolorable: false,
-    notes: '3 piece types × 16 colours = 46 SVGs. Persian figurine style. Ideal for multi-player or themed variants.',
-    pieces: [
-      { file: 'White_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'w', name: 'Elephant (white)' },
-      { file: 'Black_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'b', name: 'Elephant (black)' },
-      { file: 'White_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'w', name: 'Ferz (white)' },
-      { file: 'Black_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'b', name: 'Ferz (black)' },
-      { file: 'White_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'w', name: 'Alfil (white)' },
-      { file: 'Black_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'b', name: 'Alfil (black)' },
-      { file: 'Red_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'red', name: 'Elephant (red)' },
-      { file: 'Red_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'red', name: 'Ferz (red)' },
-      { file: 'Red_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'red', name: 'Alfil (red)' },
-      { file: 'Blue_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'blue', name: 'Elephant (blue)' },
-      { file: 'Blue_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'blue', name: 'Ferz (blue)' },
-      { file: 'Blue_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'blue', name: 'Alfil (blue)' },
-      { file: 'Green_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'green', name: 'Elephant (green)' },
-      { file: 'Green_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'green', name: 'Ferz (green)' },
-      { file: 'Green_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'green', name: 'Alfil (green)' },
-      { file: 'Yellow_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'yellow', name: 'Elephant (yellow)' },
-      { file: 'Yellow_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'yellow', name: 'Ferz (yellow)' },
-      { file: 'Yellow_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'yellow', name: 'Alfil (yellow)' },
-      { file: 'Orange_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'orange', name: 'Elephant (orange)' },
-      { file: 'Orange_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'orange', name: 'Ferz (orange)' },
-      { file: 'Orange_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'orange', name: 'Alfil (orange)' },
-      { file: 'Pink_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'pink', name: 'Elephant (pink)' },
-      { file: 'Pink_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'pink', name: 'Ferz (pink)' },
-      { file: 'Pink_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'pink', name: 'Alfil (pink)' },
-      { file: 'Navy_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'navy', name: 'Elephant (navy)' },
-      { file: 'Navy_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'navy', name: 'Ferz (navy)' },
-      { file: 'Navy_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'navy', name: 'Alfil (navy)' },
-      { file: 'Brown_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'brown', name: 'Elephant (brown)' },
-      { file: 'Brown_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'brown', name: 'Ferz (brown)' },
-      { file: 'Brown_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'brown', name: 'Alfil (brown)' },
-      { file: 'Forest_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'forest', name: 'Elephant (forest)' },
-      { file: 'Forest_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'forest', name: 'Ferz (forest)' },
-      { file: 'Forest_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'forest', name: 'Alfil (forest)' },
-      { file: 'Ash_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'ash', name: 'Elephant (ash)' },
-      { file: 'Ash_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'ash', name: 'Ferz (ash)' },
-      { file: 'Ash_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'ash', name: 'Alfil (ash)' },
-      { file: 'Beige_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'beige', name: 'Elephant (beige)' },
-      { file: 'Beige_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'beige', name: 'Ferz (beige)' },
-      { file: 'Beige_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'beige', name: 'Alfil (beige)' },
-      { file: 'Blood_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'blood', name: 'Elephant (blood)' },
-      { file: 'Blood_Ferz_Xogos_da_Meiga_chess_icons_family.svg', char: 'f', color: 'blood', name: 'Ferz (blood)' },
-      { file: 'Blood_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'blood', name: 'Alfil (blood)' },
-      { file: 'Teal_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'teal', name: 'Elephant (teal)' },
-      { file: 'Teal_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'teal', name: 'Alfil (teal)' },
-      { file: 'Purple_Elephant_Xogos_da_Meiga_chess_icons_family.svg', char: 'e', color: 'purple', name: 'Elephant (purple)' },
-      { file: 'Purple_Medieval_Alfil_Xogos_da_Meiga_chess_icons_family.svg', char: 'alfil', color: 'purple', name: 'Alfil (purple)' },
-    ]
-  },
-  {
-    id: 'wikimedia-go',
-    name: 'Go Stones (SVG)',
-    path: '../assets/pieces/sets/wikimedia/go/',
-    author: 'SVG primitives',
-    license: 'Public domain (geometric shapes)',
-    recolorable: false,
-    notes: 'Go stones are simple filled circles. These are generated SVGs, not sourced art.',
-    pieces: [
-      { file: 'black_stone.svg', char: 'stone', color: 'b', name: 'Black stone' },
-      { file: 'white_stone.svg', char: 'stone', color: 'w', name: 'White stone' },
-    ]
-  },
-  {
-    id: 'wikimedia-noto-rotated',
-    name: 'Noto Rotated (4-Player)',
-    path: '../assets/pieces/sets/wikimedia/noto/',
-    author: 'Ekirahardian (Google Noto project)',
-    license: 'SIL OFL 1.1',
-    recolorable: true,
-    notes: '49 rotated/turned pieces for 4-player variants. 90°, 180° (turned), 270°, and knight at 45° intervals.',
-    pieces: [
-    { file: 'BLACK_CHESS_BISHOP_ROTATED_NINETY_DEGREES.svg', char: 'b', color: 'b', name: 'Bishop (90°)' },
-    { file: 'BLACK_CHESS_BISHOP_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'b', color: 'b', name: 'Bishop (270°)' },
-    { file: 'BLACK_CHESS_EQUIHOPPER_ROTATED_NINETY_DEGREES.svg', char: 'eq', color: 'b', name: 'Equihopper (90°)' },
-    { file: 'BLACK_CHESS_KING_ROTATED_NINETY_DEGREES.svg', char: 'k', color: 'b', name: 'King (90°)' },
-    { file: 'BLACK_CHESS_KING_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'k', color: 'b', name: 'King (270°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_FORTY-FIVE_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (45°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_NINETY_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (90°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_ONE_HUNDRED_THIRTY-FIVE_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (135°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_THREE_HUNDRED_FIFTEEN_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (315°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (270°)' },
-    { file: 'BLACK_CHESS_KNIGHT_ROTATED_TWO_HUNDRED_TWENTY-FIVE_DEGREES.svg', char: 'n', color: 'b', name: 'Knight (225°)' },
-    { file: 'BLACK_CHESS_PAWN_ROTATED_NINETY_DEGREES.svg', char: 'p', color: 'b', name: 'Pawn (90°)' },
-    { file: 'BLACK_CHESS_PAWN_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'p', color: 'b', name: 'Pawn (270°)' },
-    { file: 'BLACK_CHESS_QUEEN_ROTATED_NINETY_DEGREES.svg', char: 'q', color: 'b', name: 'Queen (90°)' },
-    { file: 'BLACK_CHESS_QUEEN_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'q', color: 'b', name: 'Queen (270°)' },
-    { file: 'BLACK_CHESS_ROOK_ROTATED_NINETY_DEGREES.svg', char: 'r', color: 'b', name: 'Rook (90°)' },
-    { file: 'BLACK_CHESS_ROOK_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'r', color: 'b', name: 'Rook (270°)' },
-    { file: 'BLACK_CHESS_TURNED_BISHOP.svg', char: 'b', color: 'b', name: 'Turned-Bishop (180°)' },
-    { file: 'BLACK_CHESS_TURNED_KING.svg', char: 'k', color: 'b', name: 'Turned-King (180°)' },
-    { file: 'BLACK_CHESS_TURNED_KNIGHT.svg', char: 'n', color: 'b', name: 'Turned-Knight (180°)' },
-    { file: 'BLACK_CHESS_TURNED_PAWN.svg', char: 'p', color: 'b', name: 'Turned-Pawn (180°)' },
-    { file: 'BLACK_CHESS_TURNED_QUEEN.svg', char: 'q', color: 'b', name: 'Turned-Queen (180°)' },
-    { file: 'BLACK_CHESS_TURNED_ROOK.svg', char: 'r', color: 'b', name: 'Turned-Rook (180°)' },
-    { file: 'NEUTRAL_CHESS_TURNED_BISHOP.svg', char: 'b', color: 'neutral', name: 'Turned-Bishop (180°)' },
-    { file: 'NEUTRAL_CHESS_TURNED_KING.svg', char: 'k', color: 'neutral', name: 'Turned-King (180°)' },
-    { file: 'NEUTRAL_CHESS_TURNED_KNIGHT.svg', char: 'n', color: 'neutral', name: 'Turned-Knight (180°)' },
-    { file: 'NEUTRAL_CHESS_TURNED_PAWN.svg', char: 'p', color: 'neutral', name: 'Turned-Pawn (180°)' },
-    { file: 'NEUTRAL_CHESS_TURNED_ROOK.svg', char: 'r', color: 'neutral', name: 'Turned-Rook (180°)' },
-    { file: 'WHITE_CHESS_BISHOP_ROTATED_NINETY_DEGREES.svg', char: 'b', color: 'w', name: 'Bishop (90°)' },
-    { file: 'WHITE_CHESS_BISHOP_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'b', color: 'w', name: 'Bishop (270°)' },
-    { file: 'WHITE_CHESS_EQUIHOPPER_ROTATED_NINETY_DEGREES.svg', char: 'eq', color: 'w', name: 'Equihopper (90°)' },
-    { file: 'WHITE_CHESS_KING_ROTATED_NINETY_DEGREES.svg', char: 'k', color: 'w', name: 'King (90°)' },
-    { file: 'WHITE_CHESS_KING_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'k', color: 'w', name: 'King (270°)' },
-    { file: 'WHITE_CHESS_KNIGHT_ROTATED_FORTY-FIVE_DEGREES.svg', char: 'n', color: 'w', name: 'Knight (45°)' },
-    { file: 'WHITE_CHESS_KNIGHT_ROTATED_ONE_HUNDRED_THIRTY-FIVE_DEGREES.svg', char: 'n', color: 'w', name: 'Knight (135°)' },
-    { file: 'WHITE_CHESS_KNIGHT_ROTATED_THREE_HUNDRED_FIFTEEN_DEGREES.svg', char: 'n', color: 'w', name: 'Knight (315°)' },
-    { file: 'WHITE_CHESS_KNIGHT_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'n', color: 'w', name: 'Knight (270°)' },
-    { file: 'WHITE_CHESS_KNIGHT_ROTATED_TWO_HUNDRED_TWENTY-FIVE_DEGREES.svg', char: 'n', color: 'w', name: 'Knight (225°)' },
-    { file: 'WHITE_CHESS_PAWN_ROTATED_NINETY_DEGREES.svg', char: 'p', color: 'w', name: 'Pawn (90°)' },
-    { file: 'WHITE_CHESS_PAWN_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'p', color: 'w', name: 'Pawn (270°)' },
-    { file: 'WHITE_CHESS_QUEEN_ROTATED_NINETY_DEGREES.svg', char: 'q', color: 'w', name: 'Queen (90°)' },
-    { file: 'WHITE_CHESS_ROOK_ROTATED_NINETY_DEGREES.svg', char: 'r', color: 'w', name: 'Rook (90°)' },
-    { file: 'WHITE_CHESS_ROOK_ROTATED_TWO_HUNDRED_SEVENTY_DEGREES.svg', char: 'r', color: 'w', name: 'Rook (270°)' },
-    { file: 'WHITE_CHESS_TURNED_BISHOP.svg', char: 'b', color: 'w', name: 'Turned-Bishop (180°)' },
-    { file: 'WHITE_CHESS_TURNED_KING.svg', char: 'k', color: 'w', name: 'Turned-King (180°)' },
-    { file: 'WHITE_CHESS_TURNED_KNIGHT.svg', char: 'n', color: 'w', name: 'Turned-Knight (180°)' },
-    { file: 'WHITE_CHESS_TURNED_PAWN.svg', char: 'p', color: 'w', name: 'Turned-Pawn (180°)' },
-    { file: 'WHITE_CHESS_TURNED_QUEEN.svg', char: 'q', color: 'w', name: 'Turned-Queen (180°)' },
-    { file: 'WHITE_CHESS_TURNED_ROOK.svg', char: 'r', color: 'w', name: 'Turned-Rook (180°)' },
-    ]
-  },
-];
-
-SETS.push(...ADDITIONAL_SETS);
-
-const EXTENDED_SETS = [
-  {
-    id: 'wikimedia-cburnett-extended',
-    name: 'CBurnett Extended (4-Player + Fairy)',
-    path: '../assets/pieces/sets/wikimedia/standard/',
-    author: 'Cburnett + contributors',
-    license: 'GFDL / CC BY-SA 3.0 / BSD',
-    recolorable: false,
-    notes: '88 additional CBurnett pieces: fairy types + 4-player coloured fills (blue, green, red, yellow). Transparent backgrounds.',
-    pieces: [
-    { file: 'Chess_1dt45.svg', char: 'man', color: 'b', name: 'Man (draughts)' },
-    { file: 'Chess_1lt45.svg', char: 'man', color: 'w', name: 'Man (draughts)' },
-    { file: 'Chess_2dt45.svg', char: 'king', color: 'b', name: 'King (draughts)' },
-    { file: 'Chess_2lt45.svg', char: 'king', color: 'w', name: 'King (draughts)' },
-    { file: 'Chess_Fdt45.svg', char: 'f', color: 'b', name: 'Fers' },
-    { file: 'Chess_Flt45.svg', char: 'f', color: 'w', name: 'Fers' },
-    { file: 'Chess_Gdt45.svg', char: 'g', color: 'b', name: 'Guard/Khon' },
-    { file: 'Chess_Glt45.svg', char: 'g', color: 'w', name: 'Guard/Khon' },
-    { file: 'Chess_Nbt45.svg', char: 'n', color: 'blue', name: 'Nightrider' },
-    { file: 'Chess_Ngt45.svg', char: 'n', color: 'green', name: 'Nightrider' },
-    { file: 'Chess_Nrt45.svg', char: 'n', color: 'red', name: 'Nightrider' },
-    { file: 'Chess_Nyt45.svg', char: 'n', color: 'yellow', name: 'Nightrider' },
-    { file: 'Chess_Sdt45.svg', char: 's', color: 'b', name: 'Silver General' },
-    { file: 'Chess_Slt45.svg', char: 's', color: 'w', name: 'Silver General' },
-    { file: 'Chess_Udt45.svg', char: 'u', color: 'b', name: 'Unicorn' },
-    { file: 'Chess_Ult45.svg', char: 'u', color: 'w', name: 'Unicorn' },
-    { file: 'Chess_Wdt45.svg', char: 'wazir', color: 'b', name: 'Wazir' },
-    { file: 'Chess_Wlt45.svg', char: 'wazir', color: 'w', name: 'Wazir' },
-    { file: 'Chess_Zdt45.svg', char: 'zebra', color: 'b', name: 'Zebra' },
-    { file: 'Chess_Zlt45.svg', char: 'zebra', color: 'w', name: 'Zebra' },
-    { file: 'Chess_adt45.svg', char: 'a', color: 'b', name: 'Archbishop' },
-    { file: 'Chess_bbt45.svg', char: 'b', color: 'blue', name: 'Bishop' },
-    { file: 'Chess_bgt45.svg', char: 'b', color: 'green', name: 'Bishop' },
-    { file: 'Chess_brt45.svg', char: 'b', color: 'red', name: 'Bishop' },
-    { file: 'Chess_byt45.svg', char: 'b', color: 'yellow', name: 'Bishop' },
-    { file: 'Chess_dat45.svg', char: 'dragon', color: 'ash', name: 'Dragon' },
-    { file: 'Chess_dbt45.svg', char: 'dragon', color: 'blue', name: 'Dragon' },
-    { file: 'Chess_dlt45.svg', char: 'dragon', color: 'w', name: 'Dragon' },
-    { file: 'Chess_drt45.svg', char: 'dragon', color: 'red', name: 'Dragon' },
-    { file: 'Chess_dwt45.svg', char: 'dragon', color: 'brown', name: 'Dragon' },
-    { file: 'Chess_ebt45.svg', char: 'e', color: 'blue', name: 'Elephant' },
-    { file: 'Chess_edt45.svg', char: 'e', color: 'b', name: 'Elephant' },
-    { file: 'Chess_egt45.svg', char: 'e', color: 'green', name: 'Elephant' },
-    { file: 'Chess_elt45.svg', char: 'e', color: 'w', name: 'Elephant' },
-    { file: 'Chess_ert45.svg', char: 'e', color: 'red', name: 'Elephant' },
-    { file: 'Chess_eyt45.svg', char: 'e', color: 'yellow', name: 'Elephant' },
-    { file: 'Chess_gbt45.svg', char: 'G', color: 'blue', name: 'Grasshopper' },
-    { file: 'Chess_ggt45.svg', char: 'G', color: 'green', name: 'Grasshopper' },
-    { file: 'Chess_grt45.svg', char: 'G', color: 'red', name: 'Grasshopper' },
-    { file: 'Chess_gyt45.svg', char: 'G', color: 'yellow', name: 'Grasshopper' },
-    { file: 'Chess_hdt45.svg', char: 'h', color: 'b', name: 'Hawk' },
-    { file: 'Chess_hlt45.svg', char: 'h', color: 'w', name: 'Hawk' },
-    { file: 'Chess_kbt45.svg', char: 'k', color: 'blue', name: 'King' },
-    { file: 'Chess_kgt45.svg', char: 'k', color: 'green', name: 'King' },
-    { file: 'Chess_krt45.svg', char: 'k', color: 'red', name: 'King' },
-    { file: 'Chess_kyt45.svg', char: 'k', color: 'yellow', name: 'King' },
-    { file: 'Chess_lat45.svg', char: 'l', color: 'ash', name: 'Lancer' },
-    { file: 'Chess_lrt45.svg', char: 'l', color: 'red', name: 'Lancer' },
-    { file: 'Chess_mdt45.svg', char: 'm', color: 'b', name: 'Maharaja' },
-    { file: 'Chess_mlt45.svg', char: 'm', color: 'w', name: 'Maharaja' },
-    { file: 'Chess_oot45.svg', char: 'marker', color: 'neutral', name: 'Circle Marker' },
-    { file: 'Chess_oxt45.svg', char: 'marker', color: 'neutral', name: 'Cross Marker' },
-    { file: 'Chess_pbt45.svg', char: 'p', color: 'blue', name: 'Pawn' },
-    { file: 'Chess_pgt45.svg', char: 'p', color: 'green', name: 'Pawn' },
-    { file: 'Chess_prt45.svg', char: 'p', color: 'red', name: 'Pawn' },
-    { file: 'Chess_pyt45.svg', char: 'p', color: 'yellow', name: 'Pawn' },
-    { file: 'Chess_qbt45.svg', char: 'q', color: 'blue', name: 'Queen' },
-    { file: 'Chess_qgt45.svg', char: 'q', color: 'green', name: 'Queen' },
-    { file: 'Chess_qrt45.svg', char: 'q', color: 'red', name: 'Queen' },
-    { file: 'Chess_qyt45.svg', char: 'q', color: 'yellow', name: 'Queen' },
-    { file: 'Chess_rat45.svg', char: 'r', color: 'ash', name: 'Rook' },
-    { file: 'Chess_rbt45.svg', char: 'r', color: 'blue', name: 'Rook' },
-    { file: 'Chess_rgt45.svg', char: 'r', color: 'green', name: 'Rook' },
-    { file: 'Chess_rrt45.svg', char: 'r', color: 'red', name: 'Rook' },
-    { file: 'Chess_ryt45.svg', char: 'r', color: 'yellow', name: 'Rook' },
-    { file: 'Chess_sbt45.svg', char: 's', color: 'blue', name: 'S' },
-    { file: 'Chess_sgt45.svg', char: 's', color: 'green', name: 'S' },
-    { file: 'Chess_srt45.svg', char: 's', color: 'red', name: 'S' },
-    { file: 'Chess_syt45.svg', char: 's', color: 'yellow', name: 'S' },
-    { file: 'Chess_uat45.svg', char: 'u', color: 'ash', name: 'U' },
-    { file: 'Chess_urt45.svg', char: 'u', color: 'red', name: 'U' },
-    { file: 'Chess_vdt45.svg', char: 'v', color: 'b', name: 'V' },
-    { file: 'Chess_vlt45.svg', char: 'v', color: 'w', name: 'V' },
-    ]
-  },
-];
-
-SETS.push(...EXTENDED_SETS);
-
-const EMOJI_SETS = [
-  {
-    id: 'fluent-emoji',
-    name: 'Fluent Emoji (Game Tokens)',
-    path: '../assets/pieces/sets/fluent-emoji/',
-    author: 'Microsoft',
-    license: 'MIT',
-    recolorable: false,
-    notes: '358 game-relevant emoji. Flat style, gradient-free. Animals, shapes, vehicles, buildings, terrain, fantasy.',
-    pieces: [
-    { file: 'aerial-tramway.svg', char: 'vehicle', color: 'neutral', name: 'Aerial Tramway' },
-    { file: 'airplane.svg', char: 'vehicle', color: 'neutral', name: 'Airplane' },
-    { file: 'ambulance.svg', char: 'vehicle', color: 'neutral', name: 'Ambulance' },
-    { file: 'american-football.svg', char: 'game', color: 'neutral', name: 'American Football' },
-    { file: 'anchor.svg', char: 'vehicle', color: 'neutral', name: 'Anchor' },
-    { file: 'ant.svg', char: 'animal', color: 'neutral', name: 'Ant' },
-    { file: 'atom.svg', char: 'shape', color: 'neutral', name: 'Atom' },
-    { file: 'auto-rickshaw.svg', char: 'vehicle', color: 'neutral', name: 'Auto Rickshaw' },
-    { file: 'badger.svg', char: 'animal', color: 'neutral', name: 'Badger' },
-    { file: 'badminton.svg', char: 'game', color: 'neutral', name: 'Badminton' },
-    { file: 'bank.svg', char: 'building', color: 'neutral', name: 'Bank' },
-    { file: 'baseball.svg', char: 'game', color: 'neutral', name: 'Baseball' },
-    { file: 'basketball.svg', char: 'game', color: 'neutral', name: 'Basketball' },
-    { file: 'bat.svg', char: 'animal', color: 'neutral', name: 'Bat' },
-    { file: 'beach.svg', char: 'building', color: 'neutral', name: 'Beach' },
-    { file: 'bear.svg', char: 'animal', color: 'neutral', name: 'Bear' },
-    { file: 'beaver.svg', char: 'animal', color: 'neutral', name: 'Beaver' },
-    { file: 'bee.svg', char: 'animal', color: 'neutral', name: 'Bee' },
-    { file: 'beetle.svg', char: 'animal', color: 'neutral', name: 'Beetle' },
-    { file: 'bicycle.svg', char: 'vehicle', color: 'neutral', name: 'Bicycle' },
-    { file: 'biohazard.svg', char: 'shape', color: 'neutral', name: 'Biohazard' },
-    { file: 'bird.svg', char: 'animal', color: 'neutral', name: 'Bird' },
-    { file: 'bison.svg', char: 'animal', color: 'neutral', name: 'Bison' },
-    { file: 'black-cat.svg', char: 'animal', color: 'neutral', name: 'Black Cat' },
-    { file: 'black-circle.svg', char: 'shape', color: 'neutral', name: 'Black Circle' },
-    { file: 'black-heart.svg', char: 'shape', color: 'neutral', name: 'Black Heart' },
-    { file: 'black-square.svg', char: 'shape', color: 'neutral', name: 'Black Square' },
-    { file: 'blossom.svg', char: 'plant', color: 'neutral', name: 'Blossom' },
-    { file: 'blowfish.svg', char: 'animal', color: 'neutral', name: 'Blowfish' },
-    { file: 'blue-circle.svg', char: 'shape', color: 'neutral', name: 'Blue Circle' },
-    { file: 'blue-diamond.svg', char: 'shape', color: 'neutral', name: 'Blue Diamond' },
-    { file: 'blue-heart.svg', char: 'shape', color: 'neutral', name: 'Blue Heart' },
-    { file: 'blue-square.svg', char: 'shape', color: 'neutral', name: 'Blue Square' },
-    { file: 'boar.svg', char: 'animal', color: 'neutral', name: 'Boar' },
-    { file: 'bouquet.svg', char: 'plant', color: 'neutral', name: 'Bouquet' },
-    { file: 'bow.svg', char: 'game', color: 'neutral', name: 'Bow' },
-    { file: 'brick.svg', char: 'building', color: 'neutral', name: 'Brick' },
-    { file: 'broken-heart.svg', char: 'shape', color: 'neutral', name: 'Broken Heart' },
-    { file: 'brown-circle.svg', char: 'shape', color: 'neutral', name: 'Brown Circle' },
-    { file: 'brown-heart.svg', char: 'shape', color: 'neutral', name: 'Brown Heart' },
-    { file: 'brown-square.svg', char: 'shape', color: 'neutral', name: 'Brown Square' },
-    { file: 'bug.svg', char: 'animal', color: 'neutral', name: 'Bug' },
-    { file: 'bullet-train.svg', char: 'vehicle', color: 'neutral', name: 'Bullet Train' },
-    { file: 'bullseye.svg', char: 'game', color: 'neutral', name: 'Bullseye' },
-    { file: 'bus-stop.svg', char: 'vehicle', color: 'neutral', name: 'Bus Stop' },
-    { file: 'bus.svg', char: 'vehicle', color: 'neutral', name: 'Bus' },
-    { file: 'butterfly.svg', char: 'animal', color: 'neutral', name: 'Butterfly' },
-    { file: 'cactus.svg', char: 'plant', color: 'neutral', name: 'Cactus' },
-    { file: 'camel.svg', char: 'animal', color: 'neutral', name: 'Camel' },
-    { file: 'camping.svg', char: 'building', color: 'neutral', name: 'Camping' },
-    { file: 'canoe.svg', char: 'vehicle', color: 'neutral', name: 'Canoe' },
-    { file: 'castle.svg', char: 'building', color: 'neutral', name: 'Castle' },
-    { file: 'cat.svg', char: 'animal', color: 'neutral', name: 'Cat' },
-    { file: 'caterpillar.svg', char: 'animal', color: 'neutral', name: 'Caterpillar' },
-    { file: 'chart-down.svg', char: 'shape', color: 'neutral', name: 'Chart Down' },
-    { file: 'chart-up.svg', char: 'shape', color: 'neutral', name: 'Chart Up' },
-    { file: 'check-mark.svg', char: 'shape', color: 'neutral', name: 'Check Mark' },
-    { file: 'cherry-blossom.svg', char: 'plant', color: 'neutral', name: 'Cherry Blossom' },
-    { file: 'chess-pawn.svg', char: 'game', color: 'neutral', name: 'Chess Pawn' },
-    { file: 'chipmunk.svg', char: 'animal', color: 'neutral', name: 'Chipmunk' },
-    { file: 'church.svg', char: 'building', color: 'neutral', name: 'Church' },
-    { file: 'classical-building.svg', char: 'building', color: 'neutral', name: 'Classical Building' },
-    { file: 'cloud-lightning-rain.svg', char: 'vehicle', color: 'neutral', name: 'Cloud Lightning Rain' },
-    { file: 'cloud-lightning.svg', char: 'vehicle', color: 'neutral', name: 'Cloud Lightning' },
-    { file: 'cloud-rain.svg', char: 'terrain', color: 'neutral', name: 'Cloud Rain' },
-    { file: 'cloud-snow.svg', char: 'terrain', color: 'neutral', name: 'Cloud Snow' },
-    { file: 'cloud.svg', char: 'terrain', color: 'neutral', name: 'Cloud' },
-    { file: 'club-suit.svg', char: 'game', color: 'neutral', name: 'Club Suit' },
-    { file: 'cockroach.svg', char: 'animal', color: 'neutral', name: 'Cockroach' },
-    { file: 'comet.svg', char: 'terrain', color: 'neutral', name: 'Comet' },
-    { file: 'construction.svg', char: 'vehicle', color: 'neutral', name: 'Construction' },
-    { file: 'convenience-store.svg', char: 'building', color: 'neutral', name: 'Convenience Store' },
-    { file: 'coral.svg', char: 'animal', color: 'neutral', name: 'Coral' },
-    { file: 'cow.svg', char: 'animal', color: 'neutral', name: 'Cow' },
-    { file: 'crab.svg', char: 'animal', color: 'neutral', name: 'Crab' },
-    { file: 'crescent-moon.svg', char: 'terrain', color: 'neutral', name: 'Crescent Moon' },
-    { file: 'cricket.svg', char: 'animal', color: 'neutral', name: 'Cricket' },
-    { file: 'croc.svg', char: 'animal', color: 'neutral', name: 'Croc' },
-    { file: 'cross-mark.svg', char: 'shape', color: 'neutral', name: 'Cross Mark' },
-    { file: 'crown.svg', char: 'game', color: 'neutral', name: 'Crown' },
-    { file: 'crystal-ball.svg', char: 'game', color: 'neutral', name: 'Crystal Ball' },
-    { file: 'curling.svg', char: 'game', color: 'neutral', name: 'Curling' },
-    { file: 'currency-exchange.svg', char: 'shape', color: 'neutral', name: 'Currency Exchange' },
-    { file: 'cyclone.svg', char: 'terrain', color: 'neutral', name: 'Cyclone' },
-    { file: 'dagger.svg', char: 'game', color: 'neutral', name: 'Dagger' },
-    { file: 'deciduous.svg', char: 'plant', color: 'neutral', name: 'Deciduous' },
-    { file: 'deer.svg', char: 'animal', color: 'neutral', name: 'Deer' },
-    { file: 'delivery-truck.svg', char: 'vehicle', color: 'neutral', name: 'Delivery Truck' },
-    { file: 'department-store.svg', char: 'building', color: 'neutral', name: 'Department Store' },
-    { file: 'derelict-house.svg', char: 'building', color: 'neutral', name: 'Derelict House' },
-    { file: 'desert-island.svg', char: 'building', color: 'neutral', name: 'Desert Island' },
-    { file: 'desert.svg', char: 'building', color: 'neutral', name: 'Desert' },
-    { file: 'dharma-wheel.svg', char: 'shape', color: 'neutral', name: 'Dharma Wheel' },
-    { file: 'diamond-dot.svg', char: 'shape', color: 'neutral', name: 'Diamond Dot' },
-    { file: 'diamond-suit.svg', char: 'game', color: 'neutral', name: 'Diamond Suit' },
-    { file: 'dinosaur.svg', char: 'animal', color: 'neutral', name: 'Dinosaur' },
-    { file: 'dodo.svg', char: 'animal', color: 'neutral', name: 'Dodo' },
-    { file: 'dog-face.svg', char: 'animal', color: 'neutral', name: 'Dog Face' },
-    { file: 'dog.svg', char: 'animal', color: 'neutral', name: 'Dog' },
-    { file: 'dollar.svg', char: 'shape', color: 'neutral', name: 'Dollar' },
-    { file: 'dolphin.svg', char: 'animal', color: 'neutral', name: 'Dolphin' },
-    { file: 'donkey.svg', char: 'animal', color: 'neutral', name: 'Donkey' },
-    { file: 'dove.svg', char: 'animal', color: 'neutral', name: 'Dove' },
-    { file: 'dragon.svg', char: 'animal', color: 'neutral', name: 'Dragon' },
-    { file: 'droplet.svg', char: 'terrain', color: 'neutral', name: 'Droplet' },
-    { file: 'duck.svg', char: 'animal', color: 'neutral', name: 'Duck' },
-    { file: 'eagle.svg', char: 'animal', color: 'neutral', name: 'Eagle' },
-    { file: 'ear-of-rice.svg', char: 'plant', color: 'neutral', name: 'Ear Of Rice' },
-    { file: 'eight-pointed.svg', char: 'shape', color: 'neutral', name: 'Eight Pointed' },
-    { file: 'eight-spoked.svg', char: 'other', color: 'neutral', name: 'Eight Spoked' },
-    { file: 'elephant.svg', char: 'animal', color: 'neutral', name: 'Elephant' },
-    { file: 'elf.svg', char: 'fantasy', color: 'neutral', name: 'Elf' },
-    { file: 'evergreen.svg', char: 'plant', color: 'neutral', name: 'Evergreen' },
-    { file: 'factory.svg', char: 'building', color: 'neutral', name: 'Factory' },
-    { file: 'fairy.svg', char: 'fantasy', color: 'neutral', name: 'Fairy' },
-    { file: 'fallen-leaf.svg', char: 'plant', color: 'neutral', name: 'Fallen Leaf' },
-    { file: 'feather.svg', char: 'animal', color: 'neutral', name: 'Feather' },
-    { file: 'ferry.svg', char: 'vehicle', color: 'neutral', name: 'Ferry' },
-    { file: 'fire-engine.svg', char: 'vehicle', color: 'neutral', name: 'Fire Engine' },
-    { file: 'fire.svg', char: 'terrain', color: 'neutral', name: 'Fire' },
-    { file: 'first-quarter.svg', char: 'other', color: 'neutral', name: 'First Quarter' },
-    { file: 'fish.svg', char: 'animal', color: 'neutral', name: 'Fish' },
-    { file: 'fishing.svg', char: 'game', color: 'neutral', name: 'Fishing' },
-    { file: 'flamingo.svg', char: 'animal', color: 'neutral', name: 'Flamingo' },
-    { file: 'fleur-de-lis.svg', char: 'shape', color: 'neutral', name: 'Fleur De Lis' },
-    { file: 'flower-cards.svg', char: 'game', color: 'neutral', name: 'Flower Cards' },
-    { file: 'fly.svg', char: 'animal', color: 'neutral', name: 'Fly' },
-    { file: 'flying-disc.svg', char: 'game', color: 'neutral', name: 'Flying Disc' },
-    { file: 'flying-saucer.svg', char: 'vehicle', color: 'neutral', name: 'Flying Saucer' },
-    { file: 'fog.svg', char: 'terrain', color: 'neutral', name: 'Fog' },
-    { file: 'fountain.svg', char: 'building', color: 'neutral', name: 'Fountain' },
-    { file: 'four-leaf-clover.svg', char: 'plant', color: 'neutral', name: 'Four Leaf Clover' },
-    { file: 'fox.svg', char: 'animal', color: 'neutral', name: 'Fox' },
-    { file: 'frog.svg', char: 'animal', color: 'neutral', name: 'Frog' },
-    { file: 'fuel-pump.svg', char: 'vehicle', color: 'neutral', name: 'Fuel Pump' },
-    { file: 'full-moon.svg', char: 'terrain', color: 'neutral', name: 'Full Moon' },
-    { file: 'game-die.svg', char: 'game', color: 'neutral', name: 'Game Die' },
-    { file: 'genie.svg', char: 'fantasy', color: 'neutral', name: 'Genie' },
-    { file: 'giraffe.svg', char: 'animal', color: 'neutral', name: 'Giraffe' },
-    { file: 'globe-americas.svg', char: 'terrain', color: 'neutral', name: 'Globe Americas' },
-    { file: 'globe-asia.svg', char: 'terrain', color: 'neutral', name: 'Globe Asia' },
-    { file: 'globe-europe.svg', char: 'terrain', color: 'neutral', name: 'Globe Europe' },
-    { file: 'globe-meridians.svg', char: 'shape', color: 'neutral', name: 'Globe Meridians' },
-    { file: 'glowing-star.svg', char: 'terrain', color: 'neutral', name: 'Glowing Star' },
-    { file: 'goat.svg', char: 'animal', color: 'neutral', name: 'Goat' },
-    { file: 'goose.svg', char: 'animal', color: 'neutral', name: 'Goose' },
-    { file: 'gorilla.svg', char: 'animal', color: 'neutral', name: 'Gorilla' },
-    { file: 'green-circle.svg', char: 'shape', color: 'neutral', name: 'Green Circle' },
-    { file: 'green-heart.svg', char: 'shape', color: 'neutral', name: 'Green Heart' },
-    { file: 'green-square.svg', char: 'shape', color: 'neutral', name: 'Green Square' },
-    { file: 'guide-dog.svg', char: 'animal', color: 'neutral', name: 'Guide Dog' },
-    { file: 'hamster.svg', char: 'animal', color: 'neutral', name: 'Hamster' },
-    { file: 'heart-exclamation.svg', char: 'shape', color: 'neutral', name: 'Heart Exclamation' },
-    { file: 'heart-suit.svg', char: 'game', color: 'neutral', name: 'Heart Suit' },
-    { file: 'hedgehog.svg', char: 'animal', color: 'neutral', name: 'Hedgehog' },
-    { file: 'helicopter.svg', char: 'vehicle', color: 'neutral', name: 'Helicopter' },
-    { file: 'herb.svg', char: 'plant', color: 'neutral', name: 'Herb' },
-    { file: 'hibiscus.svg', char: 'plant', color: 'neutral', name: 'Hibiscus' },
-    { file: 'hippo.svg', char: 'animal', color: 'neutral', name: 'Hippo' },
-    { file: 'hollow-circle.svg', char: 'shape', color: 'neutral', name: 'Hollow Circle' },
-    { file: 'horse.svg', char: 'animal', color: 'neutral', name: 'Horse' },
-    { file: 'hospital.svg', char: 'building', color: 'neutral', name: 'Hospital' },
-    { file: 'house-garden.svg', char: 'building', color: 'neutral', name: 'House Garden' },
-    { file: 'house.svg', char: 'building', color: 'neutral', name: 'House' },
-    { file: 'hut.svg', char: 'building', color: 'neutral', name: 'Hut' },
-    { file: 'ice-hockey.svg', char: 'game', color: 'neutral', name: 'Ice Hockey' },
-    { file: 'infinity.svg', char: 'shape', color: 'neutral', name: 'Infinity' },
-    { file: 'japanese-castle.svg', char: 'building', color: 'neutral', name: 'Japanese Castle' },
-    { file: 'jellyfish.svg', char: 'animal', color: 'neutral', name: 'Jellyfish' },
-    { file: 'joker.svg', char: 'game', color: 'neutral', name: 'Joker' },
-    { file: 'kangaroo.svg', char: 'animal', color: 'neutral', name: 'Kangaroo' },
-    { file: 'kick-scooter.svg', char: 'vehicle', color: 'neutral', name: 'Kick Scooter' },
-    { file: 'koala.svg', char: 'animal', color: 'neutral', name: 'Koala' },
-    { file: 'lacrosse.svg', char: 'game', color: 'neutral', name: 'Lacrosse' },
-    { file: 'ladybug.svg', char: 'animal', color: 'neutral', name: 'Ladybug' },
-    { file: 'last-quarter.svg', char: 'other', color: 'neutral', name: 'Last Quarter' },
-    { file: 'leaf-wind.svg', char: 'terrain', color: 'neutral', name: 'Leaf Wind' },
-    { file: 'leopard.svg', char: 'animal', color: 'neutral', name: 'Leopard' },
-    { file: 'light-rail.svg', char: 'vehicle', color: 'neutral', name: 'Light Rail' },
-    { file: 'lightning.svg', char: 'vehicle', color: 'neutral', name: 'Lightning' },
-    { file: 'lion.svg', char: 'animal', color: 'neutral', name: 'Lion' },
-    { file: 'lizard.svg', char: 'animal', color: 'neutral', name: 'Lizard' },
-    { file: 'llama.svg', char: 'animal', color: 'neutral', name: 'Llama' },
-    { file: 'lobster.svg', char: 'animal', color: 'neutral', name: 'Lobster' },
-    { file: 'locomotive.svg', char: 'vehicle', color: 'neutral', name: 'Locomotive' },
-    { file: 'lorry.svg', char: 'vehicle', color: 'neutral', name: 'Lorry' },
-    { file: 'lotus.svg', char: 'plant', color: 'neutral', name: 'Lotus' },
-    { file: 'love-hotel.svg', char: 'building', color: 'neutral', name: 'Love Hotel' },
-    { file: 'mahjong.svg', char: 'game', color: 'neutral', name: 'Mahjong' },
-    { file: 'mammoth.svg', char: 'animal', color: 'neutral', name: 'Mammoth' },
-    { file: 'maple-leaf.svg', char: 'plant', color: 'neutral', name: 'Maple Leaf' },
-    { file: 'merperson.svg', char: 'fantasy', color: 'neutral', name: 'Merperson' },
-    { file: 'metro.svg', char: 'other', color: 'neutral', name: 'Metro' },
-    { file: 'microbe.svg', char: 'animal', color: 'neutral', name: 'Microbe' },
-    { file: 'milky-way.svg', char: 'terrain', color: 'neutral', name: 'Milky Way' },
-    { file: 'minibus.svg', char: 'vehicle', color: 'neutral', name: 'Minibus' },
-    { file: 'monkey.svg', char: 'animal', color: 'neutral', name: 'Monkey' },
-    { file: 'monorail.svg', char: 'vehicle', color: 'neutral', name: 'Monorail' },
-    { file: 'moon.svg', char: 'terrain', color: 'neutral', name: 'Moon' },
-    { file: 'moose.svg', char: 'animal', color: 'neutral', name: 'Moose' },
-    { file: 'mosque.svg', char: 'building', color: 'neutral', name: 'Mosque' },
-    { file: 'mosquito.svg', char: 'animal', color: 'neutral', name: 'Mosquito' },
-    { file: 'motor-scooter.svg', char: 'vehicle', color: 'neutral', name: 'Motor Scooter' },
-    { file: 'motorcycle.svg', char: 'vehicle', color: 'neutral', name: 'Motorcycle' },
-    { file: 'motorized-wheelchair.svg', char: 'vehicle', color: 'neutral', name: 'Motorized Wheelchair' },
-    { file: 'mount-fuji.svg', char: 'building', color: 'neutral', name: 'Mount Fuji' },
-    { file: 'mountain-cableway.svg', char: 'vehicle', color: 'neutral', name: 'Mountain Cableway' },
-    { file: 'mountain-railway.svg', char: 'vehicle', color: 'neutral', name: 'Mountain Railway' },
-    { file: 'mountain.svg', char: 'terrain', color: 'neutral', name: 'Mountain' },
-    { file: 'mouse.svg', char: 'animal', color: 'neutral', name: 'Mouse' },
-    { file: 'mushroom.svg', char: 'plant', color: 'neutral', name: 'Mushroom' },
-    { file: 'national-park.svg', char: 'building', color: 'neutral', name: 'National Park' },
-    { file: 'new-moon.svg', char: 'terrain', color: 'neutral', name: 'New Moon' },
-    { file: 'night-stars.svg', char: 'terrain', color: 'neutral', name: 'Night Stars' },
-    { file: 'no-entry.svg', char: 'shape', color: 'neutral', name: 'No Entry' },
-    { file: 'ocean.svg', char: 'terrain', color: 'neutral', name: 'Ocean' },
-    { file: 'octopus.svg', char: 'animal', color: 'neutral', name: 'Octopus' },
-    { file: 'office.svg', char: 'building', color: 'neutral', name: 'Office' },
-    { file: 'orange-circle.svg', char: 'shape', color: 'neutral', name: 'Orange Circle' },
-    { file: 'orange-diamond.svg', char: 'shape', color: 'neutral', name: 'Orange Diamond' },
-    { file: 'orange-heart.svg', char: 'shape', color: 'neutral', name: 'Orange Heart' },
-    { file: 'orange-square.svg', char: 'shape', color: 'neutral', name: 'Orange Square' },
-    { file: 'orangutan.svg', char: 'animal', color: 'neutral', name: 'Orangutan' },
-    { file: 'otter.svg', char: 'animal', color: 'neutral', name: 'Otter' },
-    { file: 'owl.svg', char: 'animal', color: 'neutral', name: 'Owl' },
-    { file: 'ox.svg', char: 'animal', color: 'neutral', name: 'Ox' },
-    { file: 'palm.svg', char: 'plant', color: 'neutral', name: 'Palm' },
-    { file: 'panda.svg', char: 'animal', color: 'neutral', name: 'Panda' },
-    { file: 'parachute.svg', char: 'vehicle', color: 'neutral', name: 'Parachute' },
-    { file: 'parrot.svg', char: 'animal', color: 'neutral', name: 'Parrot' },
-    { file: 'peace.svg', char: 'shape', color: 'neutral', name: 'Peace' },
-    { file: 'peacock.svg', char: 'animal', color: 'neutral', name: 'Peacock' },
-    { file: 'penguin.svg', char: 'animal', color: 'neutral', name: 'Penguin' },
-    { file: 'performing-arts.svg', char: 'game', color: 'neutral', name: 'Performing Arts' },
-    { file: 'pickup-truck.svg', char: 'vehicle', color: 'neutral', name: 'Pickup Truck' },
-    { file: 'pig.svg', char: 'animal', color: 'neutral', name: 'Pig' },
-    { file: 'polar-bear.svg', char: 'animal', color: 'neutral', name: 'Polar Bear' },
-    { file: 'police-car.svg', char: 'vehicle', color: 'neutral', name: 'Police Car' },
-    { file: 'police-light.svg', char: 'vehicle', color: 'neutral', name: 'Police Light' },
-    { file: 'poodle.svg', char: 'animal', color: 'neutral', name: 'Poodle' },
-    { file: 'pool-ball.svg', char: 'game', color: 'neutral', name: 'Pool Ball' },
-    { file: 'post-office.svg', char: 'building', color: 'neutral', name: 'Post Office' },
-    { file: 'potted-plant.svg', char: 'plant', color: 'neutral', name: 'Potted Plant' },
-    { file: 'prohibited.svg', char: 'shape', color: 'neutral', name: 'Prohibited' },
-    { file: 'purple-circle.svg', char: 'shape', color: 'neutral', name: 'Purple Circle' },
-    { file: 'purple-heart.svg', char: 'shape', color: 'neutral', name: 'Purple Heart' },
-    { file: 'purple-square.svg', char: 'shape', color: 'neutral', name: 'Purple Square' },
-    { file: 'puzzle.svg', char: 'game', color: 'neutral', name: 'Puzzle' },
-    { file: 'rabbit.svg', char: 'animal', color: 'neutral', name: 'Rabbit' },
-    { file: 'raccoon.svg', char: 'animal', color: 'neutral', name: 'Raccoon' },
-    { file: 'racing-car.svg', char: 'vehicle', color: 'neutral', name: 'Racing Car' },
-    { file: 'radioactive.svg', char: 'shape', color: 'neutral', name: 'Radioactive' },
-    { file: 'rainbow.svg', char: 'game', color: 'neutral', name: 'Rainbow' },
-    { file: 'ram.svg', char: 'animal', color: 'neutral', name: 'Ram' },
-    { file: 'rat.svg', char: 'animal', color: 'neutral', name: 'Rat' },
-    { file: 'recycling.svg', char: 'shape', color: 'neutral', name: 'Recycling' },
-    { file: 'red-circle.svg', char: 'shape', color: 'neutral', name: 'Red Circle' },
-    { file: 'red-heart.svg', char: 'shape', color: 'neutral', name: 'Red Heart' },
-    { file: 'red-square.svg', char: 'shape', color: 'neutral', name: 'Red Square' },
-    { file: 'rhino.svg', char: 'animal', color: 'neutral', name: 'Rhino' },
-    { file: 'ringed-planet.svg', char: 'terrain', color: 'neutral', name: 'Ringed Planet' },
-    { file: 'rock.svg', char: 'building', color: 'neutral', name: 'Rock' },
-    { file: 'rocket.svg', char: 'vehicle', color: 'neutral', name: 'Rocket' },
-    { file: 'roller-skate.svg', char: 'vehicle', color: 'neutral', name: 'Roller Skate' },
-    { file: 'rooster.svg', char: 'animal', color: 'neutral', name: 'Rooster' },
-    { file: 'rose.svg', char: 'plant', color: 'neutral', name: 'Rose' },
-    { file: 'rugby.svg', char: 'game', color: 'neutral', name: 'Rugby' },
-    { file: 'sailboat.svg', char: 'vehicle', color: 'neutral', name: 'Sailboat' },
-    { file: 'school.svg', char: 'building', color: 'neutral', name: 'School' },
-    { file: 'scorpion.svg', char: 'animal', color: 'neutral', name: 'Scorpion' },
-    { file: 'seal.svg', char: 'animal', color: 'neutral', name: 'Seal' },
-    { file: 'seat.svg', char: 'vehicle', color: 'neutral', name: 'Seat' },
-    { file: 'seedling.svg', char: 'plant', color: 'neutral', name: 'Seedling' },
-    { file: 'shamrock.svg', char: 'building', color: 'neutral', name: 'Shamrock' },
-    { file: 'shark.svg', char: 'animal', color: 'neutral', name: 'Shark' },
-    { file: 'shield.svg', char: 'game', color: 'neutral', name: 'Shield' },
-    { file: 'ship.svg', char: 'vehicle', color: 'neutral', name: 'Ship' },
-    { file: 'shooting-star.svg', char: 'terrain', color: 'neutral', name: 'Shooting Star' },
-    { file: 'shrimp.svg', char: 'animal', color: 'neutral', name: 'Shrimp' },
-    { file: 'skateboard.svg', char: 'vehicle', color: 'neutral', name: 'Skateboard' },
-    { file: 'skunk.svg', char: 'animal', color: 'neutral', name: 'Skunk' },
-    { file: 'sled.svg', char: 'game', color: 'neutral', name: 'Sled' },
-    { file: 'sloth.svg', char: 'animal', color: 'neutral', name: 'Sloth' },
-    { file: 'small-airplane.svg', char: 'vehicle', color: 'neutral', name: 'Small Airplane' },
-    { file: 'snail.svg', char: 'animal', color: 'neutral', name: 'Snail' },
-    { file: 'snake.svg', char: 'animal', color: 'neutral', name: 'Snake' },
-    { file: 'snowflake.svg', char: 'terrain', color: 'neutral', name: 'Snowflake' },
-    { file: 'soccer.svg', char: 'game', color: 'neutral', name: 'Soccer' },
-    { file: 'softball.svg', char: 'game', color: 'neutral', name: 'Softball' },
-    { file: 'spade.svg', char: 'game', color: 'neutral', name: 'Spade' },
-    { file: 'sparkles.svg', char: 'terrain', color: 'neutral', name: 'Sparkles' },
-    { file: 'speedboat.svg', char: 'vehicle', color: 'neutral', name: 'Speedboat' },
-    { file: 'spider.svg', char: 'animal', color: 'neutral', name: 'Spider' },
-    { file: 'squid.svg', char: 'animal', color: 'neutral', name: 'Squid' },
-    { file: 'stadium.svg', char: 'building', color: 'neutral', name: 'Stadium' },
-    { file: 'star-of-david.svg', char: 'shape', color: 'neutral', name: 'Star Of David' },
-    { file: 'star.svg', char: 'terrain', color: 'neutral', name: 'Star' },
-    { file: 'statue-of-liberty.svg', char: 'building', color: 'neutral', name: 'Statue Of Liberty' },
-    { file: 'stop-sign.svg', char: 'vehicle', color: 'neutral', name: 'Stop Sign' },
-    { file: 'sun-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Cloud' },
-    { file: 'sun-large-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Large Cloud' },
-    { file: 'sun-rain-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Rain Cloud' },
-    { file: 'sun-small-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Small Cloud' },
-    { file: 'sun.svg', char: 'terrain', color: 'neutral', name: 'Sun' },
-    { file: 'sunflower.svg', char: 'terrain', color: 'neutral', name: 'Sunflower' },
-    { file: 'sunrise-mountains.svg', char: 'terrain', color: 'neutral', name: 'Sunrise Mountains' },
-    { file: 'sunrise.svg', char: 'terrain', color: 'neutral', name: 'Sunrise' },
-    { file: 'sunset.svg', char: 'terrain', color: 'neutral', name: 'Sunset' },
-    { file: 'suspension-railway.svg', char: 'vehicle', color: 'neutral', name: 'Suspension Railway' },
-    { file: 'swan.svg', char: 'animal', color: 'neutral', name: 'Swan' },
-    { file: 'swords.svg', char: 'game', color: 'neutral', name: 'Swords' },
-    { file: 't-rex.svg', char: 'animal', color: 'neutral', name: 'T Rex' },
-    { file: 'table-tennis.svg', char: 'game', color: 'neutral', name: 'Table Tennis' },
-    { file: 'taxi.svg', char: 'vehicle', color: 'neutral', name: 'Taxi' },
-    { file: 'temple.svg', char: 'building', color: 'neutral', name: 'Temple' },
-    { file: 'tennis.svg', char: 'game', color: 'neutral', name: 'Tennis' },
-    { file: 'tent.svg', char: 'building', color: 'neutral', name: 'Tent' },
-    { file: 'thermometer.svg', char: 'terrain', color: 'neutral', name: 'Thermometer' },
-    { file: 'tiger.svg', char: 'animal', color: 'neutral', name: 'Tiger' },
-    { file: 'tokyo-tower.svg', char: 'building', color: 'neutral', name: 'Tokyo Tower' },
-    { file: 'tornado.svg', char: 'terrain', color: 'neutral', name: 'Tornado' },
-    { file: 'tractor.svg', char: 'vehicle', color: 'neutral', name: 'Tractor' },
-    { file: 'traffic-light-h.svg', char: 'vehicle', color: 'neutral', name: 'Traffic Light H' },
-    { file: 'traffic-light-v.svg', char: 'vehicle', color: 'neutral', name: 'Traffic Light V' },
-    { file: 'train.svg', char: 'vehicle', color: 'neutral', name: 'Train' },
-    { file: 'tram-car.svg', char: 'vehicle', color: 'neutral', name: 'Tram Car' },
-    { file: 'tram.svg', char: 'vehicle', color: 'neutral', name: 'Tram' },
-    { file: 'trident.svg', char: 'game', color: 'neutral', name: 'Trident' },
-    { file: 'troll.svg', char: 'fantasy', color: 'neutral', name: 'Troll' },
-    { file: 'trolleybus.svg', char: 'fantasy', color: 'neutral', name: 'Trolleybus' },
-    { file: 'tropical-fish.svg', char: 'animal', color: 'neutral', name: 'Tropical Fish' },
-    { file: 'tulip.svg', char: 'plant', color: 'neutral', name: 'Tulip' },
-    { file: 'turkey.svg', char: 'animal', color: 'neutral', name: 'Turkey' },
-    { file: 'turtle.svg', char: 'animal', color: 'neutral', name: 'Turtle' },
-    { file: 'unicorn.svg', char: 'animal', color: 'neutral', name: 'Unicorn' },
-    { file: 'volcano.svg', char: 'terrain', color: 'neutral', name: 'Volcano' },
-    { file: 'volleyball.svg', char: 'game', color: 'neutral', name: 'Volleyball' },
-    { file: 'waning-crescent.svg', char: 'terrain', color: 'neutral', name: 'Waning Crescent' },
-    { file: 'waning-gibbous.svg', char: 'other', color: 'neutral', name: 'Waning Gibbous' },
-    { file: 'warning.svg', char: 'shape', color: 'neutral', name: 'Warning' },
-    { file: 'water-buffalo.svg', char: 'animal', color: 'neutral', name: 'Water Buffalo' },
-    { file: 'waxing-crescent.svg', char: 'terrain', color: 'neutral', name: 'Waxing Crescent' },
-    { file: 'waxing-gibbous.svg', char: 'other', color: 'neutral', name: 'Waxing Gibbous' },
-    { file: 'whale.svg', char: 'animal', color: 'neutral', name: 'Whale' },
-    { file: 'wheelchair.svg', char: 'vehicle', color: 'neutral', name: 'Wheelchair' },
-    { file: 'white-circle.svg', char: 'shape', color: 'neutral', name: 'White Circle' },
-    { file: 'white-heart.svg', char: 'shape', color: 'neutral', name: 'White Heart' },
-    { file: 'white-square.svg', char: 'shape', color: 'neutral', name: 'White Square' },
-    { file: 'wind-face.svg', char: 'terrain', color: 'neutral', name: 'Wind Face' },
-    { file: 'wolf.svg', char: 'animal', color: 'neutral', name: 'Wolf' },
-    { file: 'wood.svg', char: 'building', color: 'neutral', name: 'Wood' },
-    { file: 'worm.svg', char: 'animal', color: 'neutral', name: 'Worm' },
-    { file: 'yellow-circle.svg', char: 'shape', color: 'neutral', name: 'Yellow Circle' },
-    { file: 'yellow-heart.svg', char: 'shape', color: 'neutral', name: 'Yellow Heart' },
-    { file: 'yellow-square.svg', char: 'shape', color: 'neutral', name: 'Yellow Square' },
-    { file: 'yin-yang.svg', char: 'shape', color: 'neutral', name: 'Yin Yang' },
-    { file: 'zebra.svg', char: 'animal', color: 'neutral', name: 'Zebra' },
-    { file: 'zombie.svg', char: 'fantasy', color: 'neutral', name: 'Zombie' },
-    ]
-  },
-  {
-    id: 'twemoji',
-    name: 'Twemoji (Game Tokens)',
-    path: '../assets/pieces/sets/twemoji/',
-    author: 'Twitter / jdecked',
-    license: 'CC-BY 4.0',
-    recolorable: false,
-    notes: '358 game-relevant emoji. Flat style, gradient-free. Animals, shapes, vehicles, buildings, terrain, fantasy.',
-    pieces: [
-    { file: 'aerial-tramway.svg', char: 'vehicle', color: 'neutral', name: 'Aerial Tramway' },
-    { file: 'airplane.svg', char: 'vehicle', color: 'neutral', name: 'Airplane' },
-    { file: 'ambulance.svg', char: 'vehicle', color: 'neutral', name: 'Ambulance' },
-    { file: 'american-football.svg', char: 'game', color: 'neutral', name: 'American Football' },
-    { file: 'anchor.svg', char: 'vehicle', color: 'neutral', name: 'Anchor' },
-    { file: 'ant.svg', char: 'animal', color: 'neutral', name: 'Ant' },
-    { file: 'atom.svg', char: 'shape', color: 'neutral', name: 'Atom' },
-    { file: 'auto-rickshaw.svg', char: 'vehicle', color: 'neutral', name: 'Auto Rickshaw' },
-    { file: 'badger.svg', char: 'animal', color: 'neutral', name: 'Badger' },
-    { file: 'badminton.svg', char: 'game', color: 'neutral', name: 'Badminton' },
-    { file: 'bank.svg', char: 'building', color: 'neutral', name: 'Bank' },
-    { file: 'baseball.svg', char: 'game', color: 'neutral', name: 'Baseball' },
-    { file: 'basketball.svg', char: 'game', color: 'neutral', name: 'Basketball' },
-    { file: 'bat.svg', char: 'animal', color: 'neutral', name: 'Bat' },
-    { file: 'beach.svg', char: 'building', color: 'neutral', name: 'Beach' },
-    { file: 'bear.svg', char: 'animal', color: 'neutral', name: 'Bear' },
-    { file: 'beaver.svg', char: 'animal', color: 'neutral', name: 'Beaver' },
-    { file: 'bee.svg', char: 'animal', color: 'neutral', name: 'Bee' },
-    { file: 'beetle.svg', char: 'animal', color: 'neutral', name: 'Beetle' },
-    { file: 'bicycle.svg', char: 'vehicle', color: 'neutral', name: 'Bicycle' },
-    { file: 'biohazard.svg', char: 'shape', color: 'neutral', name: 'Biohazard' },
-    { file: 'bird.svg', char: 'animal', color: 'neutral', name: 'Bird' },
-    { file: 'bison.svg', char: 'animal', color: 'neutral', name: 'Bison' },
-    { file: 'black-cat.svg', char: 'animal', color: 'neutral', name: 'Black Cat' },
-    { file: 'black-circle.svg', char: 'shape', color: 'neutral', name: 'Black Circle' },
-    { file: 'black-heart.svg', char: 'shape', color: 'neutral', name: 'Black Heart' },
-    { file: 'black-square.svg', char: 'shape', color: 'neutral', name: 'Black Square' },
-    { file: 'blackbird.svg', char: 'animal', color: 'neutral', name: 'Blackbird' },
-    { file: 'blossom.svg', char: 'plant', color: 'neutral', name: 'Blossom' },
-    { file: 'blowfish.svg', char: 'animal', color: 'neutral', name: 'Blowfish' },
-    { file: 'blue-circle.svg', char: 'shape', color: 'neutral', name: 'Blue Circle' },
-    { file: 'blue-diamond.svg', char: 'shape', color: 'neutral', name: 'Blue Diamond' },
-    { file: 'blue-heart.svg', char: 'shape', color: 'neutral', name: 'Blue Heart' },
-    { file: 'blue-square.svg', char: 'shape', color: 'neutral', name: 'Blue Square' },
-    { file: 'boar.svg', char: 'animal', color: 'neutral', name: 'Boar' },
-    { file: 'bouquet.svg', char: 'plant', color: 'neutral', name: 'Bouquet' },
-    { file: 'bow.svg', char: 'game', color: 'neutral', name: 'Bow' },
-    { file: 'brick.svg', char: 'building', color: 'neutral', name: 'Brick' },
-    { file: 'bright.svg', char: 'shape', color: 'neutral', name: 'Bright' },
-    { file: 'broken-heart.svg', char: 'shape', color: 'neutral', name: 'Broken Heart' },
-    { file: 'brown-circle.svg', char: 'shape', color: 'neutral', name: 'Brown Circle' },
-    { file: 'brown-heart.svg', char: 'shape', color: 'neutral', name: 'Brown Heart' },
-    { file: 'brown-square.svg', char: 'shape', color: 'neutral', name: 'Brown Square' },
-    { file: 'bug.svg', char: 'animal', color: 'neutral', name: 'Bug' },
-    { file: 'bullet-train.svg', char: 'vehicle', color: 'neutral', name: 'Bullet Train' },
-    { file: 'bullseye.svg', char: 'game', color: 'neutral', name: 'Bullseye' },
-    { file: 'bus-stop.svg', char: 'vehicle', color: 'neutral', name: 'Bus Stop' },
-    { file: 'bus.svg', char: 'vehicle', color: 'neutral', name: 'Bus' },
-    { file: 'butterfly.svg', char: 'animal', color: 'neutral', name: 'Butterfly' },
-    { file: 'cactus.svg', char: 'plant', color: 'neutral', name: 'Cactus' },
-    { file: 'camel.svg', char: 'animal', color: 'neutral', name: 'Camel' },
-    { file: 'camping.svg', char: 'building', color: 'neutral', name: 'Camping' },
-    { file: 'canoe.svg', char: 'vehicle', color: 'neutral', name: 'Canoe' },
-    { file: 'castle.svg', char: 'building', color: 'neutral', name: 'Castle' },
-    { file: 'cat.svg', char: 'animal', color: 'neutral', name: 'Cat' },
-    { file: 'chart-down.svg', char: 'shape', color: 'neutral', name: 'Chart Down' },
-    { file: 'chart-up.svg', char: 'shape', color: 'neutral', name: 'Chart Up' },
-    { file: 'check-mark.svg', char: 'shape', color: 'neutral', name: 'Check Mark' },
-    { file: 'cherry-blossom.svg', char: 'plant', color: 'neutral', name: 'Cherry Blossom' },
-    { file: 'chess-pawn.svg', char: 'game', color: 'neutral', name: 'Chess Pawn' },
-    { file: 'chipmunk.svg', char: 'animal', color: 'neutral', name: 'Chipmunk' },
-    { file: 'church.svg', char: 'building', color: 'neutral', name: 'Church' },
-    { file: 'classical-building.svg', char: 'building', color: 'neutral', name: 'Classical Building' },
-    { file: 'cloud-lightning-rain.svg', char: 'vehicle', color: 'neutral', name: 'Cloud Lightning Rain' },
-    { file: 'cloud-lightning.svg', char: 'vehicle', color: 'neutral', name: 'Cloud Lightning' },
-    { file: 'cloud-rain.svg', char: 'terrain', color: 'neutral', name: 'Cloud Rain' },
-    { file: 'cloud-snow.svg', char: 'terrain', color: 'neutral', name: 'Cloud Snow' },
-    { file: 'cloud.svg', char: 'terrain', color: 'neutral', name: 'Cloud' },
-    { file: 'club-suit.svg', char: 'game', color: 'neutral', name: 'Club Suit' },
-    { file: 'cockroach.svg', char: 'animal', color: 'neutral', name: 'Cockroach' },
-    { file: 'comet.svg', char: 'terrain', color: 'neutral', name: 'Comet' },
-    { file: 'construction.svg', char: 'vehicle', color: 'neutral', name: 'Construction' },
-    { file: 'convenience-store.svg', char: 'building', color: 'neutral', name: 'Convenience Store' },
-    { file: 'coral.svg', char: 'animal', color: 'neutral', name: 'Coral' },
-    { file: 'cow.svg', char: 'animal', color: 'neutral', name: 'Cow' },
-    { file: 'crab.svg', char: 'animal', color: 'neutral', name: 'Crab' },
-    { file: 'cricket.svg', char: 'animal', color: 'neutral', name: 'Cricket' },
-    { file: 'croc.svg', char: 'animal', color: 'neutral', name: 'Croc' },
-    { file: 'cross-mark.svg', char: 'shape', color: 'neutral', name: 'Cross Mark' },
-    { file: 'crown.svg', char: 'game', color: 'neutral', name: 'Crown' },
-    { file: 'crystal-ball.svg', char: 'game', color: 'neutral', name: 'Crystal Ball' },
-    { file: 'curling.svg', char: 'game', color: 'neutral', name: 'Curling' },
-    { file: 'currency-exchange.svg', char: 'shape', color: 'neutral', name: 'Currency Exchange' },
-    { file: 'cyclone.svg', char: 'terrain', color: 'neutral', name: 'Cyclone' },
-    { file: 'dagger.svg', char: 'game', color: 'neutral', name: 'Dagger' },
-    { file: 'deciduous.svg', char: 'plant', color: 'neutral', name: 'Deciduous' },
-    { file: 'deer.svg', char: 'animal', color: 'neutral', name: 'Deer' },
-    { file: 'delivery-truck.svg', char: 'vehicle', color: 'neutral', name: 'Delivery Truck' },
-    { file: 'department-store.svg', char: 'building', color: 'neutral', name: 'Department Store' },
-    { file: 'derelict-house.svg', char: 'building', color: 'neutral', name: 'Derelict House' },
-    { file: 'desert-island.svg', char: 'building', color: 'neutral', name: 'Desert Island' },
-    { file: 'desert.svg', char: 'building', color: 'neutral', name: 'Desert' },
-    { file: 'dharma-wheel.svg', char: 'shape', color: 'neutral', name: 'Dharma Wheel' },
-    { file: 'diamond-dot.svg', char: 'shape', color: 'neutral', name: 'Diamond Dot' },
-    { file: 'diamond-suit.svg', char: 'game', color: 'neutral', name: 'Diamond Suit' },
-    { file: 'dim.svg', char: 'shape', color: 'neutral', name: 'Dim' },
-    { file: 'dinosaur.svg', char: 'animal', color: 'neutral', name: 'Dinosaur' },
-    { file: 'dodo.svg', char: 'animal', color: 'neutral', name: 'Dodo' },
-    { file: 'dog-face.svg', char: 'animal', color: 'neutral', name: 'Dog Face' },
-    { file: 'dog.svg', char: 'animal', color: 'neutral', name: 'Dog' },
-    { file: 'dollar.svg', char: 'shape', color: 'neutral', name: 'Dollar' },
-    { file: 'dolphin.svg', char: 'animal', color: 'neutral', name: 'Dolphin' },
-    { file: 'donkey.svg', char: 'animal', color: 'neutral', name: 'Donkey' },
-    { file: 'dove.svg', char: 'animal', color: 'neutral', name: 'Dove' },
-    { file: 'dragon.svg', char: 'animal', color: 'neutral', name: 'Dragon' },
-    { file: 'droplet.svg', char: 'terrain', color: 'neutral', name: 'Droplet' },
-    { file: 'duck.svg', char: 'animal', color: 'neutral', name: 'Duck' },
-    { file: 'eagle.svg', char: 'animal', color: 'neutral', name: 'Eagle' },
-    { file: 'ear-of-rice.svg', char: 'plant', color: 'neutral', name: 'Ear Of Rice' },
-    { file: 'eight-pointed.svg', char: 'shape', color: 'neutral', name: 'Eight Pointed' },
-    { file: 'eight-spoked.svg', char: 'other', color: 'neutral', name: 'Eight Spoked' },
-    { file: 'elephant.svg', char: 'animal', color: 'neutral', name: 'Elephant' },
-    { file: 'elf.svg', char: 'fantasy', color: 'neutral', name: 'Elf' },
-    { file: 'evergreen.svg', char: 'plant', color: 'neutral', name: 'Evergreen' },
-    { file: 'factory.svg', char: 'building', color: 'neutral', name: 'Factory' },
-    { file: 'fairy.svg', char: 'fantasy', color: 'neutral', name: 'Fairy' },
-    { file: 'fallen-leaf.svg', char: 'plant', color: 'neutral', name: 'Fallen Leaf' },
-    { file: 'ferry.svg', char: 'vehicle', color: 'neutral', name: 'Ferry' },
-    { file: 'fire-engine.svg', char: 'vehicle', color: 'neutral', name: 'Fire Engine' },
-    { file: 'fire.svg', char: 'terrain', color: 'neutral', name: 'Fire' },
-    { file: 'first-quarter.svg', char: 'other', color: 'neutral', name: 'First Quarter' },
-    { file: 'fish.svg', char: 'animal', color: 'neutral', name: 'Fish' },
-    { file: 'fishing.svg', char: 'game', color: 'neutral', name: 'Fishing' },
-    { file: 'flamingo.svg', char: 'animal', color: 'neutral', name: 'Flamingo' },
-    { file: 'fleur-de-lis.svg', char: 'shape', color: 'neutral', name: 'Fleur De Lis' },
-    { file: 'flower-cards.svg', char: 'game', color: 'neutral', name: 'Flower Cards' },
-    { file: 'fly.svg', char: 'animal', color: 'neutral', name: 'Fly' },
-    { file: 'flying-disc.svg', char: 'game', color: 'neutral', name: 'Flying Disc' },
-    { file: 'flying-saucer.svg', char: 'vehicle', color: 'neutral', name: 'Flying Saucer' },
-    { file: 'fog.svg', char: 'terrain', color: 'neutral', name: 'Fog' },
-    { file: 'fountain.svg', char: 'building', color: 'neutral', name: 'Fountain' },
-    { file: 'four-leaf-clover.svg', char: 'plant', color: 'neutral', name: 'Four Leaf Clover' },
-    { file: 'fox.svg', char: 'animal', color: 'neutral', name: 'Fox' },
-    { file: 'frog.svg', char: 'animal', color: 'neutral', name: 'Frog' },
-    { file: 'fuel-pump.svg', char: 'vehicle', color: 'neutral', name: 'Fuel Pump' },
-    { file: 'game-die.svg', char: 'game', color: 'neutral', name: 'Game Die' },
-    { file: 'genie.svg', char: 'fantasy', color: 'neutral', name: 'Genie' },
-    { file: 'giraffe.svg', char: 'animal', color: 'neutral', name: 'Giraffe' },
-    { file: 'globe-americas.svg', char: 'terrain', color: 'neutral', name: 'Globe Americas' },
-    { file: 'globe-asia.svg', char: 'terrain', color: 'neutral', name: 'Globe Asia' },
-    { file: 'globe-europe.svg', char: 'terrain', color: 'neutral', name: 'Globe Europe' },
-    { file: 'globe-meridians.svg', char: 'shape', color: 'neutral', name: 'Globe Meridians' },
-    { file: 'glowing-star.svg', char: 'terrain', color: 'neutral', name: 'Glowing Star' },
-    { file: 'goat.svg', char: 'animal', color: 'neutral', name: 'Goat' },
-    { file: 'goblin.svg', char: 'fantasy', color: 'neutral', name: 'Goblin' },
-    { file: 'goose.svg', char: 'animal', color: 'neutral', name: 'Goose' },
-    { file: 'gorilla.svg', char: 'animal', color: 'neutral', name: 'Gorilla' },
-    { file: 'green-circle.svg', char: 'shape', color: 'neutral', name: 'Green Circle' },
-    { file: 'green-heart.svg', char: 'shape', color: 'neutral', name: 'Green Heart' },
-    { file: 'green-square.svg', char: 'shape', color: 'neutral', name: 'Green Square' },
-    { file: 'hamster.svg', char: 'animal', color: 'neutral', name: 'Hamster' },
-    { file: 'heart-suit.svg', char: 'game', color: 'neutral', name: 'Heart Suit' },
-    { file: 'hedgehog.svg', char: 'animal', color: 'neutral', name: 'Hedgehog' },
-    { file: 'helicopter.svg', char: 'vehicle', color: 'neutral', name: 'Helicopter' },
-    { file: 'herb.svg', char: 'plant', color: 'neutral', name: 'Herb' },
-    { file: 'hibiscus.svg', char: 'plant', color: 'neutral', name: 'Hibiscus' },
-    { file: 'hippo.svg', char: 'animal', color: 'neutral', name: 'Hippo' },
-    { file: 'hollow-circle.svg', char: 'shape', color: 'neutral', name: 'Hollow Circle' },
-    { file: 'horse.svg', char: 'animal', color: 'neutral', name: 'Horse' },
-    { file: 'hospital.svg', char: 'building', color: 'neutral', name: 'Hospital' },
-    { file: 'house-garden.svg', char: 'building', color: 'neutral', name: 'House Garden' },
-    { file: 'house.svg', char: 'building', color: 'neutral', name: 'House' },
-    { file: 'hut.svg', char: 'building', color: 'neutral', name: 'Hut' },
-    { file: 'ice-hockey.svg', char: 'game', color: 'neutral', name: 'Ice Hockey' },
-    { file: 'infinity.svg', char: 'shape', color: 'neutral', name: 'Infinity' },
-    { file: 'japanese-castle.svg', char: 'building', color: 'neutral', name: 'Japanese Castle' },
-    { file: 'jellyfish.svg', char: 'animal', color: 'neutral', name: 'Jellyfish' },
-    { file: 'joker.svg', char: 'game', color: 'neutral', name: 'Joker' },
-    { file: 'kangaroo.svg', char: 'animal', color: 'neutral', name: 'Kangaroo' },
-    { file: 'kick-scooter.svg', char: 'vehicle', color: 'neutral', name: 'Kick Scooter' },
-    { file: 'koala.svg', char: 'animal', color: 'neutral', name: 'Koala' },
-    { file: 'lacrosse.svg', char: 'game', color: 'neutral', name: 'Lacrosse' },
-    { file: 'ladybug.svg', char: 'animal', color: 'neutral', name: 'Ladybug' },
-    { file: 'last-quarter.svg', char: 'other', color: 'neutral', name: 'Last Quarter' },
-    { file: 'leaf-wind.svg', char: 'terrain', color: 'neutral', name: 'Leaf Wind' },
-    { file: 'leopard.svg', char: 'animal', color: 'neutral', name: 'Leopard' },
-    { file: 'light-rail.svg', char: 'vehicle', color: 'neutral', name: 'Light Rail' },
-    { file: 'lightning.svg', char: 'vehicle', color: 'neutral', name: 'Lightning' },
-    { file: 'lion.svg', char: 'animal', color: 'neutral', name: 'Lion' },
-    { file: 'lizard.svg', char: 'animal', color: 'neutral', name: 'Lizard' },
-    { file: 'llama.svg', char: 'animal', color: 'neutral', name: 'Llama' },
-    { file: 'lobster.svg', char: 'animal', color: 'neutral', name: 'Lobster' },
-    { file: 'locomotive.svg', char: 'vehicle', color: 'neutral', name: 'Locomotive' },
-    { file: 'lorry.svg', char: 'vehicle', color: 'neutral', name: 'Lorry' },
-    { file: 'lotus.svg', char: 'plant', color: 'neutral', name: 'Lotus' },
-    { file: 'love-hotel.svg', char: 'building', color: 'neutral', name: 'Love Hotel' },
-    { file: 'mahjong.svg', char: 'game', color: 'neutral', name: 'Mahjong' },
-    { file: 'mammoth.svg', char: 'animal', color: 'neutral', name: 'Mammoth' },
-    { file: 'maple-leaf.svg', char: 'plant', color: 'neutral', name: 'Maple Leaf' },
-    { file: 'merperson.svg', char: 'fantasy', color: 'neutral', name: 'Merperson' },
-    { file: 'metro.svg', char: 'other', color: 'neutral', name: 'Metro' },
-    { file: 'microbe.svg', char: 'animal', color: 'neutral', name: 'Microbe' },
-    { file: 'milky-way.svg', char: 'terrain', color: 'neutral', name: 'Milky Way' },
-    { file: 'minibus.svg', char: 'vehicle', color: 'neutral', name: 'Minibus' },
-    { file: 'monkey.svg', char: 'animal', color: 'neutral', name: 'Monkey' },
-    { file: 'monorail.svg', char: 'vehicle', color: 'neutral', name: 'Monorail' },
-    { file: 'moon.svg', char: 'terrain', color: 'neutral', name: 'Moon' },
-    { file: 'moose.svg', char: 'animal', color: 'neutral', name: 'Moose' },
-    { file: 'mosque.svg', char: 'building', color: 'neutral', name: 'Mosque' },
-    { file: 'mosquito.svg', char: 'animal', color: 'neutral', name: 'Mosquito' },
-    { file: 'motor-scooter.svg', char: 'vehicle', color: 'neutral', name: 'Motor Scooter' },
-    { file: 'motorcycle.svg', char: 'vehicle', color: 'neutral', name: 'Motorcycle' },
-    { file: 'motorized-wheelchair.svg', char: 'vehicle', color: 'neutral', name: 'Motorized Wheelchair' },
-    { file: 'mount-fuji.svg', char: 'building', color: 'neutral', name: 'Mount Fuji' },
-    { file: 'mountain-cableway.svg', char: 'vehicle', color: 'neutral', name: 'Mountain Cableway' },
-    { file: 'mountain-railway.svg', char: 'vehicle', color: 'neutral', name: 'Mountain Railway' },
-    { file: 'mountain.svg', char: 'terrain', color: 'neutral', name: 'Mountain' },
-    { file: 'mouse.svg', char: 'animal', color: 'neutral', name: 'Mouse' },
-    { file: 'mushroom.svg', char: 'plant', color: 'neutral', name: 'Mushroom' },
-    { file: 'national-park.svg', char: 'building', color: 'neutral', name: 'National Park' },
-    { file: 'nest.svg', char: 'animal', color: 'neutral', name: 'Nest' },
-    { file: 'new-moon.svg', char: 'terrain', color: 'neutral', name: 'New Moon' },
-    { file: 'night-stars.svg', char: 'terrain', color: 'neutral', name: 'Night Stars' },
-    { file: 'no-entry.svg', char: 'shape', color: 'neutral', name: 'No Entry' },
-    { file: 'ocean.svg', char: 'terrain', color: 'neutral', name: 'Ocean' },
-    { file: 'octopus.svg', char: 'animal', color: 'neutral', name: 'Octopus' },
-    { file: 'office.svg', char: 'building', color: 'neutral', name: 'Office' },
-    { file: 'ogre.svg', char: 'fantasy', color: 'neutral', name: 'Ogre' },
-    { file: 'orange-circle.svg', char: 'shape', color: 'neutral', name: 'Orange Circle' },
-    { file: 'orange-diamond.svg', char: 'shape', color: 'neutral', name: 'Orange Diamond' },
-    { file: 'orange-heart.svg', char: 'shape', color: 'neutral', name: 'Orange Heart' },
-    { file: 'orange-square.svg', char: 'shape', color: 'neutral', name: 'Orange Square' },
-    { file: 'orangutan.svg', char: 'animal', color: 'neutral', name: 'Orangutan' },
-    { file: 'otter.svg', char: 'animal', color: 'neutral', name: 'Otter' },
-    { file: 'owl.svg', char: 'animal', color: 'neutral', name: 'Owl' },
-    { file: 'ox.svg', char: 'animal', color: 'neutral', name: 'Ox' },
-    { file: 'palm.svg', char: 'plant', color: 'neutral', name: 'Palm' },
-    { file: 'panda.svg', char: 'animal', color: 'neutral', name: 'Panda' },
-    { file: 'parachute.svg', char: 'vehicle', color: 'neutral', name: 'Parachute' },
-    { file: 'parrot.svg', char: 'animal', color: 'neutral', name: 'Parrot' },
-    { file: 'peace.svg', char: 'shape', color: 'neutral', name: 'Peace' },
-    { file: 'peacock.svg', char: 'animal', color: 'neutral', name: 'Peacock' },
-    { file: 'penguin.svg', char: 'animal', color: 'neutral', name: 'Penguin' },
-    { file: 'performing-arts.svg', char: 'game', color: 'neutral', name: 'Performing Arts' },
-    { file: 'phoenix.svg', char: 'animal', color: 'neutral', name: 'Phoenix' },
-    { file: 'pickup-truck.svg', char: 'vehicle', color: 'neutral', name: 'Pickup Truck' },
-    { file: 'pig.svg', char: 'animal', color: 'neutral', name: 'Pig' },
-    { file: 'polar-bear.svg', char: 'animal', color: 'neutral', name: 'Polar Bear' },
-    { file: 'police-car.svg', char: 'vehicle', color: 'neutral', name: 'Police Car' },
-    { file: 'police-light.svg', char: 'vehicle', color: 'neutral', name: 'Police Light' },
-    { file: 'poodle.svg', char: 'animal', color: 'neutral', name: 'Poodle' },
-    { file: 'pool-ball.svg', char: 'game', color: 'neutral', name: 'Pool Ball' },
-    { file: 'post-office.svg', char: 'building', color: 'neutral', name: 'Post Office' },
-    { file: 'potted-plant.svg', char: 'plant', color: 'neutral', name: 'Potted Plant' },
-    { file: 'prohibited.svg', char: 'shape', color: 'neutral', name: 'Prohibited' },
-    { file: 'purple-circle.svg', char: 'shape', color: 'neutral', name: 'Purple Circle' },
-    { file: 'purple-heart.svg', char: 'shape', color: 'neutral', name: 'Purple Heart' },
-    { file: 'purple-square.svg', char: 'shape', color: 'neutral', name: 'Purple Square' },
-    { file: 'puzzle.svg', char: 'game', color: 'neutral', name: 'Puzzle' },
-    { file: 'rabbit.svg', char: 'animal', color: 'neutral', name: 'Rabbit' },
-    { file: 'raccoon.svg', char: 'animal', color: 'neutral', name: 'Raccoon' },
-    { file: 'racing-car.svg', char: 'vehicle', color: 'neutral', name: 'Racing Car' },
-    { file: 'radioactive.svg', char: 'shape', color: 'neutral', name: 'Radioactive' },
-    { file: 'rainbow.svg', char: 'game', color: 'neutral', name: 'Rainbow' },
-    { file: 'ram.svg', char: 'animal', color: 'neutral', name: 'Ram' },
-    { file: 'rat.svg', char: 'animal', color: 'neutral', name: 'Rat' },
-    { file: 'recycling.svg', char: 'shape', color: 'neutral', name: 'Recycling' },
-    { file: 'red-circle.svg', char: 'shape', color: 'neutral', name: 'Red Circle' },
-    { file: 'red-heart.svg', char: 'shape', color: 'neutral', name: 'Red Heart' },
-    { file: 'red-square.svg', char: 'shape', color: 'neutral', name: 'Red Square' },
-    { file: 'rhino.svg', char: 'animal', color: 'neutral', name: 'Rhino' },
-    { file: 'ringed-planet.svg', char: 'terrain', color: 'neutral', name: 'Ringed Planet' },
-    { file: 'rock.svg', char: 'building', color: 'neutral', name: 'Rock' },
-    { file: 'rocket.svg', char: 'vehicle', color: 'neutral', name: 'Rocket' },
-    { file: 'roller-skate.svg', char: 'vehicle', color: 'neutral', name: 'Roller Skate' },
-    { file: 'rooster.svg', char: 'animal', color: 'neutral', name: 'Rooster' },
-    { file: 'rose.svg', char: 'plant', color: 'neutral', name: 'Rose' },
-    { file: 'rugby.svg', char: 'game', color: 'neutral', name: 'Rugby' },
-    { file: 'sailboat.svg', char: 'vehicle', color: 'neutral', name: 'Sailboat' },
-    { file: 'school.svg', char: 'building', color: 'neutral', name: 'School' },
-    { file: 'scorpion.svg', char: 'animal', color: 'neutral', name: 'Scorpion' },
-    { file: 'seal.svg', char: 'animal', color: 'neutral', name: 'Seal' },
-    { file: 'seedling.svg', char: 'plant', color: 'neutral', name: 'Seedling' },
-    { file: 'shamrock.svg', char: 'building', color: 'neutral', name: 'Shamrock' },
-    { file: 'shark.svg', char: 'animal', color: 'neutral', name: 'Shark' },
-    { file: 'shield.svg', char: 'game', color: 'neutral', name: 'Shield' },
-    { file: 'ship.svg', char: 'vehicle', color: 'neutral', name: 'Ship' },
-    { file: 'shooting-star.svg', char: 'terrain', color: 'neutral', name: 'Shooting Star' },
-    { file: 'shrimp.svg', char: 'animal', color: 'neutral', name: 'Shrimp' },
-    { file: 'shrine.svg', char: 'building', color: 'neutral', name: 'Shrine' },
-    { file: 'skateboard.svg', char: 'vehicle', color: 'neutral', name: 'Skateboard' },
-    { file: 'skunk.svg', char: 'animal', color: 'neutral', name: 'Skunk' },
-    { file: 'sled.svg', char: 'game', color: 'neutral', name: 'Sled' },
-    { file: 'sloth.svg', char: 'animal', color: 'neutral', name: 'Sloth' },
-    { file: 'small-airplane.svg', char: 'vehicle', color: 'neutral', name: 'Small Airplane' },
-    { file: 'snail.svg', char: 'animal', color: 'neutral', name: 'Snail' },
-    { file: 'snake.svg', char: 'animal', color: 'neutral', name: 'Snake' },
-    { file: 'snowflake.svg', char: 'terrain', color: 'neutral', name: 'Snowflake' },
-    { file: 'soccer.svg', char: 'game', color: 'neutral', name: 'Soccer' },
-    { file: 'softball.svg', char: 'game', color: 'neutral', name: 'Softball' },
-    { file: 'spade.svg', char: 'game', color: 'neutral', name: 'Spade' },
-    { file: 'sparkles.svg', char: 'terrain', color: 'neutral', name: 'Sparkles' },
-    { file: 'speedboat.svg', char: 'vehicle', color: 'neutral', name: 'Speedboat' },
-    { file: 'spider.svg', char: 'animal', color: 'neutral', name: 'Spider' },
-    { file: 'squid.svg', char: 'animal', color: 'neutral', name: 'Squid' },
-    { file: 'stadium.svg', char: 'building', color: 'neutral', name: 'Stadium' },
-    { file: 'star-of-david.svg', char: 'shape', color: 'neutral', name: 'Star Of David' },
-    { file: 'star.svg', char: 'terrain', color: 'neutral', name: 'Star' },
-    { file: 'statue-of-liberty.svg', char: 'building', color: 'neutral', name: 'Statue Of Liberty' },
-    { file: 'stop-sign.svg', char: 'vehicle', color: 'neutral', name: 'Stop Sign' },
-    { file: 'stork-alt.svg', char: 'animal', color: 'neutral', name: 'Stork Alt' },
-    { file: 'sun-large-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Large Cloud' },
-    { file: 'sun-rain-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Rain Cloud' },
-    { file: 'sun-small-cloud.svg', char: 'terrain', color: 'neutral', name: 'Sun Small Cloud' },
-    { file: 'sun.svg', char: 'terrain', color: 'neutral', name: 'Sun' },
-    { file: 'sunflower.svg', char: 'terrain', color: 'neutral', name: 'Sunflower' },
-    { file: 'sunrise-mountains.svg', char: 'terrain', color: 'neutral', name: 'Sunrise Mountains' },
-    { file: 'sunrise.svg', char: 'terrain', color: 'neutral', name: 'Sunrise' },
-    { file: 'sunset.svg', char: 'terrain', color: 'neutral', name: 'Sunset' },
-    { file: 'suspension-railway.svg', char: 'vehicle', color: 'neutral', name: 'Suspension Railway' },
-    { file: 'swan.svg', char: 'animal', color: 'neutral', name: 'Swan' },
-    { file: 'sweat-drops.svg', char: 'terrain', color: 'neutral', name: 'Sweat Drops' },
-    { file: 'swords.svg', char: 'game', color: 'neutral', name: 'Swords' },
-    { file: 'table-tennis.svg', char: 'game', color: 'neutral', name: 'Table Tennis' },
-    { file: 'taxi.svg', char: 'vehicle', color: 'neutral', name: 'Taxi' },
-    { file: 'tennis.svg', char: 'game', color: 'neutral', name: 'Tennis' },
-    { file: 'tent.svg', char: 'building', color: 'neutral', name: 'Tent' },
-    { file: 'thermometer.svg', char: 'terrain', color: 'neutral', name: 'Thermometer' },
-    { file: 'tiger.svg', char: 'animal', color: 'neutral', name: 'Tiger' },
-    { file: 'tokyo-tower.svg', char: 'building', color: 'neutral', name: 'Tokyo Tower' },
-    { file: 'tornado.svg', char: 'terrain', color: 'neutral', name: 'Tornado' },
-    { file: 'tractor.svg', char: 'vehicle', color: 'neutral', name: 'Tractor' },
-    { file: 'traffic-light-h.svg', char: 'vehicle', color: 'neutral', name: 'Traffic Light H' },
-    { file: 'traffic-light-v.svg', char: 'vehicle', color: 'neutral', name: 'Traffic Light V' },
-    { file: 'train.svg', char: 'vehicle', color: 'neutral', name: 'Train' },
-    { file: 'tram-car.svg', char: 'vehicle', color: 'neutral', name: 'Tram Car' },
-    { file: 'tram.svg', char: 'vehicle', color: 'neutral', name: 'Tram' },
-    { file: 'trident.svg', char: 'game', color: 'neutral', name: 'Trident' },
-    { file: 'troll.svg', char: 'fantasy', color: 'neutral', name: 'Troll' },
-    { file: 'trolleybus.svg', char: 'fantasy', color: 'neutral', name: 'Trolleybus' },
-    { file: 'tropical-fish.svg', char: 'animal', color: 'neutral', name: 'Tropical Fish' },
-    { file: 'tulip.svg', char: 'plant', color: 'neutral', name: 'Tulip' },
-    { file: 'turkey.svg', char: 'animal', color: 'neutral', name: 'Turkey' },
-    { file: 'turtle.svg', char: 'animal', color: 'neutral', name: 'Turtle' },
-    { file: 'unicorn.svg', char: 'animal', color: 'neutral', name: 'Unicorn' },
-    { file: 'volcano.svg', char: 'terrain', color: 'neutral', name: 'Volcano' },
-    { file: 'volleyball.svg', char: 'game', color: 'neutral', name: 'Volleyball' },
-    { file: 'waning-crescent.svg', char: 'terrain', color: 'neutral', name: 'Waning Crescent' },
-    { file: 'waning-gibbous.svg', char: 'other', color: 'neutral', name: 'Waning Gibbous' },
-    { file: 'warning.svg', char: 'shape', color: 'neutral', name: 'Warning' },
-    { file: 'water-buffalo.svg', char: 'animal', color: 'neutral', name: 'Water Buffalo' },
-    { file: 'waxing-crescent.svg', char: 'terrain', color: 'neutral', name: 'Waxing Crescent' },
-    { file: 'waxing-gibbous.svg', char: 'other', color: 'neutral', name: 'Waxing Gibbous' },
-    { file: 'whale.svg', char: 'animal', color: 'neutral', name: 'Whale' },
-    { file: 'wheelchair.svg', char: 'vehicle', color: 'neutral', name: 'Wheelchair' },
-    { file: 'white-circle.svg', char: 'shape', color: 'neutral', name: 'White Circle' },
-    { file: 'white-heart.svg', char: 'shape', color: 'neutral', name: 'White Heart' },
-    { file: 'white-square.svg', char: 'shape', color: 'neutral', name: 'White Square' },
-    { file: 'wind-face.svg', char: 'terrain', color: 'neutral', name: 'Wind Face' },
-    { file: 'wolf.svg', char: 'animal', color: 'neutral', name: 'Wolf' },
-    { file: 'wood.svg', char: 'building', color: 'neutral', name: 'Wood' },
-    { file: 'worm.svg', char: 'animal', color: 'neutral', name: 'Worm' },
-    { file: 'yellow-circle.svg', char: 'shape', color: 'neutral', name: 'Yellow Circle' },
-    { file: 'yellow-heart.svg', char: 'shape', color: 'neutral', name: 'Yellow Heart' },
-    { file: 'yellow-square.svg', char: 'shape', color: 'neutral', name: 'Yellow Square' },
-    { file: 'yin-yang.svg', char: 'shape', color: 'neutral', name: 'Yin Yang' },
-    { file: 'zebra.svg', char: 'animal', color: 'neutral', name: 'Zebra' },
-    { file: 'zombie.svg', char: 'fantasy', color: 'neutral', name: 'Zombie' },
-    ]
-  },
-];
-
-SETS.push(...EMOJI_SETS);
-
-
-const GALLERY_SETS = [
-  {
-    id: "kadagaden-1kbyte-gambit",
-    name: "1 Kbyte Gambit (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-1kbyte-gambit/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Chunky hand-drawn style. Standard 6 pieces only.",
-    pieces: [
-      { file: "wK.svg", char: "k", color: "w", name: "King" },
-      { file: "wQ.svg", char: "q", color: "w", name: "Queen" },
-      { file: "wR.svg", char: "r", color: "w", name: "Rook" },
-      { file: "wB.svg", char: "b", color: "w", name: "Bishop" },
-      { file: "wN.svg", char: "n", color: "w", name: "Knight" },
-      { file: "wP.svg", char: "p", color: "w", name: "Pawn" },
-      { file: "bK.svg", char: "k", color: "b", name: "King" },
-      { file: "bQ.svg", char: "q", color: "b", name: "Queen" },
-      { file: "bR.svg", char: "r", color: "b", name: "Rook" },
-      { file: "bB.svg", char: "b", color: "b", name: "Bishop" },
-      { file: "bN.svg", char: "n", color: "b", name: "Knight" },
-      { file: "bP.svg", char: "p", color: "b", name: "Pawn" },
-    ]
-  },
-  {
-    id: "kadagaden-maestro-bw",
-    name: "Maestro BW (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-maestro-bw/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Clean black/white artistic style. Standard 6 pieces only.",
-    pieces: [
-      { file: "wK.svg", char: "k", color: "w", name: "King" },
-      { file: "wQ.svg", char: "q", color: "w", name: "Queen" },
-      { file: "wR.svg", char: "r", color: "w", name: "Rook" },
-      { file: "wB.svg", char: "b", color: "w", name: "Bishop" },
-      { file: "wN.svg", char: "n", color: "w", name: "Knight" },
-      { file: "wP.svg", char: "p", color: "w", name: "Pawn" },
-      { file: "bK.svg", char: "k", color: "b", name: "King" },
-      { file: "bQ.svg", char: "q", color: "b", name: "Queen" },
-      { file: "bR.svg", char: "r", color: "b", name: "Rook" },
-      { file: "bB.svg", char: "b", color: "b", name: "Bishop" },
-      { file: "bN.svg", char: "n", color: "b", name: "Knight" },
-      { file: "bP.svg", char: "p", color: "b", name: "Pawn" },
-    ]
-  },
-  {
-    id: "kaneo-midnight",
-    name: "Kaneo Midnight (Kadagaden)",
-    path: "../assets/pieces/sets/kaneo-midnight/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Dark-themed variant of Kaneo. Standard 6 pieces only.",
-    pieces: [
-      { file: "wK.svg", char: "k", color: "w", name: "King" },
-      { file: "wQ.svg", char: "q", color: "w", name: "Queen" },
-      { file: "wR.svg", char: "r", color: "w", name: "Rook" },
-      { file: "wB.svg", char: "b", color: "w", name: "Bishop" },
-      { file: "wN.svg", char: "n", color: "w", name: "Knight" },
-      { file: "wP.svg", char: "p", color: "w", name: "Pawn" },
-      { file: "bK.svg", char: "k", color: "b", name: "King" },
-      { file: "bQ.svg", char: "q", color: "b", name: "Queen" },
-      { file: "bR.svg", char: "r", color: "b", name: "Rook" },
-      { file: "bB.svg", char: "b", color: "b", name: "Bishop" },
-      { file: "bN.svg", char: "n", color: "b", name: "Knight" },
-      { file: "bP.svg", char: "p", color: "b", name: "Pawn" },
-    ]
-  },
-  {
-    id: "kadagaden-xiangqi-black-red",
-    name: "Xiangqi Black/Red (gmchess alt)",
-    path: "../assets/pieces/sets/kadagaden-xiangqi-black-red/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Chinese character discs, black and red.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_bishop.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_knight.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_rook.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "black_king.svg", char: "k", color: "b", name: "General" },
-      { file: "black_advisor.svg", char: "a", color: "b", name: "Advisor" },
-      { file: "black_bishop.svg", char: "e", color: "b", name: "Elephant" },
-      { file: "black_knight.svg", char: "n", color: "b", name: "Horse" },
-      { file: "black_rook.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "black_cannon.svg", char: "c", color: "b", name: "Cannon" },
-      { file: "black_pawn.svg", char: "p", color: "b", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-xiangqi-gray",
-    name: "Xiangqi Gray (gmchess alt)",
-    path: "../assets/pieces/sets/kadagaden-xiangqi-gray/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Chinese character discs, gray and red.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_bishop.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_knight.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_rook.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "black_king.svg", char: "k", color: "b", name: "General" },
-      { file: "black_advisor.svg", char: "a", color: "b", name: "Advisor" },
-      { file: "black_bishop.svg", char: "e", color: "b", name: "Elephant" },
-      { file: "black_knight.svg", char: "n", color: "b", name: "Horse" },
-      { file: "black_rook.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "black_cannon.svg", char: "c", color: "b", name: "Cannon" },
-      { file: "black_pawn.svg", char: "p", color: "b", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-xiangqi-intl",
-    name: "Xiangqi International (Wikipedia modded)",
-    path: "../assets/pieces/sets/kadagaden-xiangqi-intl/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "International/western figurines for Xiangqi.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_elephant.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_horse.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_chariot.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "black_king.svg", char: "k", color: "b", name: "General" },
-      { file: "black_advisor.svg", char: "a", color: "b", name: "Advisor" },
-      { file: "black_elephant.svg", char: "e", color: "b", name: "Elephant" },
-      { file: "black_horse.svg", char: "n", color: "b", name: "Horse" },
-      { file: "black_chariot.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "black_cannon.svg", char: "c", color: "b", name: "Cannon" },
-      { file: "black_pawn.svg", char: "p", color: "b", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-xiangqi-wood",
-    name: "Xiangqi Wood (gmchess style)",
-    path: "../assets/pieces/sets/kadagaden-xiangqi-wood/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Chinese character discs, wood texture.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_bishop.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_knight.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_rook.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "black_king.svg", char: "k", color: "b", name: "General" },
-      { file: "black_advisor.svg", char: "a", color: "b", name: "Advisor" },
-      { file: "black_bishop.svg", char: "e", color: "b", name: "Elephant" },
-      { file: "black_knight.svg", char: "n", color: "b", name: "Horse" },
-      { file: "black_rook.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "black_cannon.svg", char: "c", color: "b", name: "Cannon" },
-      { file: "black_pawn.svg", char: "p", color: "b", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-janggi-kakao",
-    name: "Janggi Kakao White (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-janggi-kakao/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Octagonal pieces, blue/red, Kakao white background.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_elephant.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_horse.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_chariot.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "blue_king.svg", char: "k", color: "blue", name: "General" },
-      { file: "blue_advisor.svg", char: "a", color: "blue", name: "Advisor" },
-      { file: "blue_elephant.svg", char: "e", color: "blue", name: "Elephant" },
-      { file: "blue_horse.svg", char: "n", color: "blue", name: "Horse" },
-      { file: "blue_chariot.svg", char: "r", color: "blue", name: "Chariot" },
-      { file: "blue_cannon.svg", char: "c", color: "blue", name: "Cannon" },
-      { file: "blue_pawn.svg", char: "p", color: "blue", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-janggi-wooden",
-    name: "Janggi Wooden (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-janggi-wooden/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Octagonal pieces, blue/red, wooden texture.",
-    pieces: [
-      { file: "red_king.svg", char: "k", color: "red", name: "General" },
-      { file: "red_advisor.svg", char: "a", color: "red", name: "Advisor" },
-      { file: "red_elephant.svg", char: "e", color: "red", name: "Elephant" },
-      { file: "red_horse.svg", char: "n", color: "red", name: "Horse" },
-      { file: "red_chariot.svg", char: "r", color: "red", name: "Chariot" },
-      { file: "red_cannon.svg", char: "c", color: "red", name: "Cannon" },
-      { file: "red_pawn.svg", char: "p", color: "red", name: "Soldier" },
-      { file: "blue_king.svg", char: "k", color: "blue", name: "General" },
-      { file: "blue_advisor.svg", char: "a", color: "blue", name: "Advisor" },
-      { file: "blue_elephant.svg", char: "e", color: "blue", name: "Elephant" },
-      { file: "blue_horse.svg", char: "n", color: "blue", name: "Horse" },
-      { file: "blue_chariot.svg", char: "r", color: "blue", name: "Chariot" },
-      { file: "blue_cannon.svg", char: "c", color: "blue", name: "Cannon" },
-      { file: "blue_pawn.svg", char: "p", color: "blue", name: "Soldier" },
-    ]
-  },
-  {
-    id: "kadagaden-sittuyin-black-red",
-    name: "Sittuyin Black & Red (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-sittuyin-black-red/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Burmese chess pieces, black and red.",
-    pieces: [
-      { file: "wK.svg", char: "k", color: "w", name: "King" },
-      { file: "wQ.svg", char: "f", color: "w", name: "Fers" },
-      { file: "wB.svg", char: "g", color: "w", name: "Khon" },
-      { file: "wN.svg", char: "n", color: "w", name: "Horse" },
-      { file: "wR.svg", char: "r", color: "w", name: "Chariot" },
-      { file: "wP.svg", char: "p", color: "w", name: "Pawn" },
-      { file: "bK.svg", char: "k", color: "b", name: "King" },
-      { file: "bQ.svg", char: "f", color: "b", name: "Fers" },
-      { file: "bB.svg", char: "g", color: "b", name: "Khon" },
-      { file: "bN.svg", char: "n", color: "b", name: "Horse" },
-      { file: "bR.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "bP.svg", char: "p", color: "b", name: "Pawn" },
-    ]
-  },
-  {
-    id: "kadagaden-sittuyin-green-red",
-    name: "Sittuyin Green & Red (Kadagaden)",
-    path: "../assets/pieces/sets/kadagaden-sittuyin-green-red/",
-    author: "Kadagaden",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Burmese chess pieces, green and red.",
-    pieces: [
-      { file: "wK.svg", char: "k", color: "w", name: "King" },
-      { file: "wQ.svg", char: "f", color: "w", name: "Fers" },
-      { file: "wB.svg", char: "g", color: "w", name: "Khon" },
-      { file: "wN.svg", char: "n", color: "w", name: "Horse" },
-      { file: "wR.svg", char: "r", color: "w", name: "Chariot" },
-      { file: "wP.svg", char: "p", color: "w", name: "Pawn" },
-      { file: "bK.svg", char: "k", color: "b", name: "King" },
-      { file: "bQ.svg", char: "f", color: "b", name: "Fers" },
-      { file: "bB.svg", char: "g", color: "b", name: "Khon" },
-      { file: "bN.svg", char: "n", color: "b", name: "Horse" },
-      { file: "bR.svg", char: "r", color: "b", name: "Chariot" },
-      { file: "bP.svg", char: "p", color: "b", name: "Pawn" },
-    ]
-  },
-  {
-    id: "kahu-shogi-2kanji-red-wood",
-    name: "Shogi 2-Kanji Red Wood (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-2kanji-red-wood/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Two-kanji red wood. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-doubutsu",
-    name: "Shogi Doubutsu (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-doubutsu/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Animal/Dobutsu style. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-international",
-    name: "Shogi International (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-international/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Western/international figurines for Shogi.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-kanji-3d",
-    name: "Shogi Kanji 3D OTB (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-kanji-3d/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "3D shaded kanji. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-kanji-brown",
-    name: "Shogi Kanji Brown (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-kanji-brown/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Brown flat kanji. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-kanji-light",
-    name: "Shogi Kanji Light (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-kanji-light/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Light flat kanji. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-kanji-red-wood",
-    name: "Shogi Kanji Red Wood (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-kanji-red-wood/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Red wood kanji. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-  {
-    id: "kahu-shogi-military",
-    name: "Shogi Military (Ka-hu)",
-    path: "../assets/pieces/sets/kahu-shogi-military/",
-    author: "Ka-hu (Kadagaden)",
-    license: "CC-BY-4.0",
-    recolorable: false,
-    notes: "Military/tactical icon style. Full set with promoted forms.",
-    pieces: [
-      { file: "0OU.svg", char: "k", color: "sente", name: "King" },
-      { file: "0KI.svg", char: "g", color: "sente", name: "Gold" },
-      { file: "0GI.svg", char: "s", color: "sente", name: "Silver" },
-      { file: "0KE.svg", char: "n", color: "sente", name: "Knight" },
-      { file: "0KY.svg", char: "l", color: "sente", name: "Lance" },
-      { file: "0HI.svg", char: "r", color: "sente", name: "Rook" },
-      { file: "0KA.svg", char: "b", color: "sente", name: "Bishop" },
-      { file: "0FU.svg", char: "p", color: "sente", name: "Pawn" },
-      { file: "0NG.svg", char: "+s", color: "sente", name: "Prom. Silver" },
-      { file: "0NK.svg", char: "+n", color: "sente", name: "Prom. Knight" },
-      { file: "0NY.svg", char: "+l", color: "sente", name: "Prom. Lance" },
-      { file: "0RY.svg", char: "+r", color: "sente", name: "Dragon" },
-      { file: "0UM.svg", char: "+b", color: "sente", name: "Horse" },
-      { file: "0TO.svg", char: "+p", color: "sente", name: "Tokin" },
-      { file: "0GY.svg", char: "+g", color: "sente", name: "Prom. Gold" },
-      { file: "1OU.svg", char: "k", color: "gote", name: "King" },
-      { file: "1KI.svg", char: "g", color: "gote", name: "Gold" },
-      { file: "1GI.svg", char: "s", color: "gote", name: "Silver" },
-      { file: "1KE.svg", char: "n", color: "gote", name: "Knight" },
-      { file: "1KY.svg", char: "l", color: "gote", name: "Lance" },
-      { file: "1HI.svg", char: "r", color: "gote", name: "Rook" },
-      { file: "1KA.svg", char: "b", color: "gote", name: "Bishop" },
-      { file: "1FU.svg", char: "p", color: "gote", name: "Pawn" },
-      { file: "1NG.svg", char: "+s", color: "gote", name: "Prom. Silver" },
-      { file: "1NK.svg", char: "+n", color: "gote", name: "Prom. Knight" },
-      { file: "1NY.svg", char: "+l", color: "gote", name: "Prom. Lance" },
-      { file: "1RY.svg", char: "+r", color: "gote", name: "Dragon" },
-      { file: "1UM.svg", char: "+b", color: "gote", name: "Horse" },
-      { file: "1TO.svg", char: "+p", color: "gote", name: "Tokin" },
-      { file: "1GY.svg", char: "+g", color: "gote", name: "Prom. Gold" },
-    ]
-  },
-];
-
-SETS.push(...GALLERY_SETS);
-
-
-const MCE_SETS = [
-  {
-    id: 'mce-chess',
-    name: 'MCE Chess (Production)',
-    path: '../assets/pieces/sets/mce-chess/',
-    author: 'Custom (MCE)',
-    license: 'MIT',
-    recolorable: true,
-    notes: '36 pieces: standard 6 + 12 fairy types × 2 colours. The active piece set used by all variants.',
-    pieces: [
-    { file: 'bA.svg', char: 'a', color: 'b', name: 'Archbishop' },
-    { file: 'bB.svg', char: 'b', color: 'b', name: 'Bishop' },
-    { file: 'bC.svg', char: 'c', color: 'b', name: 'Chancellor' },
-    { file: 'bE.svg', char: 'e', color: 'b', name: 'Elephant' },
-    { file: 'bF.svg', char: 'f', color: 'b', name: 'Fers' },
-    { file: 'bG.svg', char: 'g', color: 'b', name: 'Khon' },
-    { file: 'bH.svg', char: 'h', color: 'b', name: 'Archer' },
-    { file: 'bI.svg', char: 'i', color: 'b', name: 'Sit' },
-    { file: 'bK.svg', char: 'k', color: 'b', name: 'King' },
-    { file: 'bL.svg', char: 'l', color: 'b', name: 'Lancer' },
-    { file: 'bM.svg', char: 'm', color: 'b', name: 'Maharaja' },
-    { file: 'bN.svg', char: 'n', color: 'b', name: 'Knight' },
-    { file: 'bP.svg', char: 'p', color: 'b', name: 'Pawn' },
-    { file: 'bQ.svg', char: 'q', color: 'b', name: 'Queen' },
-    { file: 'bR.svg', char: 'r', color: 'b', name: 'Rook' },
-    { file: 'bS.svg', char: 's', color: 'b', name: 'Sage' },
-    { file: 'bW.svg', char: 'w', color: 'b', name: 'Kheshig' },
-    { file: 'bY.svg', char: 'y', color: 'b', name: 'Yurt' },
-    { file: 'wA.svg', char: 'a', color: 'w', name: 'Archbishop' },
-    { file: 'wB.svg', char: 'b', color: 'w', name: 'Bishop' },
-    { file: 'wC.svg', char: 'c', color: 'w', name: 'Chancellor' },
-    { file: 'wE.svg', char: 'e', color: 'w', name: 'Elephant' },
-    { file: 'wF.svg', char: 'f', color: 'w', name: 'Fers' },
-    { file: 'wG.svg', char: 'g', color: 'w', name: 'Khon' },
-    { file: 'wH.svg', char: 'h', color: 'w', name: 'Archer' },
-    { file: 'wI.svg', char: 'i', color: 'w', name: 'Sit' },
-    { file: 'wK.svg', char: 'k', color: 'w', name: 'King' },
-    { file: 'wL.svg', char: 'l', color: 'w', name: 'Lancer' },
-    { file: 'wM.svg', char: 'm', color: 'w', name: 'Maharaja' },
-    { file: 'wN.svg', char: 'n', color: 'w', name: 'Knight' },
-    { file: 'wP.svg', char: 'p', color: 'w', name: 'Pawn' },
-    { file: 'wQ.svg', char: 'q', color: 'w', name: 'Queen' },
-    { file: 'wR.svg', char: 'r', color: 'w', name: 'Rook' },
-    { file: 'wS.svg', char: 's', color: 'w', name: 'Sage' },
-    { file: 'wW.svg', char: 'w', color: 'w', name: 'Kheshig' },
-    { file: 'wY.svg', char: 'y', color: 'w', name: 'Yurt' }
-    ]
-  },
-  {
-    id: 'mce-shogi',
-    name: 'MCE Shogi (Kanji)',
-    path: '../assets/pieces/sets/mce-shogi/',
-    author: 'Custom (MCE)',
-    license: 'MIT',
-    recolorable: true,
-    notes: '28 pieces: 8 base types + 6 promoted × sente/gote. Kanji on pentagonal tiles.',
-    pieces: [
-    { file: 'g+B.svg', char: '+b', color: 'gote', name: 'Horse' },
-    { file: 'g+L.svg', char: '+l', color: 'gote', name: 'Prom. Lance' },
-    { file: 'g+N.svg', char: '+n', color: 'gote', name: 'Prom. Knight' },
-    { file: 'g+P.svg', char: '+p', color: 'gote', name: 'Tokin' },
-    { file: 'g+R.svg', char: '+r', color: 'gote', name: 'Dragon' },
-    { file: 'g+S.svg', char: '+s', color: 'gote', name: 'Prom. Silver' },
-    { file: 'gB.svg', char: 'b', color: 'gote', name: 'Bishop' },
-    { file: 'gG.svg', char: 'g', color: 'gote', name: 'Gold' },
-    { file: 'gK.svg', char: 'k', color: 'gote', name: 'King' },
-    { file: 'gL.svg', char: 'l', color: 'gote', name: 'Lance' },
-    { file: 'gN.svg', char: 'n', color: 'gote', name: 'Knight' },
-    { file: 'gP.svg', char: 'p', color: 'gote', name: 'Pawn' },
-    { file: 'gR.svg', char: 'r', color: 'gote', name: 'Rook' },
-    { file: 'gS.svg', char: 's', color: 'gote', name: 'Silver' },
-    { file: 's+B.svg', char: '+b', color: 'sente', name: 'Horse' },
-    { file: 's+L.svg', char: '+l', color: 'sente', name: 'Prom. Lance' },
-    { file: 's+N.svg', char: '+n', color: 'sente', name: 'Prom. Knight' },
-    { file: 's+P.svg', char: '+p', color: 'sente', name: 'Tokin' },
-    { file: 's+R.svg', char: '+r', color: 'sente', name: 'Dragon' },
-    { file: 's+S.svg', char: '+s', color: 'sente', name: 'Prom. Silver' },
-    { file: 'sB.svg', char: 'b', color: 'sente', name: 'Bishop' },
-    { file: 'sG.svg', char: 'g', color: 'sente', name: 'Gold' },
-    { file: 'sK.svg', char: 'k', color: 'sente', name: 'King' },
-    { file: 'sL.svg', char: 'l', color: 'sente', name: 'Lance' },
-    { file: 'sN.svg', char: 'n', color: 'sente', name: 'Knight' },
-    { file: 'sP.svg', char: 'p', color: 'sente', name: 'Pawn' },
-    { file: 'sR.svg', char: 'r', color: 'sente', name: 'Rook' },
-    { file: 'sS.svg', char: 's', color: 'sente', name: 'Silver' }
-    ]
-  },
-  {
-    id: 'mce-xiangqi-trad',
-    name: 'MCE Xiangqi Traditional',
-    path: '../assets/pieces/sets/mce-xiangqi-trad/',
-    author: 'Custom (MCE)',
-    license: 'MIT',
-    recolorable: true,
-    notes: '14 pieces: 7 types × red/black. Chinese character discs.',
-    pieces: [
-    { file: 'bA.svg', char: 'a', color: 'b', name: 'Advisor' },
-    { file: 'bC.svg', char: 'c', color: 'b', name: 'Cannon' },
-    { file: 'bE.svg', char: 'e', color: 'b', name: 'Elephant' },
-    { file: 'bK.svg', char: 'k', color: 'b', name: 'General' },
-    { file: 'bN.svg', char: 'n', color: 'b', name: 'Horse' },
-    { file: 'bP.svg', char: 'p', color: 'b', name: 'Soldier' },
-    { file: 'bR.svg', char: 'r', color: 'b', name: 'Chariot' },
-    { file: 'rA.svg', char: 'a', color: 'red', name: 'Advisor' },
-    { file: 'rC.svg', char: 'c', color: 'red', name: 'Cannon' },
-    { file: 'rE.svg', char: 'e', color: 'red', name: 'Elephant' },
-    { file: 'rK.svg', char: 'k', color: 'red', name: 'General' },
-    { file: 'rN.svg', char: 'n', color: 'red', name: 'Horse' },
-    { file: 'rP.svg', char: 'p', color: 'red', name: 'Soldier' },
-    { file: 'rR.svg', char: 'r', color: 'red', name: 'Chariot' }
-    ]
-  },
-  {
-    id: 'mce-xiangqi-west',
-    name: 'MCE Xiangqi Western',
-    path: '../assets/pieces/sets/mce-xiangqi-west/',
-    author: 'Custom (MCE)',
-    license: 'MIT',
-    recolorable: true,
-    notes: '14 pieces: 7 types × red/black. English letter discs.',
-    pieces: [
-    { file: 'bA.svg', char: 'a', color: 'b', name: 'Advisor' },
-    { file: 'bC.svg', char: 'c', color: 'b', name: 'Cannon' },
-    { file: 'bE.svg', char: 'e', color: 'b', name: 'Elephant' },
-    { file: 'bK.svg', char: 'k', color: 'b', name: 'General' },
-    { file: 'bN.svg', char: 'n', color: 'b', name: 'Horse' },
-    { file: 'bP.svg', char: 'p', color: 'b', name: 'Soldier' },
-    { file: 'bR.svg', char: 'r', color: 'b', name: 'Chariot' },
-    { file: 'rA.svg', char: 'a', color: 'red', name: 'Advisor' },
-    { file: 'rC.svg', char: 'c', color: 'red', name: 'Cannon' },
-    { file: 'rE.svg', char: 'e', color: 'red', name: 'Elephant' },
-    { file: 'rK.svg', char: 'k', color: 'red', name: 'General' },
-    { file: 'rN.svg', char: 'n', color: 'red', name: 'Horse' },
-    { file: 'rP.svg', char: 'p', color: 'red', name: 'Soldier' },
-    { file: 'rR.svg', char: 'r', color: 'red', name: 'Chariot' }
-    ]
-  },
-];
-
-SETS.push(...MCE_SETS);
-
-const FAMILY_ORDER = [
-  'chess-standard', 'chess-artistic', 'chess-fairy',
-  'xiangqi', 'janggi', 'shogi', 'sittuyin', 'draughts', 'emoji'
-];
-
-function getFamily(id) {
-  if (id.includes('janggi')) return 'janggi';
-  if (id.includes('xiangqi')) return 'xiangqi';
-  if (id.includes('shogi') || id === 'wikimedia-dobutsu') return 'shogi';
-  if (id.includes('sittuyin') || id === 'wikimedia-makruk') return 'sittuyin';
-  if (id === 'wikimedia-draughts' || id === 'wikimedia-go') return 'draughts';
-  if (id === 'fluent-emoji' || id === 'twemoji') return 'emoji';
-  if (id === 'wikimedia-fairy' || id === 'wikimedia-xogos') return 'chess-fairy';
-  if (id.startsWith('wikimedia-')) return 'chess-artistic';
-  return 'chess-standard';
+async function loadGalleryIndex() {
+  const resp = await fetch('../assets/pieces/gallery-index.json');
+  SETS = await resp.json();
+  return SETS;
 }
 
-const ALL_SETS = [...SETS].sort((a, b) => {
-  const fa = FAMILY_ORDER.indexOf(getFamily(a.id));
-  const fb = FAMILY_ORDER.indexOf(getFamily(b.id));
-  if (fa !== fb) return fa - fb;
-  return a.id.localeCompare(b.id);
-});
-
-const ALL_CHARS = ['k','q','r','b','n','p','a','c','m','f','g','e','y','l','h','w','i','s',
-  '+b','+r','+s','+n','+l','+p','+g',
-  'alfil','camel','giraffe','dabbaba','wazir','man','king','stone','eq','G','f+'];
-const CHAR_NAMES = {
-  k:'King', q:'Queen', r:'Rook', b:'Bishop', n:'Knight', p:'Pawn',
-  a:'Archbishop/Advisor', c:'Chancellor/Cannon', m:'Maharaja', f:'Fers', g:'Gold/Khon',
-  e:'Elephant', y:'Yurt', l:'Lance/Lancer', h:'Archer', w:'Kheshig', i:'Sit', s:'Silver/Sage',
-  '+b':'Horse (Prom. Bishop)', '+r':'Dragon (Prom. Rook)', '+s':'Prom. Silver',
-  '+n':'Prom. Knight', '+l':'Prom. Lance', '+p':'Tokin', '+g':'Prom. Gold',
-  alfil:'Alfil', camel:'Camel', giraffe:'Giraffe', dabbaba:'Dabbaba', wazir:'Wazir',
-  man:'Man (draughts)', king:'King (draughts)', stone:'Stone (go)', eq:'Equihopper',
-  G:'Grasshopper', 'f+':'Promoted Pawn'
-};
-
-const container = document.getElementById('gallery-container');
-const bgSelect = document.getElementById('bg-select');
-const sizeSelect = document.getElementById('size-select');
-const filterSelect = document.getElementById('filter-select');
-const searchInput = document.getElementById('search-input');
-const viewSelect = document.getElementById('view-select');
-const colorFilter = document.getElementById('color-filter');
-
-ALL_SETS.forEach(s => {
-  const opt = document.createElement('option');
-  opt.value = s.id;
-  opt.textContent = s.name;
-  filterSelect.appendChild(opt);
-});
-
-function createPieceCell(piece, set, bg, size) {
-  const cell = document.createElement('div');
-  cell.className = `piece-cell bg-${bg}`;
-  if (set.recolorable) cell.classList.add('recolorable');
-
-  if (piece.symbol) {
-    const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgEl.setAttribute('width', size);
-    svgEl.setAttribute('height', size);
-    svgEl.setAttribute('viewBox', '0 0 45 45');
-    const use = document.createElementNS('http://www.w3.org/2000/svg', 'svg:use');
-    use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `${set.spriteUrl}#${piece.symbol}`);
-    svgEl.appendChild(use);
-    cell.appendChild(svgEl);
-  } else {
-    const img = document.createElement('img');
-    img.src = set.path + piece.file;
-    img.alt = `${piece.color} ${piece.name}`;
-    img.loading = 'lazy';
-    img.onerror = () => { cell.style.opacity = '0.3'; img.alt = 'Missing'; };
-    cell.appendChild(img);
-  }
-
-  const label = document.createElement('div');
-  label.className = 'piece-label';
-  const setTag = `<span class="set-tag">${set.name.split('(')[0].trim().split(' ').slice(-1)}</span>`;
-  label.innerHTML = `<span class="char-code">${piece.char}</span> ${piece.name} ${setTag}`;
-  cell.appendChild(label);
-
-  return cell;
+function renderIntro(sets) {
+  const totalPieces = sets.reduce((sum, s) => sum + s.pieceCount, 0);
+  const families = [...new Set(sets.map(s => s.family))];
+  const familyList = families.sort().map(f => f.replace(/-/g, ' ')).join(', ');
+  document.getElementById('gallery-intro').textContent =
+    `Visual catalogue of all piece sets available to the engine — ${totalPieces.toLocaleString()} SVGs across ${sets.length} sets covering ${families.length} game families: ${familyList}. Each set provides individual SVGs that can be mixed, matched, and composed via the piece-set-resolver fallback chain.`;
 }
 
-function getFilteredPieces() {
-  const search = (searchInput?.value || '').toLowerCase().trim();
-  const setFilter = filterSelect.value;
-  const color = colorFilter?.value || 'all';
+function populateFilters(sets) {
+  const familyFilter = document.getElementById('family-filter');
+  const setFilter = document.getElementById('filter-select');
+  const families = [...new Set(sets.map(s => s.family))].sort();
 
-  let results = [];
-  const setsToSearch = setFilter === 'all' ? ALL_SETS : ALL_SETS.filter(s => s.id === setFilter);
+  families.forEach(f => {
+    const count = sets.filter(s => s.family === f).length;
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = `${f.replace(/-/g, ' ')} (${count})`;
+    familyFilter.appendChild(opt);
+  });
 
-  for (const set of setsToSearch) {
-    for (const piece of set.pieces) {
-      if (search && !piece.name.toLowerCase().includes(search) && !piece.char.toLowerCase().includes(search)) continue;
-      if (color !== 'all' && piece.color !== color) continue;
-      results.push({ piece, set });
-    }
-  }
-  return results;
+  sets.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.name} (${s.pieceCount})`;
+    setFilter.appendChild(opt);
+  });
 }
 
-function renderBySet() {
-  const bg = bgSelect.value;
-  const size = parseInt(sizeSelect.value);
-  const setFilter = filterSelect.value;
-  const search = (searchInput?.value || '').toLowerCase().trim();
-  const color = colorFilter?.value || 'all';
+function getSetPath(set) {
+  return `../assets/pieces/sets/${set.id}/`;
+}
+
+function renderGallery(sets, options = {}) {
+  const container = document.getElementById('gallery-container');
+  const { search, family, setId, size = 64, bg = 'checkered' } = options;
+
+  let filtered = sets;
+  if (family && family !== 'all') filtered = filtered.filter(s => s.family === family);
+  if (setId && setId !== 'all') filtered = filtered.filter(s => s.id === setId);
 
   container.innerHTML = '';
-  container.style.setProperty('--piece-size', size + 'px');
-  container.style.setProperty('--cell-size', (size + 24) + 'px');
 
-  const setsToShow = setFilter === 'all' ? ALL_SETS : ALL_SETS.filter(s => s.id === setFilter);
+  filtered.forEach(set => {
+    const setPath = getSetPath(set);
+    const svgFiles = set._svgCache || [];
 
-  for (const set of setsToShow) {
-    const pieces = set.pieces.filter(p => {
-      if (search && !p.name.toLowerCase().includes(search) && !p.char.toLowerCase().includes(search)) return false;
-      if (color !== 'all' && p.color !== color) return false;
-      return true;
-    });
-    if (!pieces.length) continue;
+    let filesToShow = svgFiles;
+    if (search) {
+      const q = search.toLowerCase();
+      filesToShow = svgFiles.filter(f => f.toLowerCase().includes(q));
+    }
+    if (filesToShow.length === 0 && search) return;
 
-    const section = document.createElement('section');
-    section.className = 'set-section';
+    const section = document.createElement('div');
+    section.className = 'gallery-set';
 
-    const h2 = document.createElement('h2');
-    h2.textContent = set.name;
-    if (set.recolorable) h2.innerHTML += ' <span class="recolor-badge">recolorable</span>';
-    section.appendChild(h2);
+    const header = document.createElement('div');
+    header.className = 'gallery-set__header';
+
+    const title = document.createElement('h3');
+    title.textContent = set.name;
+    header.appendChild(title);
 
     const meta = document.createElement('div');
-    meta.className = 'set-meta';
-    const format = set.spriteUrl ? '<span class="set-format">SPRITE</span>' : '';
-    meta.innerHTML = `<span>${pieces.length} pieces</span><span>${set.license}</span><span>${set.author}</span>${format}`;
-    section.appendChild(meta);
+    meta.className = 'gallery-set__meta';
+
+    const familyBadge = document.createElement('span');
+    familyBadge.className = 'badge badge--family';
+    familyBadge.textContent = set.family.replace(/-/g, ' ');
+    meta.appendChild(familyBadge);
+
+    const licenseBadge = document.createElement('span');
+    licenseBadge.className = 'badge badge--license';
+    licenseBadge.textContent = set.license;
+    meta.appendChild(licenseBadge);
+
+    const countBadge = document.createElement('span');
+    countBadge.className = 'badge badge--count';
+    countBadge.textContent = `${set.pieceCount} SVGs`;
+    meta.appendChild(countBadge);
+
+    header.appendChild(meta);
+
+    const attribution = document.createElement('div');
+    attribution.className = 'gallery-set__attribution';
+    let authorHtml = set.author;
+    if (set.authorUrl) {
+      authorHtml = `<a href="${set.authorUrl}" target="_blank" rel="noopener">${set.author}</a>`;
+    }
+    let sourceHtml = '';
+    if (set.source) {
+      sourceHtml = ` · <a href="${set.source}" target="_blank" rel="noopener">Source</a>`;
+    }
+    attribution.innerHTML = `by ${authorHtml}${sourceHtml}`;
+    header.appendChild(attribution);
+
+    section.appendChild(header);
 
     const grid = document.createElement('div');
-    grid.className = 'piece-grid';
-    for (const piece of pieces) {
-      grid.appendChild(createPieceCell(piece, set, bg, size));
-    }
-    section.appendChild(grid);
-    container.appendChild(section);
-  }
-}
+    grid.className = `gallery-grid bg-${bg}`;
+    grid.style.setProperty('--piece-size', `${size}px`);
 
-function renderByPiece() {
-  const bg = bgSelect.value;
-  const size = parseInt(sizeSelect.value);
-  const results = getFilteredPieces();
+    const displayFiles = filesToShow.length > 0 ? filesToShow : svgFiles;
+    displayFiles.forEach(file => {
+      const cell = document.createElement('div');
+      cell.className = 'gallery-cell';
+      cell.title = file;
 
-  container.innerHTML = '';
-  container.style.setProperty('--piece-size', size + 'px');
-  container.style.setProperty('--cell-size', (size + 24) + 'px');
+      const img = document.createElement('img');
+      img.src = setPath + file;
+      img.alt = file;
+      img.width = size;
+      img.height = size;
+      img.loading = 'lazy';
+      cell.appendChild(img);
 
-  const groups = new Map();
-  for (const { piece, set } of results) {
-    const key = piece.name.replace(/\s*\(.*?\)\s*/g, '').toLowerCase();
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push({ piece, set });
-  }
+      const label = document.createElement('span');
+      label.className = 'gallery-cell__label';
+      label.textContent = file.replace('.svg', '');
+      cell.appendChild(label);
 
-  for (const [name, items] of groups) {
-    if (items.length === 0) continue;
-    const section = document.createElement('section');
-    section.className = 'set-section';
-
-    const h2 = document.createElement('h2');
-    h2.textContent = items[0].piece.name.replace(/\s*\(.*?\)\s*$/, '');
-    h2.innerHTML += ` <span class="piece-count">${items.length} versions</span>`;
-    section.appendChild(h2);
-
-    const grid = document.createElement('div');
-    grid.className = 'piece-grid';
-    for (const { piece, set } of items) {
-      grid.appendChild(createPieceCell(piece, set, bg, size));
-    }
-    section.appendChild(grid);
-    container.appendChild(section);
-  }
-}
-
-function renderGallery() {
-  const view = viewSelect?.value || 'by-set';
-  if (view === 'by-piece') {
-    renderByPiece();
-  } else {
-    renderBySet();
-  }
-}
-
-function getVisibleSets() {
-  const setFilter = filterSelect.value;
-  return setFilter === 'all' ? ALL_SETS : ALL_SETS.filter(s => s.id === setFilter);
-}
-
-function renderCoverageMatrix() {
-  const matrixDiv = document.getElementById('coverage-matrix');
-  const coreChars = ['k','q','r','b','n','p','a','c','m','f','g','e','y','l','h','w','i','s'];
-  const sets = getVisibleSets();
-  let html = '<table><thead><tr><th>Set</th>';
-  coreChars.forEach(c => { html += `<th title="${CHAR_NAMES[c] || c}">${c.toUpperCase()}</th>`; });
-  html += '</tr></thead><tbody>';
-
-  for (const set of sets) {
-    html += `<tr><td>${set.name}</td>`;
-    const coveredChars = new Set(set.pieces.map(p => p.char.toLowerCase()));
-    coreChars.forEach(c => {
-      const has = coveredChars.has(c);
-      html += `<td class="${has ? 'has' : 'missing'}">${has ? '✓' : '✗'}</td>`;
+      grid.appendChild(cell);
     });
-    html += '</tr>';
-  }
-  html += '</tbody></table>';
-  matrixDiv.innerHTML = html;
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+
+  renderStats(filtered);
 }
 
-function renderLicenceTable() {
-  const tbody = document.querySelector('#licence-table tbody');
-  const sets = getVisibleSets();
-  tbody.innerHTML = sets.map(s => `
-    <tr>
-      <td>${s.name}</td>
-      <td>${s.author}</td>
-      <td>${s.license}</td>
-      <td>${s.pieces.length}</td>
-      <td>${s.recolorable ? '<span class="recolor-badge">recolorable</span> ' : ''}${s.notes}</td>
-    </tr>
-  `).join('');
-}
-
-function renderStats() {
-  const statsDiv = document.getElementById('gallery-stats');
-  if (!statsDiv) return;
-
-  const sets = getVisibleSets();
-  const totalPieces = sets.reduce((sum, s) => sum + s.pieces.length, 0);
-  const totalSets = sets.length;
-  const recolorable = sets.filter(s => s.recolorable).length;
-
-  const categories = {};
-  for (const set of sets) {
-    for (const p of set.pieces) {
-      const cat = p.char || 'other';
-      categories[cat] = (categories[cat] || 0) + 1;
+async function loadSvgList(set) {
+  if (set._svgCache) return set._svgCache;
+  const path = getSetPath(set);
+  try {
+    const resp = await fetch(path);
+    if (!resp.ok) throw new Error();
+    const html = await resp.text();
+    const matches = html.match(/[\w.%+-]+\.svg/g);
+    if (matches && matches.length > 0) {
+      const svgs = [...new Set(matches)].filter(f => !f.includes('manifest') && !f.includes('LICENSE')).sort();
+      set._svgCache = svgs;
+      return svgs;
     }
-  }
-
-  const licenses = {};
-  for (const set of sets) {
-    const l = set.license.split('/')[0].trim();
-    licenses[l] = (licenses[l] || 0) + 1;
-  }
-
-  const catBadges = Object.entries(categories)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 12)
-    .map(([cat, count]) => `<span class="stat-badge">${cat} <strong>${count}</strong></span>`)
-    .join('');
-
-  statsDiv.innerHTML = `
-    <div class="stats-row">
-      <span class="stat-item"><strong>${totalPieces}</strong> pieces</span>
-      <span class="stat-item"><strong>${totalSets}</strong> sets</span>
-      <span class="stat-item"><strong>${recolorable}</strong> recolorable</span>
-      <span class="stat-item"><strong>${Object.keys(licenses).length}</strong> licenses</span>
-    </div>
-    <div class="stats-categories">${catBadges}</div>
-  `;
+  } catch (e) {}
+  set._svgCache = [];
+  return [];
 }
 
-function renderAll() {
-  renderStats();
-  renderGallery();
-  renderCoverageMatrix();
-  renderLicenceTable();
+function renderStats(filtered) {
+  const statsEl = document.getElementById('gallery-stats');
+  const totalPieces = filtered.reduce((sum, s) => sum + s.pieceCount, 0);
+  const families = [...new Set(filtered.map(s => s.family))];
+  statsEl.textContent = `Showing ${filtered.length} sets · ${totalPieces.toLocaleString()} SVGs · ${families.length} families`;
 }
 
-const controls = [bgSelect, sizeSelect, filterSelect, searchInput, viewSelect, colorFilter].filter(Boolean);
-controls.forEach(el => el.addEventListener('change', renderAll));
-if (searchInput) searchInput.addEventListener('input', renderAll);
+function renderLicenceTable(sets) {
+  const tbody = document.querySelector('#licence-table tbody');
+  tbody.innerHTML = '';
+  sets.forEach(set => {
+    const tr = document.createElement('tr');
 
-renderAll();
+    const nameCell = document.createElement('td');
+    nameCell.textContent = set.name;
+    tr.appendChild(nameCell);
+
+    const familyCell = document.createElement('td');
+    familyCell.textContent = set.family.replace(/-/g, ' ');
+    tr.appendChild(familyCell);
+
+    const authorCell = document.createElement('td');
+    if (set.authorUrl) {
+      authorCell.innerHTML = `<a href="${set.authorUrl}" target="_blank" rel="noopener">${set.author}</a>`;
+    } else {
+      authorCell.textContent = set.author;
+    }
+    tr.appendChild(authorCell);
+
+    const licenseCell = document.createElement('td');
+    if (set.licenseUrl) {
+      licenseCell.innerHTML = `<a href="${set.licenseUrl}" target="_blank" rel="noopener">${set.license}</a>`;
+    } else {
+      licenseCell.textContent = set.license;
+    }
+    tr.appendChild(licenseCell);
+
+    const sourceCell = document.createElement('td');
+    if (set.source) {
+      const short = set.source.replace('https://github.com/', '').split('/tree/')[0];
+      sourceCell.innerHTML = `<a href="${set.source}" target="_blank" rel="noopener">${short}</a>`;
+    }
+    tr.appendChild(sourceCell);
+
+    const countCell = document.createElement('td');
+    countCell.textContent = set.pieceCount;
+    tr.appendChild(countCell);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function getOptions() {
+  return {
+    search: document.getElementById('search-input').value.trim(),
+    family: document.getElementById('family-filter').value,
+    setId: document.getElementById('filter-select').value,
+    size: parseInt(document.getElementById('size-select').value),
+    bg: document.getElementById('bg-select').value,
+  };
+}
+
+async function init() {
+  const sets = await loadGalleryIndex();
+  renderIntro(sets);
+  populateFilters(sets);
+  renderLicenceTable(sets);
+
+  await Promise.all(sets.map(s => loadSvgList(s)));
+  renderGallery(sets, getOptions());
+
+  const controls = ['search-input', 'filter-select', 'size-select', 'bg-select', 'color-filter'];
+  controls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => {
+        renderGallery(sets, getOptions());
+      });
+    }
+  });
+
+  document.getElementById('family-filter').addEventListener('change', () => {
+    const family = document.getElementById('family-filter').value;
+    const setFilter = document.getElementById('filter-select');
+    setFilter.innerHTML = '<option value="all">All sets</option>';
+    const filtered = family === 'all' ? sets : sets.filter(s => s.family === family);
+    filtered.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.name} (${s.pieceCount})`;
+      setFilter.appendChild(opt);
+    });
+    renderGallery(sets, getOptions());
+  });
+}
+
+init();

@@ -1,0 +1,11 @@
+{
+  "id": "lichess-rhosgfx",
+  "name": "RhosGFX (CC0)",
+  "family": "chess",
+  "author": "RhosGFX",
+  "license": "CC0-1.0",
+  "source": "https://github.com/lichess-org/lila/tree/master/public/piece/rhosgfx",
+  "pieceCount": 12,
+  "authorUrl": "https://rhosgfx.itch.io/",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+}

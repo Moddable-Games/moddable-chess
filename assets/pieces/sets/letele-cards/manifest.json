@@ -1,0 +1,11 @@
+{
+  "id": "letele-cards",
+  "name": "Letele Cards",
+  "family": "playing-cards",
+  "author": "letele",
+  "license": "CC0-1.0",
+  "source": "https://github.com/letele/playing-cards",
+  "pieceCount": 56,
+  "authorUrl": "https://github.com/letele",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+}

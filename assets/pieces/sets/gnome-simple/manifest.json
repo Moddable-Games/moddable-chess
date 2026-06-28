@@ -1,0 +1,11 @@
+{
+  "id": "gnome-simple",
+  "name": "Gnome Simple",
+  "family": "chess",
+  "author": "Max Froumentin",
+  "license": "W3C",
+  "source": "https://github.com/GNOME/gnome-chess/tree/main/data/pieces/simple",
+  "pieceCount": 12,
+  "authorUrl": "W3C",
+  "licenseUrl": "https://www.w3.org/copyright/software-license-2023/"
+}

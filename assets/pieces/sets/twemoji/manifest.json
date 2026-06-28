@@ -1,0 +1,11 @@
+{
+  "id": "twemoji",
+  "name": "Twemoji",
+  "family": "emoji",
+  "author": "Twitter / jdecked",
+  "license": "CC-BY-4.0",
+  "source": "https://github.com/jdecked/twemoji",
+  "pieceCount": 358,
+  "authorUrl": "https://github.com/jdecked",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+}

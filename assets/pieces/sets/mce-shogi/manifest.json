@@ -1,0 +1,10 @@
+{
+  "id": "mce-shogi",
+  "name": "MCE Shogi (Original)",
+  "family": "shogi",
+  "author": "Mark Smalley",
+  "license": "MIT",
+  "source": "https://github.com/nicebadguy/moddable-chess",
+  "pieceCount": 28,
+  "licenseUrl": "https://opensource.org/licenses/MIT"
+}

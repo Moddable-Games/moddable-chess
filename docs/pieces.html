@@ -29,7 +29,7 @@
   <nav class="docs-toc" id="docs-toc"></nav>
   <div class="docs-body">
     <h1>Piece Gallery</h1>
-    <p class="intro">Visual catalogue of all piece sets available to the engine — 1,517 SVGs across 40 sets covering chess, fairy chess, xiangqi, janggi, shogi, sittuyin, makruk, draughts, go, and game tokens (emoji). Each set provides individual SVGs that can be mixed, matched, and composed via the piece-set-resolver fallback chain.</p>
+    <p class="intro" id="gallery-intro">Loading piece gallery...</p>
 
     <div class="gallery-controls">
       <label>
@@ -41,6 +41,12 @@
         <select id="view-select">
           <option value="by-set">By set</option>
           <option value="by-piece">By piece type</option>
+        </select>
+      </label>
+      <label>
+        <span>Family:</span>
+        <select id="family-filter">
+          <option value="all">All families</option>
         </select>
       </label>
       <label>
@@ -98,10 +104,11 @@
         <thead>
           <tr>
             <th>Set</th>
+            <th>Family</th>
             <th>Author</th>
             <th>License</th>
+            <th>Source</th>
             <th>Pieces</th>
-            <th>Notes</th>
           </tr>
         </thead>
         <tbody></tbody>

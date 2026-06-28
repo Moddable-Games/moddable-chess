@@ -1,0 +1,11 @@
+{
+  "id": "luffykudo-shogi-chess",
+  "name": "Luffykudo Shogi Chess",
+  "family": "shogi",
+  "author": "LuffyKudo / Jemierry J.I. Maglinte Jumawan",
+  "license": "CC-BY-SA-4.0",
+  "source": "https://github.com/LuffyKudo/JI-Chess-Themed-Shogi",
+  "pieceCount": 30,
+  "authorUrl": "https://github.com/LuffyKudo",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+}

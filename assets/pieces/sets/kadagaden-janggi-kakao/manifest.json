@@ -1,0 +1,11 @@
+{
+  "id": "kadagaden-janggi-kakao",
+  "name": "Kadagaden Janggi Kakao",
+  "family": "janggi",
+  "author": "Kadagaden",
+  "license": "CC-BY-4.0",
+  "source": "https://github.com/Kadagaden/chess-pieces",
+  "pieceCount": 14,
+  "authorUrl": "https://github.com/Kadagaden",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+}

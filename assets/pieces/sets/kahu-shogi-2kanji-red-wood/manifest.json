@@ -1,0 +1,11 @@
+{
+  "id": "kahu-shogi-2kanji-red-wood",
+  "name": "Kahu Shogi 2kanji Red Wood",
+  "family": "shogi",
+  "author": "Ka-hu",
+  "license": "CC-BY-4.0",
+  "source": "https://github.com/Ka-hu/shogi-pieces",
+  "pieceCount": 30,
+  "authorUrl": "Kadagaden",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+}

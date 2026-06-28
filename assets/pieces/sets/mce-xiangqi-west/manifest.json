@@ -1,0 +1,10 @@
+{
+  "id": "mce-xiangqi-west",
+  "name": "MCE Xiangqi Western",
+  "family": "xiangqi",
+  "author": "Mark Smalley",
+  "license": "MIT",
+  "source": "https://github.com/nicebadguy/moddable-chess",
+  "pieceCount": 14,
+  "licenseUrl": "https://opensource.org/licenses/MIT"
+}

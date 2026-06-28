@@ -1,0 +1,11 @@
+{
+  "id": "maurimo-celtic",
+  "name": "Maurimo Celtic",
+  "family": "chess",
+  "author": "Maurizio Monge",
+  "license": "MIT",
+  "source": "https://github.com/maurimo/chess-art",
+  "pieceCount": 12,
+  "authorUrl": "https://github.com/maurimo",
+  "licenseUrl": "https://opensource.org/licenses/MIT"
+}

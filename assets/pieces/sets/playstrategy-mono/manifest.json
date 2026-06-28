@@ -1,0 +1,10 @@
+{
+  "id": "playstrategy-mono",
+  "name": "Playstrategy Mono",
+  "family": "fairy-chess",
+  "author": "Thibault Duplessis and Colin M.L. Burnett",
+  "license": "GPL-2.0+",
+  "source": "https://github.com/lichess-org/lila/tree/master/public/piece/mono",
+  "pieceCount": 46,
+  "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
+}

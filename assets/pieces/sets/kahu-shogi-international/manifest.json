@@ -1,0 +1,11 @@
+{
+  "id": "kahu-shogi-international",
+  "name": "Kahu Shogi International",
+  "family": "shogi",
+  "author": "Ka-hu",
+  "license": "CC-BY-4.0",
+  "source": "https://github.com/Ka-hu/shogi-pieces",
+  "pieceCount": 30,
+  "authorUrl": "Kadagaden",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "fluent-emoji",
+  "name": "Fluent Emoji",
+  "family": "emoji",
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "source": "https://github.com/microsoft/fluentui-emoji",
+  "pieceCount": 358,
+  "authorUrl": "https://github.com/microsoft",
+  "licenseUrl": "https://opensource.org/licenses/MIT"
+}

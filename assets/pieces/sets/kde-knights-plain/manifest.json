@@ -1,0 +1,10 @@
+{
+  "id": "kde-knights-plain",
+  "name": "Kde Knights Plain",
+  "family": "chess",
+  "author": "KDE Project contributors",
+  "license": "GPL-2.0",
+  "source": "https://github.com/KDE/knights/tree/master/themes",
+  "pieceCount": 12,
+  "licenseUrl": "https://www.gnu.org/licenses/gpl-2.0.txt"
+}

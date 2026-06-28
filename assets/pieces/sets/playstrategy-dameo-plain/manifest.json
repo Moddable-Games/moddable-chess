@@ -1,0 +1,10 @@
+{
+  "id": "playstrategy-dameo-plain",
+  "name": "Playstrategy Dameo Plain",
+  "family": "draughts",
+  "author": "PlayStrategy / pychess.org contributors",
+  "license": "AGPL-3.0+",
+  "source": "https://github.com/Mind-Sports-Games/lila/tree/master/public/piece",
+  "pieceCount": 4,
+  "licenseUrl": "https://www.gnu.org/licenses/agpl-3.0.txt"
+}
