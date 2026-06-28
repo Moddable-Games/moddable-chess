@@ -481,7 +481,7 @@ function renderToolbar() {
   const modeInfo = document.createElement('span');
   modeInfo.className = 'toolbar-mode';
   if (gameMode === 'solo') {
-    const aiName = paramP2 !== 'Black' ? playerNames.b : 'AI';
+    const aiName = paramP2 !== 'Black' ? playerNames.b : 'The House';
     modeInfo.textContent = `${playerNames.w} vs ${aiName}`;
   } else {
     modeInfo.textContent = `${playerNames.w} vs ${playerNames.b}`;
