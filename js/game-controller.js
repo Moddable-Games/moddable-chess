@@ -467,6 +467,7 @@ function populateSetSelect(select) {
 
 function renderToolbar() {
   toolbarEl.innerHTML = '';
+  advancedPopup = null;
 
   const leftGroup = document.createElement('div');
   leftGroup.className = 'toolbar-group';
@@ -552,7 +553,7 @@ let advancedPopup = null;
 
 function toggleAdvancedPopup(anchor) {
   if (advancedPopup) {
-    advancedPopup.remove();
+    if (advancedPopup.parentElement) advancedPopup.remove();
     advancedPopup = null;
     return;
   }
