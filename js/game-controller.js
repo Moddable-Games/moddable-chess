@@ -478,6 +478,15 @@ function renderToolbar() {
   variantLabel.textContent = vc ? vc.label || currentVariant : 'Standard';
   leftGroup.appendChild(variantLabel);
 
+  const modeInfo = document.createElement('span');
+  modeInfo.className = 'toolbar-mode';
+  if (gameMode === 'solo') {
+    modeInfo.textContent = `${playerNames.w} vs AI`;
+  } else {
+    modeInfo.textContent = `${playerNames.w} vs ${playerNames.b}`;
+  }
+  leftGroup.appendChild(modeInfo);
+
   toolbarEl.appendChild(leftGroup);
 
   const rightGroup = document.createElement('div');

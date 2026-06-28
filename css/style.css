@@ -238,6 +238,19 @@ h1, h2, h3, h4 {
   min-width: 0;
 }
 
+.toolbar-mode {
+  font-size: 11px;
+  color: var(--play-text-muted);
+  margin-left: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+  .toolbar-mode { display: none; }
+}
+
 
 .toolbar-btn {
   display: inline-flex;
