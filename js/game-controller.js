@@ -996,6 +996,9 @@ function trackGameComplete(result) {
 
 function setStatus(text) {
   statusEl.textContent = text;
+  if (embedMode && window.parent !== window) {
+    window.parent.postMessage({ type: 'chess:status', text, gameOver, variant: currentVariant }, '*');
+  }
 }
 
 function updateStatus() {

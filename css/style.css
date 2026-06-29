@@ -652,6 +652,7 @@ h1, h2, h3, h4 {
 /* ─── Embed ─── */
 .embed-mode #center { display: flex !important; flex-direction: column; align-items: center; width: 100%; }
 .embed-mode #app { display: block; width: 100%; padding: 0; }
+.embed-mode #board-container { box-shadow: none; }
 
 /* ─── Animation ─── */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
