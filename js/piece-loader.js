@@ -1,9 +1,11 @@
 import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 
 export function loadManifestPieceDefs(manifestPath, setsDir) {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  const setDir = join(setsDir, manifest.path);
+  // New format: manifest co-located in set dir (no 'path' field)
+  // Old format: manifest.path points to set subdir under setsDir
+  const setDir = manifest.path ? join(setsDir, manifest.path) : dirname(manifestPath);
   const defs = {};
 
   for (const [key, file] of Object.entries(manifest.pieces)) {

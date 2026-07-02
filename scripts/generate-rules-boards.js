@@ -18,10 +18,11 @@ const RULES_ROOT = join(ROOT, '..', 'moddable-rules', 'games');
 function resolvePieces(board) {
   if (!board.pieceSet) return undefined;
   if (board.pieceSet.type === 'manifest') {
-    return loadManifestPieceDefs(
-      join(MANIFESTS_DIR, board.pieceSet.id + '.json'),
-      SETS_DIR
-    );
+    // Try co-located manifest (new format) before legacy manifests/ dir
+    const inSetPath = join(SETS_DIR, board.pieceSet.id, 'manifest.json');
+    const legacyPath = join(MANIFESTS_DIR, board.pieceSet.id + '.json');
+    const manifestPath = existsSync(inSetPath) ? inSetPath : legacyPath;
+    return loadManifestPieceDefs(manifestPath, SETS_DIR);
   }
   if (board.pieceSet.type === 'sprite') {
     return board.pieceSet.defs;
