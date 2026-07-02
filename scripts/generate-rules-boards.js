@@ -45,6 +45,9 @@ function resolvePosition(board) {
       style: p.style,
     });
   }
+  if (p.type === 'squares') {
+    return p.squares;
+  }
   return {};
 }
 
@@ -309,6 +312,121 @@ const UR_BOARDS = [{
   outputDir: join(RULES_ROOT, 'royal-ur', 'diagrams', 'svg'),
 }];
 
+// --- Tafl family ---
+
+const TAFL_COLORS = {
+  monoSquare: '#241a12',
+  gridLine: '#c8822a',
+  labelText: '#e8c896',
+  throneFill: '#c8822a',
+  cornerFill: '#2d5a3d',
+  edgeFill: '#c8822a',
+};
+
+const TAFL_KING = { type: 'token', color: 'white', label: 'K', fill: '#f5f0e0', stroke: '#3a2a1a' };
+const TAFL_DEFENDER = { type: 'token', color: 'white', label: 'D', fill: '#c8822a', stroke: '#5a3010' };
+const TAFL_ATTACKER = { type: 'token', color: 'black', label: 'A', fill: '#a8342a', stroke: '#5a1810' };
+
+function taflPosition({ king, defenders, attackers }) {
+  const position = { [king]: TAFL_KING };
+  for (const sq of defenders) position[sq] = TAFL_DEFENDER;
+  for (const sq of attackers) position[sq] = TAFL_ATTACKER;
+  return position;
+}
+
+function taflPerimeterMarkers(rows, cols) {
+  const lastCol = String.fromCharCode(97 + cols - 1);
+  const squares = new Set();
+  for (let c = 0; c < cols; c++) {
+    const file = String.fromCharCode(97 + c);
+    squares.add(`${file}${rows}`);
+    squares.add(`${file}1`);
+  }
+  for (let rank = 1; rank <= rows; rank++) {
+    squares.add(`a${rank}`);
+    squares.add(`${lastCol}${rank}`);
+  }
+  return [...squares].map(sq => ({ sq, kind: 'edge' }));
+}
+
+function taflCornerMarkers(rows, cols) {
+  const lastCol = String.fromCharCode(97 + cols - 1);
+  return [
+    { sq: `a1`, kind: 'corner' },
+    { sq: `a${rows}`, kind: 'corner' },
+    { sq: `${lastCol}1`, kind: 'corner' },
+    { sq: `${lastCol}${rows}`, kind: 'corner' },
+  ];
+}
+
+const TAFL_BOARDS = [
+  {
+    slug: 'tablut',
+    filename: 'board.svg',
+    title: 'Tablut — starting position',
+    rows: 9,
+    cols: 9,
+    markers: [{ sq: 'e5', kind: 'throne' }, ...taflPerimeterMarkers(9, 9)],
+    squares: taflPosition({
+      king: 'e5',
+      defenders: ['d5', 'c5', 'f5', 'g5', 'e4', 'e3', 'e6', 'e7'],
+      attackers: ['d1', 'e1', 'f1', 'e2', 'd9', 'e9', 'f9', 'e8', 'a4', 'a5', 'a6', 'b5', 'i4', 'i5', 'i6', 'h5'],
+    }),
+  },
+  {
+    slug: 'brandubh',
+    filename: 'board-brandubh.svg',
+    title: 'Brandubh — starting position',
+    rows: 7,
+    cols: 7,
+    markers: [{ sq: 'd4', kind: 'throne' }, ...taflCornerMarkers(7, 7)],
+    squares: taflPosition({
+      king: 'd4',
+      defenders: ['c4', 'e4', 'd3', 'd5'],
+      attackers: ['a4', 'b4', 'f4', 'g4', 'd1', 'd2', 'd6', 'd7'],
+    }),
+  },
+  {
+    slug: 'hnefatafl',
+    filename: 'board-hnefatafl.svg',
+    title: 'Hnefatafl — starting position',
+    rows: 11,
+    cols: 11,
+    markers: [{ sq: 'f6', kind: 'throne' }, ...taflCornerMarkers(11, 11)],
+    squares: taflPosition({
+      king: 'f6',
+      defenders: ['d6', 'e6', 'g6', 'h6', 'f4', 'f5', 'f7', 'f8', 'e5', 'g5', 'e7', 'g7'],
+      attackers: ['d1', 'e1', 'f1', 'g1', 'h1', 'f2', 'd11', 'e11', 'f11', 'g11', 'h11', 'f10', 'a4', 'a5', 'a6', 'a7', 'a8', 'b6', 'k4', 'k5', 'k6', 'k7', 'k8', 'j6'],
+    }),
+  },
+  {
+    slug: 'tawlbwrdd',
+    filename: 'board-tawlbwrdd.svg',
+    title: 'Tawlbwrdd — starting position',
+    rows: 11,
+    cols: 11,
+    markers: [{ sq: 'f6', kind: 'throne' }, ...taflPerimeterMarkers(11, 11)],
+    squares: taflPosition({
+      king: 'f6',
+      defenders: ['d6', 'e6', 'g6', 'h6', 'f4', 'f5', 'f7', 'f8', 'e5', 'g5', 'e7', 'g7'],
+      attackers: ['d1', 'e1', 'f1', 'g1', 'h1', 'f2', 'd11', 'e11', 'f11', 'g11', 'h11', 'f10', 'a4', 'a5', 'a6', 'a7', 'a8', 'b6', 'k4', 'k5', 'k6', 'k7', 'k8', 'j6'],
+    }),
+  },
+].map(b => ({
+  slug: b.slug,
+  filename: b.filename,
+  title: b.title,
+  provider: 'mono-grid',
+  rows: b.rows,
+  cols: b.cols,
+  tileSize: 36,
+  showLabels: true,
+  colors: TAFL_COLORS,
+  providerOpts: { markers: b.markers },
+  position: { type: 'squares', squares: b.squares },
+  outputDir: join(RULES_ROOT, 'tafl', 'diagrams', 'svg'),
+}));
+
 // === Generation pipeline ===
 
 let generated = 0;
@@ -327,6 +445,7 @@ function generate(board) {
     showLabels: board.showLabels,
     position,
     pieceDefs,
+    colors: board.colors,
     ...(board.providerOpts || {}),
   };
 
@@ -358,6 +477,7 @@ const ALL_BOARDS = [
   ...UR_BOARDS,
   ...XIANGQI_BOARDS,
   ...SHOGI_BOARDS,
+  ...TAFL_BOARDS,
 ];
 
 // --- Run ---
