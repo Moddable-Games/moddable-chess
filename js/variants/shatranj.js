@@ -33,7 +33,7 @@ MCE.registerVariant('shatranj', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('bare-')) {
-      return helpers.nameFor(status === 'bare-w' ? 'w' : 'b') + ' wins — bare king!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'bare-w' ? 'w' : 'b'))) + ' — bare king!';
     }
     return null;
   },

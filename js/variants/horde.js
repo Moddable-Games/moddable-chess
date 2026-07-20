@@ -51,7 +51,7 @@ MCE.registerVariant('horde', {
   statusText: function(g, helpers) {
     if (!helpers.gameOver) return null;
     if (helpers.variantStatus === 'horde-b') {
-      return helpers.nameFor('b') + ' wins — horde eliminated!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor('b'))) + ' — horde eliminated!';
     }
     return null;
   },

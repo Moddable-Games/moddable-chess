@@ -52,7 +52,7 @@ MCE.registerVariant('giveaway', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('antichess-')) {
-      return helpers.nameFor(status === 'antichess-w' ? 'w' : 'b') + ' wins — lost all pieces!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'antichess-w' ? 'w' : 'b'))) + ' — lost all pieces!';
     }
     return null;
   },

@@ -45,7 +45,7 @@ MCE.registerVariant('codrus', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('codrus-')) {
-      return helpers.nameFor(status === 'codrus-w' ? 'w' : 'b') + ' wins — sacrificed their king!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'codrus-w' ? 'w' : 'b'))) + ' — sacrificed their king!';
     }
     return null;
   },

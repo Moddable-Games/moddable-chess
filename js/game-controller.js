@@ -989,6 +989,7 @@ function handleUndoCallback(count) {
 
 function nameFor(color) { return color === MCE.WHITE ? playerNames.w : playerNames.b; }
 function nameForOpp(color) { return color === MCE.WHITE ? playerNames.b : playerNames.w; }
+function winsText(name) { return name === 'You' ? 'win' : 'wins'; }
 
 function trackGameComplete(result) {
   track('game_complete', { variant_name: currentVariant, result: result, move_count: ctrl ? ctrl.getState().undoStackLength : 0 });
@@ -1015,21 +1016,23 @@ function updateStatus() {
   }
 
   if (vc && vc.statusText) {
-    const custom = vc.statusText(game, { nameFor, nameForOpp, gameOver, variantStatus });
+    const custom = vc.statusText(game, { nameFor, nameForOpp, winsText, gameOver, variantStatus });
     if (custom) { setStatus(custom); return; }
   }
 
   if (variantStatus) {
     if (variantStatus === 'checkmate') {
-      setStatus('Checkmate — ' + nameForOpp(game.turn) + ' wins!');
+      const w = nameForOpp(game.turn);
+      setStatus('Checkmate — ' + w + ' ' + winsText(w) + '!');
     } else if (variantStatus === 'stalemate') {
       setStatus('Stalemate — draw');
     } else if (variantStatus.endsWith('-w')) {
-      setStatus(playerNames.w + ' wins!');
+      setStatus(playerNames.w + ' ' + winsText(playerNames.w) + '!');
     } else if (variantStatus.endsWith('-b')) {
-      setStatus(playerNames.b + ' wins!');
+      setStatus(playerNames.b + ' ' + winsText(playerNames.b) + '!');
     } else {
-      setStatus(nameForOpp(game.turn) + ' wins!');
+      const w = nameForOpp(game.turn);
+      setStatus(w + ' ' + winsText(w) + '!');
     }
     return;
   }
@@ -1039,15 +1042,18 @@ function updateStatus() {
   if (status === 'checkmate') {
     gameOver = true;
     trackGameComplete('checkmate');
-    setStatus('Checkmate — ' + nameForOpp(game.turn) + ' wins!');
+    const w = nameForOpp(game.turn);
+    setStatus('Checkmate — ' + w + ' ' + winsText(w) + '!');
   } else if (status === 'stalemate') {
     gameOver = true;
     trackGameComplete('stalemate');
     const sm = game.stalemateMeaning || 'draw';
     if (sm === 'loss') {
-      setStatus(nameForOpp(game.turn) + ' wins — opponent stalemated!');
+      const w = nameForOpp(game.turn);
+      setStatus(w + ' ' + winsText(w) + ' — opponent stalemated!');
     } else if (sm === 'win') {
-      setStatus(nameForOpp(game.turn) + ' wins — stalemate!');
+      const w = nameForOpp(game.turn);
+      setStatus(w + ' ' + winsText(w) + ' — stalemate!');
     } else {
       setStatus('Stalemate — draw');
     }
@@ -1071,7 +1077,8 @@ function updateStatus() {
       if (game.checkCount[game.turn] >= threshold) {
         gameOver = true;
         trackGameComplete('check-threshold');
-        setStatus(nameForOpp(game.turn) + ' wins — ' + threshold + (threshold === 1 ? ' check!' : ' checks!'));
+        const w = nameForOpp(game.turn);
+        setStatus(w + ' ' + winsText(w) + ' — ' + threshold + (threshold === 1 ? ' check!' : ' checks!'));
       }
     }
   } else {

@@ -51,7 +51,7 @@ MCE.registerVariant('knightmate', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('knightmate-')) {
-      return helpers.nameFor(status === 'knightmate-w' ? 'w' : 'b') + ' wins — royal knight captured!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'knightmate-w' ? 'w' : 'b'))) + ' — royal knight captured!';
     }
     return null;
   },

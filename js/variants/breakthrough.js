@@ -61,7 +61,7 @@ MCE.registerVariant('breakthrough', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('breakthrough-')) {
-      return helpers.nameFor(status === 'breakthrough-w' ? 'w' : 'b') + ' wins — reached the far rank!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'breakthrough-w' ? 'w' : 'b'))) + ' — reached the far rank!';
     }
     return null;
   },

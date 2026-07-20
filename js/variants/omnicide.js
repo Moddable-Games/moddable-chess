@@ -37,7 +37,7 @@ MCE.registerVariant('omnicide', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('omnicide-')) {
-      return helpers.nameFor(status === 'omnicide-w' ? 'w' : 'b') + ' wins — all pieces captured!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'omnicide-w' ? 'w' : 'b'))) + ' — all pieces captured!';
     }
     return null;
   },

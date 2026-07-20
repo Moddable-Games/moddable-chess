@@ -100,7 +100,7 @@ MCE.registerVariant('atomic', {
     var status = helpers.variantStatus;
     if (status === 'atomic-draw') return 'Draw — both kings destroyed!';
     if (status && status.startsWith('atomic-')) {
-      return helpers.nameFor(status === 'atomic-w' ? 'w' : 'b') + ' wins — king exploded!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'atomic-w' ? 'w' : 'b'))) + ' — king exploded!';
     }
     return null;
   },

@@ -78,7 +78,7 @@ MCE.registerVariant('benedictChess', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('benedict-')) {
-      return helpers.nameFor(status === 'benedict-w' ? 'w' : 'b') + ' wins — king converted!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'benedict-w' ? 'w' : 'b'))) + ' — king converted!';
     }
     return null;
   },

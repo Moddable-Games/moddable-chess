@@ -55,7 +55,7 @@ MCE.registerVariant('racingKings', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('race-')) {
-      return helpers.nameFor(status === 'race-w' ? 'w' : 'b') + ' wins — reached rank 8!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'race-w' ? 'w' : 'b'))) + ' — reached rank 8!';
     }
     return null;
   },

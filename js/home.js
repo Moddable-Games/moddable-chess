@@ -67,12 +67,12 @@ fetch('data/variants.json')
 
       filtered.forEach(v => {
         const card = document.createElement('a');
-        card.href = 'play/?variant=' + encodeURIComponent(v.key);
+        card.href = 'play/?variant=' + encodeURIComponent(v.slug || v.key);
         card.className = 'mc-variant-card';
         card.innerHTML =
-          '<div class="mc-variant-card__name">' + v.name + '</div>' +
+          '<div class="mc-variant-card__name">' + (v.title || v.name) + '</div>' +
           '<div class="mc-variant-card__board">' + v.board + '</div>' +
-          '<div class="mc-variant-card__desc">' + v.desc + '</div>';
+          '<div class="mc-variant-card__desc">' + (v.special || v.desc || '') + '</div>';
         grid.appendChild(card);
       });
 

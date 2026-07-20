@@ -38,7 +38,7 @@ MCE.registerVariant('shatar', {
     if (!helpers.gameOver) return null;
     var status = helpers.variantStatus;
     if (status && status.startsWith('shatar-')) {
-      return helpers.nameFor(status === 'shatar-w' ? 'w' : 'b') + ' wins — bare king!';
+      return ((function(n){return n+' '+(helpers.winsText?helpers.winsText(n):'wins')})(helpers.nameFor(status === 'shatar-w' ? 'w' : 'b'))) + ' — bare king!';
     }
     return null;
   },
